@@ -1,19 +1,47 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Noto_Sans_KR } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-sans-kr",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "readme.fm",
-  description: "YouTube 링크로 GitHub README용 음악 카드를 만드는 서비스",
+  title: "readme.fm — Turn a YouTube link into a README music card",
+  description:
+    "Paste a YouTube link, choose a style, and create a music card for your GitHub README.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: "#f8f9fb",
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" className={cn("font-sans", geist.variable)}>
-      <body>{children}</body>
+    <html
+      lang="ko"
+      suppressHydrationWarning
+      className={notoSansKr.variable}
+    >
+      <head>
+        <Script
+          id="readme-fm-theme"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('readme-fm-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()",
+          }}
+        />
+      </head>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }
