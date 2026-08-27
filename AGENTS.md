@@ -11,6 +11,7 @@ readme.fm은 YouTube 링크로 GitHub README용 음악 카드를 만드는 서�
 | GitHub 이슈, 브랜치, 커밋, PR, 리뷰 대응 | `.agents/skills/github-workflow/SKILL.md` | `docs/agents/github.md` |
 | PR 리뷰 및 리뷰 코멘트 후보 작성 | `.agents/skills/pr-review/SKILL.md` | `docs/agents/pr-review.md` |
 | 트러블슈팅·기술 문서의 초안과 저장 | `.agents/skills/tech-documentation/SKILL.md` | `docs/agents/troubleshooting.md` 또는 `docs/agents/tech-note.md` |
+| 프론트엔드·백엔드 관점이 함께 필요한 기능 개발 | `.agents/skills/multi-agent-orchestration/SKILL.md` | `docs/agents/multi-agent.md` |
 
 여러 작업 성격이 겹치면 관련 Skill과 정책 문서를 함께 확인한다. 정책·정의는 `docs/agents`를 단일 기준으로 삼고, Skill에는 실행 절차만 둔다.
 
