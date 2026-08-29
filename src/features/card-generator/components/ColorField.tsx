@@ -49,7 +49,7 @@ export function ColorField({
         <Popover>
           <PopoverTrigger
             aria-label={`${label} 색 선택`}
-            className="size-6 shrink-0 rounded-md border border-border/80 ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="size-6 shrink-0 cursor-pointer rounded-md border border-border/80 ring-offset-background transition-shadow hover:ring-2 hover:ring-ring/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             style={{ backgroundColor: value }}
           />
           <PopoverContent align="end" className="w-64 p-3">
@@ -148,7 +148,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
             }}
             aria-label={swatch}
             className={cn(
-              'size-5 rounded-md border transition-transform hover:scale-110',
+              'size-5 cursor-pointer rounded-md border transition-transform hover:scale-110',
               swatch === value ? 'border-primary' : 'border-border/70',
             )}
             style={{ backgroundColor: swatch }}

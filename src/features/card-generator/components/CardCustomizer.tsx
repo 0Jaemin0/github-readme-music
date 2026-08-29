@@ -38,7 +38,7 @@ export function CardCustomizer({
           <ColorField label="가수" value={theme.muted} onChange={(v) => set('muted', v)} />
           <ColorField label="포인트" value={theme.accent} onChange={(v) => set('accent', v)} />
         </div>
-        <label className="mt-3 flex cursor-pointer items-center gap-2 text-[13px] leading-5 text-muted-foreground">
+        <label className="mt-3 inline-flex w-fit cursor-pointer items-center gap-2 text-[13px] leading-5 text-muted-foreground">
           <input
             type="checkbox"
             checked={theme.gradient}

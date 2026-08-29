@@ -14,9 +14,6 @@ export const metadata: Metadata = {
   title: "readme.fm — Turn a YouTube link into a README music card",
   description:
     "Paste a YouTube link, choose a style, and create a music card for your GitHub README.",
-  icons: {
-    icon: "/icon.svg",
-  },
 };
 
 export const viewport: Viewport = {
