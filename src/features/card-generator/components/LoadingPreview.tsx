@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function LoadingPreview() {
   return (
-    <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
+    <div role="status" aria-live="polite" className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
       <div className="flex items-center gap-3">
         <div className="flex h-8 items-end gap-1" aria-hidden="true">
           {[0, 1, 2, 3].map((bar) => (

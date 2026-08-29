@@ -2,7 +2,7 @@ import { CardCustomizer } from "./CardCustomizer";
 import { CardMetadataFields } from "./CardMetadataFields";
 import { CardPreviewPanel } from "./CardPreviewPanel";
 import { MarkdownSnippet } from "./MarkdownSnippet";
-import type { CardMeta, CardStyleId, CardTheme, Track } from "../model/types";
+import type { CardMeta, CardStyleId, CardTheme, CoverPosition, Track } from "../model/types";
 
 type CardResultProps = {
   track: Track;
@@ -13,6 +13,7 @@ type CardResultProps = {
   markdown: string;
   copied: boolean;
   onMetaChange: (meta: CardMeta) => void;
+  onCoverPositionChange: (position: CoverPosition) => void;
   onStyleChange: (style: CardStyleId) => void;
   onProgressChange: (progressSeconds: number) => void;
   onThemeChange: (theme: CardTheme) => void;
@@ -28,6 +29,7 @@ export function CardResult({
   markdown,
   copied,
   onMetaChange,
+  onCoverPositionChange,
   onStyleChange,
   onProgressChange,
   onThemeChange,
@@ -35,7 +37,12 @@ export function CardResult({
 }: CardResultProps) {
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card/40 p-4 sm:p-8">
-      <CardMetadataFields meta={meta} track={track} onChange={onMetaChange} />
+      <CardMetadataFields
+        meta={meta}
+        track={track}
+        onChange={onMetaChange}
+        onCoverPositionChange={onCoverPositionChange}
+      />
       <CardPreviewPanel
         track={track}
         meta={meta}

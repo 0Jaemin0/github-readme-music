@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Pause, SkipBack, SkipForward } from "lucide-react";
+import { ImageOff, Pause, SkipBack, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { withAlpha } from "../lib/color";
 import { durationToSeconds, formatDuration } from "../lib/time";
 import type { CardMeta, CardStyleId, CardTheme, Track } from "../model/types";
 
-const CARD_STYLE = { player: "flex aspect-[2.1/1] flex-col p-5", playerCover: "size-15", title: "text-base leading-6", artist: "text-[13px]", progress: "h-1.5", duration: "text-[12px]", controls: "gap-10 [&>svg]:size-[30px]", compact: "gap-3 px-4 py-2.5", compactCover: "size-8", compactTitle: "text-[13px]", vertical: "aspect-[1/1.6] gap-5 p-5", verticalTitle: "text-lg" } as const;
+const CARD_STYLE = { player: "flex aspect-[2.1/1] flex-col p-5", playerCover: "size-15", title: "text-base leading-6", artist: "text-[13px]", progress: "h-1.5", duration: "text-[12px]", controls: "gap-10 [&>svg]:size-[30px]", compact: "gap-3 px-4 py-2", compactCover: "size-8", compactTitle: "text-[13px]", vertical: "aspect-[1/1.6] gap-5 p-5", verticalTitle: "text-lg" } as const;
 
 type CardProps = {
   track: Track;
@@ -88,7 +88,26 @@ function VerticalCard({ track, meta, theme, sizeStyle, className, shellStyle, pr
 }
 
 function CoverImage({ track, title, className }: { track: Track; title: string; className: string }) {
-  return <div className={cn("relative overflow-hidden rounded-[8px]", className)}><Image src={track.cover || "/placeholder.svg"} alt={`${title} cover art`} fill sizes="(max-width: 640px) 320px, 384px" className="object-cover" /></div>;
+  const [failedCover, setFailedCover] = useState<string | null>(null);
+  const hasImageError = failedCover === track.cover;
+
+  return (
+    <div className={cn("relative flex items-center justify-center overflow-hidden rounded-[8px] bg-muted/60", className)}>
+      {track.cover && !hasImageError ? (
+        <Image
+          src={track.cover}
+          alt={`${title} cover art`}
+          fill
+          sizes="(max-width: 640px) 320px, 384px"
+          className="object-cover"
+          style={{ objectPosition: `${track.coverPosition.x}% ${track.coverPosition.y}%` }}
+          onError={() => setFailedCover(track.cover)}
+        />
+      ) : (
+        <ImageOff className="size-1/3 text-muted-foreground/70" aria-label="앨범 커버를 불러올 수 없습니다" />
+      )}
+    </div>
+  );
 }
 
 function ProgressBar({ color, heightClassName, progress }: { color: string; heightClassName: string; progress: number }) {

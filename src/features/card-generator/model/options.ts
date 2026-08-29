@@ -13,12 +13,12 @@ export const CARD_OUTPUT_WIDTHS: Record<CardStyleId, number> = {
 };
 
 export const DEFAULT_THEME: CardTheme = {
-  background: "#12161c",
-  border: "#262d38",
+  background: "#0a0a0a",
+  border: "#262626",
   borderWidth: 1,
   radius: 22,
-  text: "#e9edf2",
-  muted: "#8c95a3",
-  accent: "#f5b544",
+  text: "#fafafa",
+  muted: "#a3a3a3",
+  accent: "#fafafa",
   gradient: false,
 };

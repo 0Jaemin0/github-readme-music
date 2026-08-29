@@ -24,6 +24,7 @@ export function CardGenerator() {
           <CardResult
             track={cardGenerator.track}
             meta={cardGenerator.meta}
+            onCoverPositionChange={cardGenerator.updateCoverPosition}
             style={cardGenerator.style}
             progressSeconds={cardGenerator.progressSeconds}
             theme={cardGenerator.theme}
