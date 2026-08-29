@@ -84,8 +84,8 @@ function renderPlayerCard(data: SvgCardData) {
     ${cardGradient(data, "player-gradient")}
     <rect x="0.5" y="0.5" width="379" height="180" rx="${data.theme.radius}" fill="${backgroundFill(data)}" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}" />
     ${coverImage(data, 20, 20, coverSize, "player-cover")}
-    ${text(data.title, 96, 47, 16, data.theme.text, 600, 242)}
-    ${text(data.artist, 96, 67, 13, data.theme.muted, 400, 242)}
+    ${tickerText(data.title, 96, 47, 16, data.theme.text, 600, 232, "player-title")}
+    ${tickerText(data.artist, 96, 67, 13, data.theme.muted, 400, 232, "player-artist")}
     ${waveform(data.theme.accent, 338, 30)}
     ${text(formatDuration(data.progressSeconds), 20, 113, 12, data.theme.muted, 500)}
     ${progressBar(data, 72, 105, 236, 6, progress)}
@@ -102,9 +102,8 @@ function renderCompactCard(data: SvgCardData) {
     ${cardGradient(data, "compact-gradient")}
     <rect x="0.5" y="0.5" width="459" height="63" rx="${Math.min(data.theme.radius, 20)}" fill="${backgroundFill(data)}" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}" />
     ${coverImage(data, 16, 16, 32, "compact-cover")}
-    ${text(data.title, 62, 30, 13, data.theme.text, 600, 290)}
-    ${text(data.artist, 62, 47, 13, data.theme.muted, 400, 290)}
-    ${text(data.duration, 422, 37, 12, data.theme.muted, 500, 26, "end")}
+    ${compactTicker(data.title, data.artist, 62, 38, data.theme.text, data.theme.muted)}
+    ${text(data.duration, 444, 37, 12, data.theme.muted, 500, undefined, "end")}
   `);
 }
 
@@ -119,8 +118,8 @@ function renderVerticalCard(data: SvgCardData) {
     ${cardGradient(data, "vertical-gradient")}
     <rect x="0.5" y="0.5" width="259" height="415" rx="${data.theme.radius}" fill="${backgroundFill(data)}" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}" />
     ${coverImage(data, 31, 22, coverSize, "vertical-cover")}
-    ${text(data.title, 22, 248, 18, data.theme.text, 600, 216)}
-    ${text(data.artist, 22, 269, 13, data.theme.muted, 400, 216)}
+    ${tickerText(data.title, 22, 248, 18, data.theme.text, 600, 216, "vertical-title")}
+    ${tickerText(data.artist, 22, 269, 13, data.theme.muted, 400, 216, "vertical-artist")}
     ${progressBar(data, 22, 294, 216, 6, progress)}
     ${text(formatDuration(data.progressSeconds), 22, 319, 12, data.theme.muted, 500)}
     ${text(`-${formatDuration(totalSeconds - data.progressSeconds)}`, 238, 319, 12, data.theme.muted, 500, 80, "end")}
@@ -156,16 +155,47 @@ function progressBar(data: SvgCardData, x: number, y: number, width: number, hei
 }
 
 function playerControls(color: string, x: number, y: number, scale: number) {
-  return `<g transform="translate(${x} ${y}) scale(${scale})" fill="${color}"><path d="M-82 -11v22l-17-11zM-61 -11v22l-17-11z"/><rect x="-9" y="-15" width="7" height="30" rx="2"/><rect x="3" y="-15" width="7" height="30" rx="2"/><path d="M82 -11v22l17-11l-17-11zM61 -11v22l17-11z"/></g>`;
+  return `<g transform="translate(${x} ${y}) scale(${scale})" fill="${color}"><path d="M-84 -12v24l-18-12zM-62 -12v24l-18-12z"/><rect x="-9" y="-17" width="8" height="34" rx="2"/><rect x="4" y="-17" width="8" height="34" rx="2"/><path d="M84 -12v24l18-12zM62 -12v24l18-12z"/></g>`;
 }
 
 function waveform(color: string, x: number, y: number) {
-  return [10, 18, 27, 15, 24, 12].map((height, index) => `<rect x="${x + index * 6}" y="${y + (28 - height) / 2}" width="3" height="${height}" rx="1.5" fill="${withAlpha(color, 0.75)}"/>`).join("");
+  return [10, 18, 27, 15, 24, 12].map((height, index) => {
+    const low = Math.max(8, height - 8);
+    const high = Math.min(28, height + 8);
+    const delay = (index * 0.12).toFixed(2);
+    return `<rect x="${x + index * 6}" y="${y + (28 - height) / 2}" width="3" height="${height}" rx="1.5" fill="${withAlpha(color, 0.75)}"><animate attributeName="height" values="${height};${high};${low};${height}" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="y" values="${y + (28 - height) / 2};${y + (28 - high) / 2};${y + (28 - low) / 2};${y + (28 - height) / 2}" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/></rect>`;
+  }).join("");
 }
 
 function text(value: string, x: number, y: number, fontSize: number, color: string, weight: number, maxWidth?: number, anchor = "start") {
   const clipped = truncate(value, maxWidth ? Math.floor(maxWidth / (fontSize * 0.82)) : 80);
   return `<text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}" text-anchor="${anchor}">${escapeXml(clipped)}</text>`;
+}
+
+function tickerText(value: string, x: number, y: number, fontSize: number, color: string, weight: number, width: number, id: string) {
+  const estimatedWidth = value.length * fontSize * 0.82;
+  if (estimatedWidth <= width) return text(value, x, y, fontSize, color, weight, width);
+
+  const gap = 28;
+  const distance = estimatedWidth + gap;
+  const duration = Math.max(7, Math.min(18, Math.ceil(value.length / 2)));
+  const clipY = y - fontSize * 1.05;
+  const content = escapeXml(value);
+
+  return `<defs><clipPath id="${id}-clip"><rect x="${x}" y="${clipY}" width="${width}" height="${fontSize * 1.4}"/></clipPath></defs><g clip-path="url(#${id}-clip)"><g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${distance} 0" dur="${duration}s" begin="1s" repeatCount="indefinite"/><text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}">${content}</text><text x="${x + distance}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}">${content}</text></g></g>`;
+}
+
+function compactTicker(title: string, artist: string, x: number, y: number, textColor: string, mutedColor: string) {
+  const titleWidth = title.length * 13 * 0.82;
+  const artistX = x + titleWidth + 10;
+  const artistWidth = artist.length * 13 * 0.82;
+  const width = 324;
+  const contentWidth = titleWidth + 10 + artistWidth;
+  const gap = 30;
+  const distance = contentWidth + gap;
+  const duration = Math.max(7, Math.min(18, Math.ceil((title.length + artist.length) / 2)));
+
+  return `<defs><clipPath id="compact-ticker-clip"><rect x="${x}" y="${y - 15}" width="${width}" height="20"/></clipPath></defs><g clip-path="url(#compact-ticker-clip)"><g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${distance} 0" dur="${duration}s" begin="1s" repeatCount="indefinite"/><text x="${x}" y="${y}" fill="${textColor}" font-size="13" font-weight="600">${escapeXml(title)}</text><text x="${artistX}" y="${y}" fill="${mutedColor}" font-size="13" font-weight="400">${escapeXml(artist)}</text><text x="${x + distance}" y="${y}" fill="${textColor}" font-size="13" font-weight="600">${escapeXml(title)}</text><text x="${artistX + distance}" y="${y}" fill="${mutedColor}" font-size="13" font-weight="400">${escapeXml(artist)}</text></g></g>`;
 }
 
 function readStyle(value: string | null): CardStyleId {
