@@ -17,15 +17,22 @@ export type CardTheme = {
   gradient: boolean;
 };
 
+export type CoverPosition = {
+  x: number;
+  y: number;
+};
+
 export type Track = {
   videoId: string;
   title: string;
   channel: string;
   duration: string;
-  views: string;
   cover: string;
+  coverPosition: CoverPosition;
   waveform: number[];
 };
+
+export type YouTubeMetadata = Pick<Track, "videoId" | "title" | "channel" | "duration" | "cover">;
 
 export type CardMeta = {
   title: string;
