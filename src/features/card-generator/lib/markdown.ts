@@ -1,5 +1,6 @@
 import { CARD_OUTPUT_WIDTHS } from "../model/options";
 import type { CardMeta, CardStyleId, CardTheme, Track } from "../model/types";
+import { createSvgCardParams } from "./svg-card";
 
 export function buildMarkdown(
   track: Track,
@@ -7,25 +8,15 @@ export function buildMarkdown(
   meta: CardMeta,
   theme: CardTheme,
   progressSeconds: number,
+  origin: string,
 ): string {
-  const youtubeUrl = `https://www.youtube.com/watch?v=${track.videoId}`;
-  const params = new URLSearchParams({
-    style,
-    title: meta.title,
-    artist: meta.artist,
-    bg: theme.background.replace("#", ""),
-    border: theme.border.replace("#", ""),
-    text: theme.text.replace("#", ""),
-    accent: theme.accent.replace("#", ""),
-    gradient: theme.gradient ? "1" : "0",
-    bw: String(theme.borderWidth),
-    r: String(theme.radius),
-    progress: String(Math.floor(progressSeconds)),
-  });
-  const cardUrl = `https://readme.fm/card/${track.videoId}.svg?${params.toString()}`;
+  const youtubeUrl = new URL(`https://www.youtube.com/watch?v=${track.videoId}`);
+  if (progressSeconds > 0) youtubeUrl.searchParams.set("t", String(Math.floor(progressSeconds)));
+  const params = createSvgCardParams(track, style, meta, theme, progressSeconds);
+  const cardUrl = `${origin.replace(/\/$/, "")}/card/${track.videoId}.svg?${params.toString()}`;
   const alt = escapeHtmlAttribute(`${meta.title} — ${meta.artist}`);
 
-  return `<a href="${youtubeUrl}"><img src="${cardUrl}" alt="${alt}" width="${CARD_OUTPUT_WIDTHS[style]}" /></a>`;
+  return `<a href="${youtubeUrl.toString()}" target="_blank" rel="noopener noreferrer"><img src="${cardUrl}" alt="${alt}" width="${CARD_OUTPUT_WIDTHS[style]}" /></a>`;
 }
 
 function escapeHtmlAttribute(value: string) {

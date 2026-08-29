@@ -31,7 +31,7 @@ export function useCardGenerator() {
   useEffect(() => () => abortControllerRef.current?.abort(), []);
 
   const markdown = useMemo(
-    () => (track ? buildMarkdown(track, style, meta, theme, progressSeconds) : ""),
+    () => (track ? buildMarkdown(track, style, meta, theme, progressSeconds, window.location.origin) : ""),
     [meta, progressSeconds, style, theme, track],
   );
 
