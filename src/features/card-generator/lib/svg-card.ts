@@ -96,28 +96,28 @@ function renderPlayerCard(data: SvgCardData) {
 
 function renderCompactCard(data: SvgCardData) {
   const width = 460;
-  const height = 64;
+  const height = 48;
 
   return svgDocument(width, height, `
     ${cardGradient(data, "compact-gradient")}
-    <rect x="0.5" y="0.5" width="459" height="63" rx="${Math.min(data.theme.radius, 20)}" fill="${backgroundFill(data)}" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}" />
-    ${coverImage(data, 16, 16, 32, "compact-cover")}
-    ${compactTicker(data.title, data.artist, 62, 38, data.theme.text, data.theme.muted)}
-    ${text(data.duration, 444, 37, 12, data.theme.muted, 500, undefined, "end")}
+    <rect x="0.5" y="0.5" width="459" height="47" rx="${Math.min(data.theme.radius, 20)}" fill="${backgroundFill(data)}" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}" />
+    ${coverImage(data, 16, 9, 30, "compact-cover")}
+    ${compactTicker(data.title, data.artist, 58, 29, data.theme.text, data.theme.muted)}
+    ${text(data.duration, 444, 29, 12, data.theme.muted, 500, undefined, "end")}
   `);
 }
 
 function renderVerticalCard(data: SvgCardData) {
   const width = 260;
   const height = 416;
-  const coverSize = 198;
+  const coverSize = 200;
   const totalSeconds = durationToSeconds(data.duration);
   const progress = totalSeconds ? Math.max(1, (data.progressSeconds / totalSeconds) * 100) : 1;
 
   return svgDocument(width, height, `
     ${cardGradient(data, "vertical-gradient")}
     <rect x="0.5" y="0.5" width="259" height="415" rx="${data.theme.radius}" fill="${backgroundFill(data)}" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}" />
-    ${coverImage(data, 31, 22, coverSize, "vertical-cover")}
+    ${coverImage(data, 30, 20, coverSize, "vertical-cover")}
     ${tickerText(data.title, 22, 248, 18, data.theme.text, 600, 216, "vertical-title")}
     ${tickerText(data.artist, 22, 269, 13, data.theme.muted, 400, 216, "vertical-artist")}
     ${progressBar(data, 22, 294, 216, 6, progress)}

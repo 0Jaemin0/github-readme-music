@@ -8,7 +8,7 @@ import { withAlpha } from "../lib/color";
 import { durationToSeconds, formatDuration } from "../lib/time";
 import type { CardMeta, CardStyleId, CardTheme, Track } from "../model/types";
 
-const CARD_STYLE = { player: "flex aspect-[2.1/1] flex-col p-5", playerCover: "size-15", title: "text-base leading-6", artist: "text-[13px]", progress: "h-1.5", duration: "text-[12px]", controls: "gap-10 [&>svg]:size-[30px]", compact: "gap-3 px-4 py-2", compactCover: "size-8", compactTitle: "text-[13px]", vertical: "aspect-[1/1.6] gap-5 p-5", verticalTitle: "text-lg" } as const;
+const CARD_STYLE = { player: "flex h-[181px] flex-col p-5", playerCover: "size-[60px]", title: "text-base leading-6", artist: "text-[13px]", progress: "h-1.5", duration: "text-[12px]", controls: "gap-10 [&>svg]:size-[30px]", compact: "h-12 gap-3 px-4 py-2", compactCover: "size-[30px]", compactTitle: "text-[13px]", vertical: "h-[416px] gap-5 p-5", verticalTitle: "text-lg" } as const;
 
 type CardProps = {
   track: Track;
@@ -74,7 +74,7 @@ function VerticalCard({ track, meta, theme, sizeStyle, className, shellStyle, pr
   const progress = totalSeconds ? (currentSeconds / totalSeconds) * 100 : 0;
 
   return <figure className={cn("flex w-full flex-col overflow-hidden border", sizeStyle.vertical, className)} style={shellStyle}>
-    <CoverImage track={track} title={meta.title} className="aspect-square w-[92%] self-center" />
+    <CoverImage track={track} title={meta.title} className="size-[200px] shrink-0 self-center" />
     <div className="min-w-0">
       <div className="min-w-0 flex-1">
         <FlowingText text={meta.title} className={cn("font-semibold tracking-[-0.015em]", sizeStyle.verticalTitle)} />
