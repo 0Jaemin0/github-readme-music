@@ -12,11 +12,22 @@ export function buildMarkdown(
 ): string {
   const youtubeUrl = new URL(`https://www.youtube.com/watch?v=${track.videoId}`);
   if (progressSeconds > 0) youtubeUrl.searchParams.set("t", String(Math.floor(progressSeconds)));
-  const params = createSvgCardParams(track, style, meta, theme, progressSeconds);
-  const cardUrl = `${origin.replace(/\/$/, "")}/card/${track.videoId}.svg?${params.toString()}`;
+  const cardUrl = buildCardImageUrl(track, style, meta, theme, progressSeconds, origin);
   const alt = escapeHtmlAttribute(`${meta.title} — ${meta.artist}`);
 
   return `<a href="${youtubeUrl.toString()}" target="_blank" rel="noopener noreferrer"><img src="${cardUrl}" alt="${alt}" width="${CARD_OUTPUT_WIDTHS[style]}" /></a>`;
+}
+
+export function buildCardImageUrl(
+  track: Track,
+  style: CardStyleId,
+  meta: CardMeta,
+  theme: CardTheme,
+  progressSeconds: number,
+  origin: string,
+) {
+  const params = createSvgCardParams(track, style, meta, theme, progressSeconds);
+  return `${origin.replace(/\/$/, "")}/card/${track.videoId}.svg?${params.toString()}`;
 }
 
 function escapeHtmlAttribute(value: string) {

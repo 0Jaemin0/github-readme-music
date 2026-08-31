@@ -21,4 +21,6 @@ export const DEFAULT_THEME: CardTheme = {
   muted: "#a3a3a3",
   accent: "#fafafa",
   gradient: false,
+  gradientDirection: null,
+  gradientIntensity: 14,
 };

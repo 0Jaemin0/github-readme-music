@@ -160,7 +160,7 @@
   }
 
   .animate-wave {
-    transform-origin: bottom;
+    transform-origin: center;
     animation: readmefm-wave 1.8s ease-in-out infinite;
   }
 
@@ -175,6 +175,7 @@
 
   .animate-track-ticker {
     animation: readmefm-track-ticker 12s linear infinite;
+    animation-delay: 1s;
   }
 
   @media (prefers-reduced-motion: reduce) {

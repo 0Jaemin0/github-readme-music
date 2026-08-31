@@ -1,4 +1,5 @@
 export type CardStyleId = "player" | "compact" | "vertical";
+export type GradientDirection = "top-left" | "top-right" | "bottom-left" | "bottom-right" | null;
 
 export type CardStyle = {
   id: CardStyleId;
@@ -15,6 +16,8 @@ export type CardTheme = {
   muted: string;
   accent: string;
   gradient: boolean;
+  gradientDirection: GradientDirection;
+  gradientIntensity: number;
 };
 
 export type CoverPosition = {
