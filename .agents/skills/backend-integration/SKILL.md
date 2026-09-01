@@ -1,6 +1,6 @@
 ---
 name: backend-integration
-description: readme.fm의 YouTube API, Supabase, 서버 API 경계와 보안을 검토하거나, 명확히 맡겨진 서버·연동 범위를 구현한다. 화면 디자인 변경에는 사용하지 않는다.
+description: github-readme-music의 YouTube API, Supabase, 서버 API 경계와 보안을 검토하거나, 명확히 맡겨진 서버·연동 범위를 구현한다. 화면 디자인 변경에는 사용하지 않는다.
 ---
 
 # Backend and Integration Engineering

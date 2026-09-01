@@ -1,6 +1,6 @@
 ---
 name: github-workflow
-description: readme.fm의 이슈, 브랜치, 커밋, PR, 리뷰 대응을 저장소 규칙에 맞게 수행한다. GitHub 외부 변경이 필요한 작업에 사용한다.
+description: github-readme-music의 이슈, 브랜치, 커밋, PR, 리뷰 대응을 저장소 규칙에 맞게 수행한다. GitHub 외부 변경이 필요한 작업에 사용한다.
 ---
 
 # GitHub Workflow

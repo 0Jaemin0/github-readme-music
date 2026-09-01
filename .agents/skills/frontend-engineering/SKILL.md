@@ -1,6 +1,6 @@
 ---
 name: frontend-engineering
-description: readme.fm의 Next.js 화면·상태·접근성을 검토하거나, 명확히 맡겨진 클라이언트 범위를 구현한다. 서버 API·DB 정책 결정에는 사용하지 않는다.
+description: github-readme-music의 Next.js 화면·상태·접근성을 검토하거나, 명확히 맡겨진 클라이언트 범위를 구현한다. 서버 API·DB 정책 결정에는 사용하지 않는다.
 ---
 
 # Frontend Engineering

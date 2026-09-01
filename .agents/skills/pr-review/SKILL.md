@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: readme.fm PR의 변경사항을 검토하고 P1~P3 기준의 위치 기반 리뷰 코멘트 초안을 작성한다. PR 리뷰 요청에 사용한다.
+description: github-readme-music PR의 변경사항을 검토하고 P1~P3 기준의 위치 기반 리뷰 코멘트 초안을 작성한다. PR 리뷰 요청에 사용한다.
 ---
 
 # PR Review

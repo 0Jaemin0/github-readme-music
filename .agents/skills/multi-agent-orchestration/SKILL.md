@@ -1,6 +1,6 @@
 ---
 name: multi-agent-orchestration
-description: readme.fm의 프론트엔드와 백엔드·외부 연동이 함께 걸린 기능을 전문 역할로 검토하고, 메인 Codex가 하나의 구현안으로 통합한다.
+description: github-readme-music의 프론트엔드와 백엔드·외부 연동이 함께 걸린 기능을 전문 역할로 검토하고, 메인 Codex가 하나의 구현안으로 통합한다.
 ---
 
 # Multi-agent Orchestration
