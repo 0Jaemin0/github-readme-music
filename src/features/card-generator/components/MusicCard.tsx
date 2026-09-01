@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mixHex, withAlpha } from "../lib/color";
@@ -105,17 +104,29 @@ function SkipIcon({ direction }: { direction: "back" | "forward" }) {
 function CoverImage({ track, title, className }: { track: Track; title: string; className: string }) {
   const [failedCover, setFailedCover] = useState<string | null>(null);
   const hasImageError = failedCover === track.cover;
+  const ratio = track.coverPosition.aspectRatio;
+  const sourceWidth = ratio >= 1 ? ratio : 1;
+  const sourceHeight = ratio >= 1 ? 1 : 1 / ratio;
+  const sourceSide = Math.min(sourceWidth, sourceHeight) * (track.coverPosition.scale / 100);
+  const cropLeft = (sourceWidth - sourceSide) * (track.coverPosition.x / 100);
+  const cropTop = (sourceHeight - sourceSide) * (track.coverPosition.y / 100);
+  const imageStyle = {
+    width: `${(sourceWidth / sourceSide) * 100}%`,
+    height: `${(sourceHeight / sourceSide) * 100}%`,
+    left: `${-(cropLeft / sourceSide) * 100}%`,
+    top: `${-(cropTop / sourceSide) * 100}%`,
+  };
 
   return (
     <div className={cn("relative flex items-center justify-center overflow-hidden rounded-[8px] bg-muted/60", className)}>
       {track.cover && !hasImageError ? (
-        <Image
+        // YouTube thumbnails are external URLs and are positioned from the shared crop contract.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={track.cover}
           alt={`${title} cover art`}
-          fill
-          sizes="(max-width: 640px) 320px, 384px"
-          className="object-cover"
-          style={{ objectPosition: `${track.coverPosition.x}% ${track.coverPosition.y}%` }}
+          className="absolute max-w-none"
+          style={imageStyle}
           onError={() => setFailedCover(track.cover)}
         />
       ) : (
@@ -136,17 +147,25 @@ function FlowingText({ text, className, color }: { text: string; className: stri
   const contentRef = useRef<HTMLSpanElement>(null);
   const [shouldFlow, setShouldFlow] = useState(false);
 
-  useEffect(() => {
-    const update = () => setShouldFlow((contentRef.current?.scrollWidth ?? 0) > (viewportRef.current?.clientWidth ?? 0));
+  useLayoutEffect(() => {
+    const update = () => {
+      const contentWidth = contentRef.current?.getBoundingClientRect().width ?? 0;
+      const viewportWidth = viewportRef.current?.clientWidth ?? 0;
+      setShouldFlow(contentWidth > viewportWidth);
+    };
     update();
+    const frame = window.requestAnimationFrame(update);
     const observer = new ResizeObserver(update);
     if (viewportRef.current) observer.observe(viewportRef.current);
-    return () => observer.disconnect();
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, [text]);
 
   return <div ref={viewportRef} className="relative min-w-0 overflow-hidden" style={{ color }}>
     <span ref={contentRef} className={cn("pointer-events-none absolute invisible whitespace-nowrap", className)}>{text}</span>
-    {shouldFlow ? <div className="animate-track-ticker flex w-max gap-8 whitespace-nowrap"><span className={className}>{text}</span><span className={className} aria-hidden="true">{text}</span></div> : <span className={cn("block truncate", className)}>{text}</span>}
+    {shouldFlow ? <div className="animate-track-ticker flex w-max gap-8 whitespace-nowrap"><span className={className}>{text}</span><span className={className} aria-hidden="true">{text}</span></div> : <span className={cn("block whitespace-nowrap", className)}>{text}</span>}
   </div>;
 }
 

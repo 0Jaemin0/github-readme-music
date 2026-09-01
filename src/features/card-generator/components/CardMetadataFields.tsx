@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { CardMeta, CoverPosition, Track } from "../model/types";
+
+const MIN_CROP_SCALE = 40;
 
 type CardMetadataFieldsProps = {
   meta: CardMeta;
@@ -11,6 +13,8 @@ type CardMetadataFieldsProps = {
   onChange: (nextMeta: CardMeta) => void;
   onCoverPositionChange: (position: CoverPosition) => void;
 };
+
+type DragMode = "move" | "resize" | null;
 
 export function CardMetadataFields({ meta, track, onChange, onCoverPositionChange }: CardMetadataFieldsProps) {
   function updateField(field: keyof CardMeta, value: string) {
@@ -21,7 +25,7 @@ export function CardMetadataFields({ meta, track, onChange, onCoverPositionChang
     <section className="rounded-xl border border-border bg-background p-4">
       <div className="mb-4">
         <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">콘텐츠</p>
-        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">카드에 표시할 정보를 다듬어 보세요.</p>
+        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">카드에 표시할 정보를 원하는 대로 바꿔 보세요.</p>
         <p className="mt-2 text-[12px] leading-5 text-muted-foreground">YouTube 원본: {track.title} · {track.channel}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -36,78 +40,161 @@ export function CardMetadataFields({ meta, track, onChange, onCoverPositionChang
 
 function CoverCropEditor({ cover, position, onPositionChange }: { cover: string; position: CoverPosition; onPositionChange: (position: CoverPosition) => void }) {
   const imageFrameRef = useRef<HTMLDivElement>(null);
+  const cropFrameRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
-  const isDraggingRef = useRef(false);
-  const [ratio, setRatio] = useState(16 / 9);
-  const [isDragging, setIsDragging] = useState(false);
-  const cropWidthPercent = ratio >= 1 ? 100 / ratio : 100;
-  const cropHeightPercent = ratio >= 1 ? 100 : ratio * 100;
-  const cropLeftPercent = ratio > 1 ? position.x * (1 - 1 / ratio) : 0;
-  const cropTopPercent = ratio < 1 ? position.y * (1 - ratio) : 0;
+  const resizeStartRef = useRef({ x: 0, y: 0, side: 0, left: 0, top: 0 });
+  const dragModeRef = useRef<DragMode>(null);
+  const [ratio, setRatio] = useState(position.aspectRatio);
+  const [dragMode, setDragMode] = useState<DragMode>(null);
+  const crop = getCropFrame(ratio, position);
 
-  function updateCropPosition(event: React.PointerEvent<HTMLDivElement>) {
-    if (!isDraggingRef.current) return;
+  function stopAdjusting(event?: ReactPointerEvent<HTMLDivElement>) {
+    if (event && event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    dragModeRef.current = null;
+    setDragMode(null);
+  }
+
+  function startMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!event.isPrimary || event.button !== 0) return;
+    const cropRect = cropFrameRef.current?.getBoundingClientRect();
     const frame = imageFrameRef.current;
-    if (!frame) return;
+    if (!cropRect || !frame) return;
+
+    dragOffsetRef.current = { x: event.clientX - cropRect.left, y: event.clientY - cropRect.top };
+    frame.setPointerCapture(event.pointerId);
+    dragModeRef.current = "move";
+    setDragMode("move");
+  }
+
+  function startResize(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (!event.isPrimary || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const cropRect = cropFrameRef.current?.getBoundingClientRect();
+    const frame = imageFrameRef.current;
+    if (!cropRect || !frame) return;
+
+    resizeStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      side: cropRect.width,
+      left: cropRect.left,
+      top: cropRect.top,
+    };
+    frame.setPointerCapture(event.pointerId);
+    dragModeRef.current = "resize";
+    setDragMode("resize");
+  }
+
+  function updateCrop(event: ReactPointerEvent<HTMLDivElement>) {
+    const mode = dragModeRef.current;
+    const frame = imageFrameRef.current;
+    if (!mode || !frame) return;
+
     const rect = frame.getBoundingClientRect();
-    const isOutsideFrame = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
-    if (isOutsideFrame) {
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-      isDraggingRef.current = false;
-      setIsDragging(false);
+    if (mode === "move" && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) {
+      stopAdjusting(event);
       return;
     }
-    const cropWidth = rect.width * (cropWidthPercent / 100);
-    const cropHeight = rect.height * (cropHeightPercent / 100);
+
+    if (mode === "resize") {
+      const maxSide = Math.min(rect.right - resizeStartRef.current.left, rect.bottom - resizeStartRef.current.top);
+      const delta = Math.min(event.clientX - resizeStartRef.current.x, event.clientY - resizeStartRef.current.y);
+      const requestedSide = resizeStartRef.current.side + delta;
+      const minimumSide = Math.min((Math.min(rect.width, rect.height) * MIN_CROP_SCALE) / 100, maxSide);
+      const side = clamp(requestedSide, minimumSide, maxSide);
+      const scale = clamp((side / Math.min(rect.width, rect.height)) * 100, MIN_CROP_SCALE, 100);
+      const nextCrop = getCropFrame(ratio, { ...position, scale });
+      const left = resizeStartRef.current.left - rect.left;
+      const top = resizeStartRef.current.top - rect.top;
+
+      onPositionChange({
+        ...position,
+        scale,
+        x: toPosition(left, rect.width * (nextCrop.width / 100), rect.width),
+        y: toPosition(top, rect.height * (nextCrop.height / 100), rect.height),
+      });
+      return;
+    }
+
+    const cropWidth = rect.width * (crop.width / 100);
+    const cropHeight = rect.height * (crop.height / 100);
     const left = clamp(event.clientX - rect.left - dragOffsetRef.current.x, 0, rect.width - cropWidth);
     const top = clamp(event.clientY - rect.top - dragOffsetRef.current.y, 0, rect.height - cropHeight);
 
     onPositionChange({
-      x: ratio > 1 ? (left / (rect.width - cropWidth)) * 100 : 50,
-      y: ratio < 1 ? (top / (rect.height - cropHeight)) * 100 : 50,
+      ...position,
+      x: toPosition(left, cropWidth, rect.width),
+      y: toPosition(top, cropHeight, rect.height),
     });
   }
 
   return (
     <div className="mt-5">
       <p className="mb-1.5 text-[13px] font-medium text-muted-foreground">앨범 커버</p>
-      <p className="text-[12px] leading-5 text-muted-foreground">YouTube 썸네일을 기본으로 사용해요. 정사각형 프레임을 드래그해 카드에 보일 영역을 조절하세요.</p>
+      <p className="text-[12px] leading-5 text-muted-foreground">정사각형 프레임을 드래그해 위치를 옮기고, 오른쪽 아래 핸들을 드래그해 크기를 조절하세요.</p>
       <div className="mt-3">
-        <div ref={imageFrameRef} className="relative w-full max-w-md overflow-hidden rounded-lg bg-muted" style={{ aspectRatio: ratio }}>
+        <div
+          ref={imageFrameRef}
+          className="relative w-full max-w-md touch-none select-none overflow-hidden rounded-lg bg-muted"
+          style={{ aspectRatio: ratio }}
+          onPointerMove={updateCrop}
+          onPointerUp={stopAdjusting}
+          onPointerCancel={stopAdjusting}
+          onLostPointerCapture={stopAdjusting}
+        >
           {/* YouTube thumbnails are external URLs, so this editor intentionally uses a plain image element. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cover}
             alt="앨범 커버 영역 선택"
-            className="size-full object-contain"
-            onLoad={(event) => setRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)}
+            draggable={false}
+            className="size-full select-none object-contain"
+            onLoad={(event) => {
+              const nextRatio = event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
+              setRatio(nextRatio);
+              if (Math.abs(nextRatio - position.aspectRatio) > 0.001) onPositionChange({ ...position, aspectRatio: nextRatio });
+            }}
           />
           <div
+            ref={cropFrameRef}
             role="presentation"
-            onPointerDown={(event) => {
-              const cropRect = event.currentTarget.getBoundingClientRect();
-              dragOffsetRef.current = { x: event.clientX - cropRect.left, y: event.clientY - cropRect.top };
-              event.currentTarget.setPointerCapture(event.pointerId);
-              isDraggingRef.current = true;
-              setIsDragging(true);
-            }}
-            onPointerMove={updateCropPosition}
-            onPointerUp={(event) => {
-              if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-              isDraggingRef.current = false;
-              setIsDragging(false);
-            }}
-            onPointerCancel={() => {
-              isDraggingRef.current = false;
-              setIsDragging(false);
-            }}
-            className={cn("absolute border-2 border-white shadow-[0_0_0_999px_rgb(0_0_0_/_0.35)]", isDragging ? "cursor-grabbing" : "cursor-grab")}
-            style={{ width: `${cropWidthPercent}%`, height: `${cropHeightPercent}%`, left: `${cropLeftPercent}%`, top: `${cropTopPercent}%` }}
-          />
+            onPointerDown={startMove}
+            className={cn(
+              "absolute select-none border-2 border-white shadow-[0_0_0_999px_rgb(0_0_0_/_0.35)]",
+              dragMode === "resize" ? "cursor-se-resize" : dragMode === "move" ? "cursor-grabbing" : "cursor-grab",
+            )}
+            style={{ width: crop.width + "%", height: crop.height + "%", left: crop.left + "%", top: crop.top + "%" }}
+          >
+            <button
+              type="button"
+              aria-label="크롭 프레임 크기 조절"
+              onPointerDown={startResize}
+              className="absolute bottom-1 right-1 size-6 cursor-se-resize rounded-sm border-2 border-background bg-primary shadow-sm"
+            />
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+function getCropFrame(ratio: number, position: CoverPosition) {
+  const scale = clamp(position.scale, MIN_CROP_SCALE, 100) / 100;
+  const width = ratio >= 1 ? (scale / ratio) * 100 : scale * 100;
+  const height = ratio >= 1 ? scale * 100 : scale * ratio * 100;
+
+  return {
+    width,
+    height,
+    left: (100 - width) * (position.x / 100),
+    top: (100 - height) * (position.y / 100),
+  };
+}
+
+function toPosition(offset: number, cropSize: number, frameSize: number) {
+  const availableSpace = frameSize - cropSize;
+  return availableSpace > 0 ? clamp((offset / availableSpace) * 100, 0, 100) : 50;
 }
 
 function MetadataField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {

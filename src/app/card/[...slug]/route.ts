@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isSvgVideoId, parseSvgCardData, renderSvgCard } from "@/features/card-generator/lib/svg-card";
+import { embedSvgCover } from "@/features/card-generator/lib/svg-cover.server";
 
 export const dynamic = "force-dynamic";
 
@@ -15,10 +16,12 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (slug.length !== 1 || !isSvgVideoId(videoId)) return new NextResponse("Invalid card request", { status: 400 });
 
   const data = parseSvgCardData(new URL(request.url).searchParams);
-  return new NextResponse(renderSvgCard(data), {
+  const card = await embedSvgCover(data, videoId);
+  return new NextResponse(renderSvgCard(card.data), {
     headers: {
       "Content-Type": "image/svg+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=300, s-maxage=300",
+      "Cache-Control": card.hasEmbeddedCover ? "public, max-age=300, s-maxage=300" : "no-store",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:",
       "X-Content-Type-Options": "nosniff",
     },
   });
