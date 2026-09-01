@@ -1,8 +1,16 @@
 'use client'
 
 import { ColorField } from './ColorField'
+import { ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, X } from 'lucide-react'
 import { contrastRatio } from '../lib/color'
-import type { CardTheme } from '../model/types'
+import type { CardTheme, GradientDirection } from '../model/types'
+
+const GRADIENT_DIRECTIONS = [
+  { value: 'top-left', label: '왼쪽 위', Icon: ArrowUpLeft },
+  { value: 'top-right', label: '오른쪽 위', Icon: ArrowUpRight },
+  { value: 'bottom-left', label: '왼쪽 아래', Icon: ArrowDownLeft },
+  { value: 'bottom-right', label: '오른쪽 아래', Icon: ArrowDownRight },
+] as const satisfies ReadonlyArray<{ value: Exclude<GradientDirection, null>; label: string; Icon: typeof ArrowUpLeft }>;
 
 export function CardCustomizer({
   theme,
@@ -19,6 +27,10 @@ export function CardCustomizer({
 
   function set<K extends keyof CardTheme>(key: K, value: CardTheme[K]) {
     onChange({ ...theme, [key]: value })
+  }
+
+  function setGradientDirection(direction: GradientDirection) {
+    onChange({ ...theme, gradient: direction !== null, gradientDirection: direction })
   }
 
   return (
@@ -38,15 +50,29 @@ export function CardCustomizer({
           <ColorField label="가수" value={theme.muted} onChange={(v) => set('muted', v)} />
           <ColorField label="포인트" value={theme.accent} onChange={(v) => set('accent', v)} />
         </div>
-        <label className="mt-3 inline-flex w-fit cursor-pointer items-center gap-2 text-[13px] leading-5 text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={theme.gradient}
-            onChange={(event) => set('gradient', event.target.checked)}
-            className="size-4 cursor-pointer accent-primary"
-          />
-          배경에 포인트 컬러 그라데이션 사용
-        </label>
+        <div className="mt-4 flex items-center gap-3">
+          <span className="text-[13px] text-muted-foreground">포인트 색 그라데이션</span>
+          <div role="radiogroup" aria-label="그라데이션 방향" className="flex items-center gap-1.5">
+            <button type="button" role="radio" aria-checked={!theme.gradient} aria-label="없음" onClick={() => setGradientDirection(null)} className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${!theme.gradient ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}><X className="size-4" /></button>
+            {GRADIENT_DIRECTIONS.map(({ value, label, Icon }) => {
+              const selected = theme.gradient && theme.gradientDirection === value
+              return <button key={value} type="button" role="radio" aria-checked={selected} aria-label={label} onClick={() => setGradientDirection(value)} className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}><Icon className="size-4" /></button>
+            })}
+          </div>
+        </div>
+        {theme.gradient ? (
+          <div className="mt-3">
+            <RangeRow
+              label="그라데이션 강도"
+              value={theme.gradientIntensity}
+              min={0}
+              max={100}
+              suffix="%"
+              onChange={(value) => set('gradientIntensity', value)}
+            />
+          </div>
+        ) : null}
+        {theme.gradient ? <p className="mt-2 text-[12px] leading-5 text-muted-foreground">선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있어요.</p> : null}
         {lowContrastRoles.length > 0 ? (
           <p role="status" className="mt-2.5 text-[13px] leading-5 text-destructive">
             {lowContrastRoles.map(({ name }) => name).join(', ')} 색의 대비가 매우 낮아요. README에서 읽기 어려울 수 있어요.

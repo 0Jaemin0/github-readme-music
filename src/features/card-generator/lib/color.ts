@@ -90,3 +90,15 @@ export function withAlpha(hex: string, alpha: number) {
   const { r, g, b } = hexToRgb(hex)
   return `rgba(${r}, ${g}, ${b}, ${clamp(alpha)})`
 }
+
+export function mixHex(base: string, overlay: string, alpha: number) {
+  const baseRgb = hexToRgb(base)
+  const overlayRgb = hexToRgb(overlay)
+  const opacity = clamp(alpha)
+  const mix = (baseChannel: number, overlayChannel: number) =>
+    Math.round(baseChannel * (1 - opacity) + overlayChannel * opacity)
+      .toString(16)
+      .padStart(2, '0')
+
+  return `#${mix(baseRgb.r, overlayRgb.r)}${mix(baseRgb.g, overlayRgb.g)}${mix(baseRgb.b, overlayRgb.b)}`
+}
