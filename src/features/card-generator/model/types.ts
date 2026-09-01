@@ -23,6 +23,8 @@ export type CardTheme = {
 export type CoverPosition = {
   x: number;
   y: number;
+  scale: number;
+  aspectRatio: number;
 };
 
 export type Track = {

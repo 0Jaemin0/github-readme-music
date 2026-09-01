@@ -10,7 +10,7 @@ const GRADIENT_DIRECTIONS = ["top-left", "top-right", "bottom-left", "bottom-rig
 
 type GradientCorner = Exclude<GradientDirection, null>;
 
-type SvgCardData = {
+export type SvgCardData = {
   style: CardStyleId;
   title: string;
   artist: string;
@@ -30,7 +30,6 @@ export function createSvgCardParams(track: Track, style: CardStyleId, meta: Card
   const playerProgress = measurePlayerProgress(track.duration, progressSeconds, theme.borderWidth);
 
   return new URLSearchParams({
-    v: "19",
     style,
     title: meta.title,
     artist: meta.artist,
@@ -38,6 +37,8 @@ export function createSvgCardParams(track: Track, style: CardStyleId, meta: Card
     cover: track.cover,
     coverX: String(track.coverPosition.x),
     coverY: String(track.coverPosition.y),
+    coverScale: String(track.coverPosition.scale),
+    coverRatio: String(track.coverPosition.aspectRatio),
     waveform: track.waveform.slice(0, 6).join(","),
     tw: String(textWidths.title),
     aw: String(textWidths.artist),
@@ -120,7 +121,12 @@ export function parseSvgCardData(params: URLSearchParams): SvgCardData {
     artist: readText(params.get("artist"), "Unknown artist", 80),
     duration,
     cover: readCover(params.get("cover")),
-    coverPosition: { x: readNumber(params.get("coverX"), 50, 0, 100), y: readNumber(params.get("coverY"), 50, 0, 100) },
+    coverPosition: {
+      x: readNumber(params.get("coverX"), 50, 0, 100),
+      y: readNumber(params.get("coverY"), 50, 0, 100),
+      scale: readNumber(params.get("coverScale"), 100, 40, 100),
+      aspectRatio: readNumber(params.get("coverRatio"), 16 / 9, 0.25, 4),
+    },
     waveform: readWaveform(params.get("waveform")),
     titleWidth: readNumber(params.get("tw"), 0, 0, 1_200),
     artistWidth: readNumber(params.get("aw"), 0, 0, 1_200),
@@ -287,9 +293,17 @@ function coverImage(data: SvgCardData, x: number, y: number, size: number, id: s
   const radius = 8;
   if (!data.cover) return `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}" fill="${withAlpha(data.theme.muted, 0.25)}"/>`;
 
-  const imageWidth = size * (16 / 9);
-  const imageX = x - ((imageWidth - size) * data.coverPosition.x) / 100;
-  return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}"/></clipPath></defs><image href="${escapeXml(data.cover)}" x="${imageX.toFixed(2)}" y="${y}" width="${imageWidth.toFixed(2)}" height="${size}" preserveAspectRatio="none" clip-path="url(#${id})"/>`;
+  const ratio = data.coverPosition.aspectRatio;
+  const sourceWidth = ratio >= 1 ? ratio : 1;
+  const sourceHeight = ratio >= 1 ? 1 : 1 / ratio;
+  const sourceSide = Math.min(sourceWidth, sourceHeight) * (data.coverPosition.scale / 100);
+  const cropLeft = (sourceWidth - sourceSide) * (data.coverPosition.x / 100);
+  const cropTop = (sourceHeight - sourceSide) * (data.coverPosition.y / 100);
+  const renderScale = size / sourceSide;
+  const imageX = x - cropLeft * renderScale;
+  const imageY = y - cropTop * renderScale;
+
+  return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}"/></clipPath></defs><image href="${escapeXml(data.cover)}" x="${imageX.toFixed(2)}" y="${imageY.toFixed(2)}" width="${(sourceWidth * renderScale).toFixed(2)}" height="${(sourceHeight * renderScale).toFixed(2)}" preserveAspectRatio="none" clip-path="url(#${id})"/>`;
 }
 
 function progressBar(data: SvgCardData, x: number, y: number, width: number, height: number, progress: number) {

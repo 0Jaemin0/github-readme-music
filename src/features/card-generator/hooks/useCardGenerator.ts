@@ -10,7 +10,7 @@ type Status = "idle" | "loading" | "ready" | "error";
 type MetadataResponse = { data?: YouTubeMetadata; error?: { message?: string } };
 
 const INITIAL_META: CardMeta = { title: "", artist: "" };
-const INITIAL_COVER_POSITION: CoverPosition = { x: 50, y: 50 };
+const INITIAL_COVER_POSITION: CoverPosition = { x: 50, y: 50, scale: 100, aspectRatio: 16 / 9 };
 const INVALID_URL_MESSAGE = "지원하는 YouTube 링크를 입력해 주세요.";
 const FALLBACK_ERROR_MESSAGE = "영상 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
 
