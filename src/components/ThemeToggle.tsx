@@ -4,8 +4,8 @@ import { useSyncExternalStore } from 'react'
 import { Laptop, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const STORAGE_KEY = 'readme-fm-theme'
-const THEME_CHANGE_EVENT = 'readme-fm-theme-change'
+const STORAGE_KEY = 'github-readme-music-theme'
+const THEME_CHANGE_EVENT = 'github-readme-music-theme-change'
 
 type Theme = 'system' | 'light' | 'dark'
 

@@ -11,7 +11,7 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "readme.fm — Turn a YouTube link into a README music card",
+  title: "github-readme-music — Turn a YouTube link into a README music card",
   description:
     "Paste a YouTube link, choose a style, and create a music card for your GitHub README.",
 };
@@ -30,11 +30,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <head>
         <Script
-          id="readme-fm-theme"
+          id="github-readme-music-theme"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var t=localStorage.getItem('readme-fm-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()",
+              "(function(){try{var t=localStorage.getItem('github-readme-music-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()",
           }}
         />
       </head>
