@@ -15,7 +15,7 @@ export function buildMarkdown(
   const cardUrl = buildCardImageUrl(track, style, meta, theme, progressSeconds, origin);
   const alt = escapeHtmlAttribute(`${meta.title} — ${meta.artist}`);
 
-  return `<a href="${youtubeUrl.toString()}" target="_blank" rel="noopener noreferrer"><img src="${cardUrl}" alt="${alt}" width="${CARD_OUTPUT_WIDTHS[style]}" /></a>`;
+  return `<a href="${youtubeUrl.toString()}"><img src="${cardUrl}" alt="${alt}" width="${CARD_OUTPUT_WIDTHS[style]}" /></a>`;
 }
 
 export function buildCardImageUrl(
