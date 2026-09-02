@@ -5,14 +5,22 @@ import { buildMarkdown } from "../lib/markdown";
 import { parseYouTubeId, suggestArtist, suggestTitle } from "../lib/youtube";
 import { DEFAULT_THEME } from "../model/options";
 import type { CardMeta, CardStyleId, CardTheme, CoverPosition, Track, YouTubeMetadata } from "../model/types";
+import { captureMonitoringError } from "@/lib/sentry-monitoring";
 
 type Status = "idle" | "loading" | "ready" | "error";
-type MetadataResponse = { data?: YouTubeMetadata; error?: { message?: string } };
+type MetadataResponse = { data?: YouTubeMetadata; error?: { code?: string } };
 
 const INITIAL_META: CardMeta = { title: "", artist: "" };
 const INITIAL_COVER_POSITION: CoverPosition = { x: 50, y: 50, scale: 100, aspectRatio: 16 / 9 };
-const INVALID_URL_MESSAGE = "지원하는 YouTube 링크를 입력해 주세요.";
-const FALLBACK_ERROR_MESSAGE = "영상 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
+const USER_ERROR_MESSAGES = {
+  INVALID_REQUEST: "YouTube 영상 링크를 확인해 주세요.",
+  INVALID_URL: "YouTube 영상 링크를 확인해 주세요.",
+  SERVER_CONFIGURATION_ERROR: "일시적인 문제가 발생했어요. 잠시 후 다시 시도해 주세요.",
+  VIDEO_NOT_FOUND: "영상을 찾을 수 없거나 이 영상은 카드에 사용할 수 없어요.",
+  YOUTUBE_QUOTA_EXCEEDED: "현재 요청이 많아요. 잠시 후 다시 시도해 주세요.",
+  YOUTUBE_UNAVAILABLE: "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
+} as const;
+const FALLBACK_ERROR_MESSAGE = USER_ERROR_MESSAGES.YOUTUBE_UNAVAILABLE;
 
 export function useCardGenerator() {
   const [url, setUrl] = useState("");
@@ -45,7 +53,7 @@ export function useCardGenerator() {
 
   async function generate() {
     if (!parseYouTubeId(url)) {
-      setError(INVALID_URL_MESSAGE);
+      setError(USER_ERROR_MESSAGES.INVALID_URL);
       setStatus("error");
       return;
     }
@@ -58,6 +66,7 @@ export function useCardGenerator() {
     setError(null);
     setStatus("loading");
     setCopied(false);
+    let receivedResponse = false;
 
     try {
       const response = await fetch("/api/youtube/metadata", {
@@ -66,9 +75,32 @@ export function useCardGenerator() {
         body: JSON.stringify({ url }),
         signal: controller.signal,
       });
-      const body = (await response.json()) as MetadataResponse;
+      receivedResponse = true;
+      const body = await response.json().catch(() => null) as MetadataResponse | null;
 
-      if (!response.ok || !body.data) throw new Error(body.error?.message || FALLBACK_ERROR_MESSAGE);
+      if (!body) {
+        captureMonitoringError({
+          message: "영상 정보 응답을 처리할 수 없습니다",
+          errorCode: "client_metadata_invalid_response",
+          operation: "youtube_metadata",
+          layer: "client",
+          httpStatus: response.status,
+        });
+        throw new Error(FALLBACK_ERROR_MESSAGE);
+      }
+
+      if (response.ok && !body.data) {
+        captureMonitoringError({
+          message: "영상 정보 응답을 처리할 수 없습니다",
+          errorCode: "client_metadata_invalid_response",
+          operation: "youtube_metadata",
+          layer: "client",
+          httpStatus: response.status,
+        });
+        throw new Error(FALLBACK_ERROR_MESSAGE);
+      }
+
+      if (!response.ok || !body.data) throw new Error(getUserErrorMessage(body.error?.code));
       if (requestId !== requestIdRef.current) return;
 
       const nextTrack: Track = {
@@ -85,7 +117,15 @@ export function useCardGenerator() {
       });
     } catch (requestError) {
       if (controller.signal.aborted || requestId !== requestIdRef.current) return;
-      setError(requestError instanceof Error ? requestError.message : FALLBACK_ERROR_MESSAGE);
+      if (!receivedResponse) {
+        captureMonitoringError({
+          message: "영상 정보를 불러오는 네트워크 요청에 실패했습니다",
+          errorCode: "client_metadata_network_failed",
+          operation: "youtube_metadata",
+          layer: "client",
+        });
+      }
+      setError(!receivedResponse ? FALLBACK_ERROR_MESSAGE : requestError instanceof Error ? requestError.message : FALLBACK_ERROR_MESSAGE);
       setStatus("error");
     }
   }
@@ -102,7 +142,7 @@ export function useCardGenerator() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
-      setError("클립보드를 사용할 수 없어 코드를 직접 선택해 복사해 주세요.");
+      setError("복사하지 못했어요. 코드를 직접 선택해 복사해 주세요.");
     }
   }
 
@@ -110,6 +150,13 @@ export function useCardGenerator() {
     url, status, error, track, meta, style, progressSeconds, theme, copied, markdown,
     setMeta, setStyle, setProgressSeconds, setTheme, updateUrl, generate, updateCoverPosition, copyMarkdown,
   };
+}
+
+function getUserErrorMessage(code: string | undefined) {
+  if (code && code in USER_ERROR_MESSAGES) {
+    return USER_ERROR_MESSAGES[code as keyof typeof USER_ERROR_MESSAGES];
+  }
+  return FALLBACK_ERROR_MESSAGE;
 }
 
 function createWaveform(videoId: string) {

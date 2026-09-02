@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   const [fileName] = slug;
   const videoId = fileName?.endsWith(".svg") ? fileName.slice(0, -4) : "";
 
-  if (slug.length !== 1 || !isSvgVideoId(videoId)) return new NextResponse("Invalid card request", { status: 400 });
+  if (slug.length !== 1 || !isSvgVideoId(videoId)) return new NextResponse("카드 요청이 올바르지 않습니다.", { status: 400 });
 
   const data = parseSvgCardData(new URL(request.url).searchParams);
   const card = await embedSvgCover(data, videoId);

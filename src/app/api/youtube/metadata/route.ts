@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { parseYouTubeId } from "@/features/card-generator/lib/youtube";
 import type { YouTubeMetadata } from "@/features/card-generator/model/types";
+import { captureMonitoringError } from "@/lib/sentry-monitoring";
 
 const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/videos";
 
@@ -26,36 +27,82 @@ export async function POST(request: Request) {
   try {
     payload = await request.json();
   } catch {
-    return errorResponse(400, "INVALID_REQUEST", "지원하는 YouTube 링크를 입력해 주세요.");
+    return errorResponse(400, "INVALID_REQUEST", "YouTube 영상 링크를 확인해 주세요.");
   }
 
-  if (!isRecord(payload)) return errorResponse(400, "INVALID_REQUEST", "지원하는 YouTube 링크를 입력해 주세요.");
+  if (!isRecord(payload)) return errorResponse(400, "INVALID_REQUEST", "YouTube 영상 링크를 확인해 주세요.");
 
   const videoId = typeof payload.url === "string" ? parseYouTubeId(payload.url) : null;
-  if (!videoId) return errorResponse(400, "INVALID_URL", "지원하는 YouTube 링크를 입력해 주세요.");
+  if (!videoId) return errorResponse(400, "INVALID_URL", "YouTube 영상 링크를 확인해 주세요.");
 
   const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) return errorResponse(500, "SERVER_CONFIGURATION_ERROR", "서비스 설정을 확인 중입니다. 잠시 후 다시 시도해 주세요.");
+  if (!apiKey) {
+    captureMonitoringError({
+      message: "YouTube API 서버 설정을 확인할 수 없습니다",
+      errorCode: "youtube_api_configuration_error",
+      operation: "youtube_metadata",
+      layer: "server",
+      httpStatus: 500,
+    });
+    return errorResponse(500, "SERVER_CONFIGURATION_ERROR", "일시적인 문제가 발생했어요. 잠시 후 다시 시도해 주세요.");
+  }
 
   let upstreamResponse: Response;
   try {
     const query = new URLSearchParams({ part: "snippet,contentDetails", id: videoId, key: apiKey });
     upstreamResponse = await fetch(`${YOUTUBE_API_URL}?${query.toString()}`, { next: { revalidate: 0 } });
   } catch {
-    return errorResponse(503, "YOUTUBE_UNAVAILABLE", "YouTube 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    captureMonitoringError({
+      message: "YouTube 메타데이터 요청에 실패했습니다",
+      errorCode: "youtube_metadata_request_failed",
+      operation: "youtube_metadata",
+      layer: "server",
+    });
+    return errorResponse(503, "YOUTUBE_UNAVAILABLE", "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
   }
 
   const upstreamBody = (await upstreamResponse.json().catch(() => null)) as YouTubeApiResponse | null;
   if (!upstreamResponse.ok) {
     const reason = upstreamBody?.error?.errors?.[0]?.reason;
     if (upstreamResponse.status === 403 && reason === "quotaExceeded") {
-      return errorResponse(429, "YOUTUBE_QUOTA_EXCEEDED", "현재 조회 요청이 많습니다. 잠시 후 다시 시도해 주세요.");
+      return errorResponse(429, "YOUTUBE_QUOTA_EXCEEDED", "현재 요청이 많아요. 잠시 후 다시 시도해 주세요.");
     }
-    return errorResponse(503, "YOUTUBE_UNAVAILABLE", "YouTube 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    captureMonitoringError({
+      message: "YouTube 메타데이터 요청에 실패했습니다",
+      errorCode: "youtube_metadata_request_failed",
+      operation: "youtube_metadata",
+      layer: "server",
+      httpStatus: upstreamResponse.status,
+    });
+    return errorResponse(503, "YOUTUBE_UNAVAILABLE", "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+  }
+
+  if (!upstreamBody || !Array.isArray(upstreamBody.items)) {
+    captureMonitoringError({
+      message: "YouTube 메타데이터 응답 형식을 처리할 수 없습니다",
+      errorCode: "youtube_metadata_invalid_response",
+      operation: "youtube_metadata",
+      layer: "server",
+      httpStatus: upstreamResponse.status,
+    });
+    return errorResponse(503, "YOUTUBE_UNAVAILABLE", "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+  }
+
+  if (upstreamBody.items.length === 0) {
+    return errorResponse(404, "VIDEO_NOT_FOUND", "영상을 찾을 수 없거나 이 영상은 카드에 사용할 수 없어요.");
   }
 
   const metadata = normalizeMetadata(upstreamBody, videoId);
-  if (!metadata) return errorResponse(404, "VIDEO_NOT_FOUND", "영상을 찾을 수 없거나 카드에 사용할 수 없습니다.");
+  if (!metadata) {
+    captureMonitoringError({
+      message: "YouTube 메타데이터 응답 형식을 처리할 수 없습니다",
+      errorCode: "youtube_metadata_invalid_response",
+      operation: "youtube_metadata",
+      layer: "server",
+      httpStatus: upstreamResponse.status,
+    });
+    return errorResponse(503, "YOUTUBE_UNAVAILABLE", "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+  }
 
   return NextResponse.json({ data: metadata });
 }

@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SvgCardData } from "./svg-card";
+import { captureMonitoringError } from "@/lib/sentry-monitoring";
 
 const MAX_COVER_BYTES = 1_000_000;
 const COVER_TIMEOUT_MS = 4_000;
@@ -38,7 +39,17 @@ async function fetchEmbeddedCover(coverUrl: string, videoId: string) {
     const bytes = new Uint8Array(await response.arrayBuffer());
     if (bytes.byteLength === 0 || bytes.byteLength > MAX_COVER_BYTES || !hasExpectedImageSignature(bytes, contentType)) return null;
 
-    return `data:${contentType};base64,${Buffer.from(bytes).toString("base64")}`;
+    try {
+      return `data:${contentType};base64,${Buffer.from(bytes).toString("base64")}`;
+    } catch {
+      captureMonitoringError({
+        message: "앨범 커버를 카드에 넣는 중 오류가 발생했습니다",
+        errorCode: "svg_cover_embed_failed",
+        operation: "svg_cover_embed",
+        layer: "server",
+      });
+      return null;
+    }
   } catch {
     return null;
   } finally {
