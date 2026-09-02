@@ -8,11 +8,11 @@ export default function Page() {
     <div className="min-h-dvh">
       <header>
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6">
-          <Link href="/" className="flex items-center gap-2" aria-label="readme.fm 홈">
+          <Link href="/" className="flex items-center gap-2" aria-label="github-readme-music 홈">
             <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <AudioLines className="size-4" aria-hidden="true" />
             </span>
-            <span className="font-mono text-[13px] font-semibold tracking-[-0.02em]">readme.fm</span>
+            <span className="font-mono text-[13px] font-semibold tracking-[-0.02em]">github-readme-music</span>
           </Link>
           <nav className="flex items-center" aria-label="보조 메뉴">
             <ThemeToggle />

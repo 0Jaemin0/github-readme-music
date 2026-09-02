@@ -1,6 +1,6 @@
 ---
 name: tech-documentation
-description: readme.fm의 트러블슈팅과 기술 선택을 실제 코드·검증 결과에 근거해 문서화하고, 승인된 경우 지정된 Notion 위치에 저장한다.
+description: github-readme-music의 트러블슈팅과 기술 선택을 실제 코드·검증 결과에 근거해 문서화하고, 승인된 경우 지정된 Notion 위치에 저장한다.
 ---
 
 # Technical Documentation

@@ -1,8 +1,8 @@
 # Project Agent Rules
 
-`AGENTS.md`는 readme.fm의 에이전트 작업 규칙을 찾는 진입점이다. 세부 정책은 `docs/agents`에, 반복 작업의 실행 절차는 `.agents/skills`에 둔다.
+`AGENTS.md`는 github-readme-music의 에이전트 작업 규칙을 찾는 진입점이다. 세부 정책은 `docs/agents`에, 반복 작업의 실행 절차는 `.agents/skills`에 둔다.
 
-readme.fm은 YouTube 링크로 GitHub README용 음악 카드를 만드는 서비스다. 제품·UI·기술 스택이 바뀔 수 있는 초기 단계이므로, 현재 요구사항과 확정된 결정만 기준으로 작업한다.
+github-readme-music은 YouTube 링크로 GitHub README용 음악 카드를 만드는 서비스다. 제품·UI·기술 스택이 바뀔 수 있는 초기 단계이므로, 현재 요구사항과 확정된 결정만 기준으로 작업한다.
 
 ## 작업 라우팅
 

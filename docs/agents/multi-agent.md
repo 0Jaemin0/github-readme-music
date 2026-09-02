@@ -1,6 +1,6 @@
 # Multi-agent Collaboration Rules
 
-readme.fm에서 사용자는 PM으로서 문제, 우선순위, 완료 기준을 결정한다. 메인 Codex는 개발 리드로서 작업을 분해하고, 필요한 전문 역할의 검토를 취합해 최종 구현과 검증을 책임진다.
+github-readme-music에서 사용자는 PM으로서 문제, 우선순위, 완료 기준을 결정한다. 메인 Codex는 개발 리드로서 작업을 분해하고, 필요한 전문 역할의 검토를 취합해 최종 구현과 검증을 책임진다.
 
 ## Roles
 
