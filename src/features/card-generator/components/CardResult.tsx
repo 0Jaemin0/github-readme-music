@@ -12,6 +12,8 @@ type CardResultProps = {
   theme: CardTheme;
   markdown: string;
   copied: boolean;
+  copyFeedback: "success" | "error" | null;
+  isRefreshing: boolean;
   onMetaChange: (meta: CardMeta) => void;
   onCoverPositionChange: (position: CoverPosition) => void;
   onStyleChange: (style: CardStyleId) => void;
@@ -28,6 +30,8 @@ export function CardResult({
   theme,
   markdown,
   copied,
+  copyFeedback,
+  isRefreshing,
   onMetaChange,
   onCoverPositionChange,
   onStyleChange,
@@ -37,6 +41,7 @@ export function CardResult({
 }: CardResultProps) {
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card/40 p-4 sm:p-8">
+      {isRefreshing ? <p className="text-[13px] text-muted-foreground" role="status">새 영상 정보를 불러오고 있습니다. 현재 카드는 그대로 유지됩니다.</p> : null}
       <CardMetadataFields
         meta={meta}
         track={track}
@@ -53,7 +58,7 @@ export function CardResult({
         onProgressChange={onProgressChange}
       />
       <CardCustomizer theme={theme} onChange={onThemeChange} />
-      <MarkdownSnippet markdown={markdown} copied={copied} onCopy={onCopy} />
+      <MarkdownSnippet markdown={markdown} copied={copied} feedback={copyFeedback} onCopy={onCopy} />
     </div>
   );
 }

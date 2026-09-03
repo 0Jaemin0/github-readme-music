@@ -12,13 +12,16 @@ type MetadataResponse = { data?: YouTubeMetadata; error?: { code?: string } };
 
 const INITIAL_META: CardMeta = { title: "", artist: "" };
 const INITIAL_COVER_POSITION: CoverPosition = { x: 50, y: 50, scale: 100, aspectRatio: 16 / 9 };
+const CARD_ORIGIN = "https://github-readme-music.vercel.app";
 const USER_ERROR_MESSAGES = {
   INVALID_REQUEST: "YouTube 영상 링크를 확인해 주세요.",
   INVALID_URL: "YouTube 영상 링크를 확인해 주세요.",
-  SERVER_CONFIGURATION_ERROR: "일시적인 문제가 발생했어요. 잠시 후 다시 시도해 주세요.",
-  VIDEO_NOT_FOUND: "영상을 찾을 수 없거나 이 영상은 카드에 사용할 수 없어요.",
-  YOUTUBE_QUOTA_EXCEEDED: "현재 요청이 많아요. 잠시 후 다시 시도해 주세요.",
-  YOUTUBE_UNAVAILABLE: "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
+  SERVER_CONFIGURATION_ERROR: "일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+  VIDEO_NOT_FOUND: "영상을 찾을 수 없거나 이 영상은 카드에 사용할 수 없습니다.",
+  YOUTUBE_QUOTA_EXCEEDED: "현재 요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+  RATE_LIMITED: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+  REQUEST_TOO_LARGE: "요청 내용이 너무 큽니다. YouTube 링크만 입력해 주세요.",
+  YOUTUBE_UNAVAILABLE: "영상 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
 } as const;
 const FALLBACK_ERROR_MESSAGE = USER_ERROR_MESSAGES.YOUTUBE_UNAVAILABLE;
 
@@ -32,14 +35,19 @@ export function useCardGenerator() {
   const [progressSeconds, setProgressSeconds] = useState(0);
   const [theme, setTheme] = useState<CardTheme>(DEFAULT_THEME);
   const [copied, setCopied] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState<"success" | "error" | null>(null);
   const [, startTransition] = useTransition();
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
+  const copyFeedbackTimerRef = useRef<number | null>(null);
 
-  useEffect(() => () => abortControllerRef.current?.abort(), []);
+  useEffect(() => () => {
+    abortControllerRef.current?.abort();
+    if (copyFeedbackTimerRef.current) window.clearTimeout(copyFeedbackTimerRef.current);
+  }, []);
 
   const markdown = useMemo(
-    () => (track ? buildMarkdown(track, style, meta, theme, progressSeconds, window.location.origin) : ""),
+    () => (track ? buildMarkdown(track, style, meta, theme, progressSeconds, CARD_ORIGIN) : ""),
     [meta, progressSeconds, style, theme, track],
   );
 
@@ -64,6 +72,7 @@ export function useCardGenerator() {
     const requestId = ++requestIdRef.current;
 
     setError(null);
+    setCopyFeedback(null);
     setStatus("loading");
     setCopied(false);
     let receivedResponse = false;
@@ -112,7 +121,10 @@ export function useCardGenerator() {
       startTransition(() => {
         setTrack(nextTrack);
         setProgressSeconds(0);
-        setMeta({ title: suggestTitle(nextTrack.title), artist: suggestArtist(nextTrack.channel, nextTrack.title) });
+        setMeta({
+          title: limitMetaText(suggestTitle(nextTrack.title)),
+          artist: limitMetaText(suggestArtist(nextTrack.channel, nextTrack.title)),
+        });
         setStatus("ready");
       });
     } catch (requestError) {
@@ -140,14 +152,24 @@ export function useCardGenerator() {
     try {
       await navigator.clipboard.writeText(markdown);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
+      showCopyFeedback("success");
     } catch {
-      setError("복사하지 못했어요. 코드를 직접 선택해 복사해 주세요.");
+      showCopyFeedback("error");
     }
   }
 
+  function showCopyFeedback(feedback: "success" | "error") {
+    if (copyFeedbackTimerRef.current) window.clearTimeout(copyFeedbackTimerRef.current);
+    setCopyFeedback(feedback);
+    copyFeedbackTimerRef.current = window.setTimeout(() => {
+      setCopied(false);
+      setCopyFeedback(null);
+      copyFeedbackTimerRef.current = null;
+    }, 1800);
+  }
+
   return {
-    url, status, error, track, meta, style, progressSeconds, theme, copied, markdown,
+    url, status, error, track, meta, style, progressSeconds, theme, copied, copyFeedback, markdown,
     setMeta, setStyle, setProgressSeconds, setTheme, updateUrl, generate, updateCoverPosition, copyMarkdown,
   };
 }
@@ -166,4 +188,8 @@ function createWaveform(videoId: string) {
     seed = (seed * 1_103_515_245 + 12_345) & 0x7fffffff;
     return 18 + (seed % 63);
   });
+}
+
+function limitMetaText(value: string) {
+  return value.slice(0, 120);
 }

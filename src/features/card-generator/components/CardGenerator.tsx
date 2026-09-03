@@ -19,8 +19,8 @@ export function CardGenerator() {
       />
 
       <div className="mt-8">
-        {cardGenerator.status === "loading" ? <LoadingPreview /> : null}
-        {cardGenerator.status === "ready" && cardGenerator.track ? (
+        {cardGenerator.status === "loading" && !cardGenerator.track ? <LoadingPreview /> : null}
+        {cardGenerator.track ? (
           <CardResult
             track={cardGenerator.track}
             meta={cardGenerator.meta}
@@ -30,6 +30,8 @@ export function CardGenerator() {
             theme={cardGenerator.theme}
             markdown={cardGenerator.markdown}
             copied={cardGenerator.copied}
+            copyFeedback={cardGenerator.copyFeedback}
+            isRefreshing={cardGenerator.status === "loading"}
             onMetaChange={cardGenerator.setMeta}
             onStyleChange={cardGenerator.setStyle}
             onProgressChange={cardGenerator.setProgressSeconds}

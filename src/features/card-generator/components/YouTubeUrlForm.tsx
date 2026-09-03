@@ -70,7 +70,7 @@ export function YouTubeUrlForm({ url, error, isLoading, onUrlChange, onSubmit }:
           </p>
         ) : (
           <p className="text-muted-foreground">
-            YouTube 링크를 입력하면 제목과 아티스트를 확인해 카드로 만들 수 있어요.
+            YouTube 링크를 입력하시면 제목과 아티스트를 확인한 뒤 카드를 만들 수 있습니다.
           </p>
         )}
       </div>

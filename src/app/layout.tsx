@@ -12,9 +12,12 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "github-readme-music — Turn a YouTube link into a README music card",
-  description:
-    "Paste a YouTube link, choose a style, and create a music card for your GitHub README.",
+  title: "github-readme-music",
+  description: "YouTube 링크 하나로 GitHub README용 음악 카드를 만들어 보세요.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export const viewport: Viewport = {

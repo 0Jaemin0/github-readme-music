@@ -29,7 +29,7 @@ export function CardPreviewPanel({
     <section className="rounded-xl border border-border bg-background p-4 sm:p-5">
       <div className="mb-3">
         <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">미리보기</p>
-        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">README에 들어갈 모습을 확인하세요.</p>
+        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">README에 표시될 카드 모습을 확인해 주세요.</p>
       </div>
       <Tabs value={style} onValueChange={(value) => onStyleChange(value as CardStyleId)}>
         <TabsList className="mb-4 grid w-full grid-cols-3">
