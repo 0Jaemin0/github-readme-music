@@ -42,7 +42,7 @@ YouTube 링크를 입력하면 영상의 제목, 채널명, 재생 시간, 썸�
 
 ### 기본 카드 예시
 
-#### 일반형
+<p align="center"><strong>일반형</strong></p>
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
@@ -50,7 +50,7 @@ YouTube 링크를 입력하면 영상의 제목, 채널명, 재생 시간, 썸�
   </a>
 </p>
 
-#### 가로형
+<p align="center"><strong>가로형</strong></p>
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
@@ -58,7 +58,7 @@ YouTube 링크를 입력하면 영상의 제목, 채널명, 재생 시간, 썸�
   </a>
 </p>
 
-#### 세로형
+<p align="center"><strong>세로형</strong></p>
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
