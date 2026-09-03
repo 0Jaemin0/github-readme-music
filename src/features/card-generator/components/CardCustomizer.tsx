@@ -72,10 +72,10 @@ export function CardCustomizer({
             />
           </div>
         ) : null}
-        {theme.gradient ? <p className="mt-2 text-[12px] leading-5 text-muted-foreground">선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있어요.</p> : null}
+        {theme.gradient ? <p className="mt-2 text-[12px] leading-5 text-muted-foreground">선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있습니다.</p> : null}
         {lowContrastRoles.length > 0 ? (
           <p role="status" className="mt-2.5 text-[13px] leading-5 text-destructive">
-            {lowContrastRoles.map(({ name }) => name).join(', ')} 색의 대비가 매우 낮아요. README에서 읽기 어려울 수 있어요.
+            {lowContrastRoles.map(({ name }) => name).join(', ')} 색의 대비가 매우 낮습니다. README에서 읽기 어려울 수 있습니다.
           </p>
         ) : null}
       </section>

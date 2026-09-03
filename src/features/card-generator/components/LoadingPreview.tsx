@@ -13,7 +13,7 @@ export function LoadingPreview() {
             />
           ))}
         </div>
-        <p className="text-[13px] leading-5 text-muted-foreground">영상 정보를 읽고 있어요…</p>
+        <p className="text-[13px] leading-5 text-muted-foreground">영상 정보를 불러오고 있습니다…</p>
       </div>
       <div className="mt-6 space-y-3">
         <Skeleton className="h-4 w-2/3" />
