@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { CardMeta, CoverPosition, Track } from "../model/types";
 
 const MIN_CROP_SCALE = 40;
+const MAX_META_LENGTH = 120;
 
 type CardMetadataFieldsProps = {
   meta: CardMeta;
@@ -25,14 +26,14 @@ export function CardMetadataFields({ meta, track, onChange, onCoverPositionChang
     <section className="rounded-xl border border-border bg-background p-4">
       <div className="mb-4">
         <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">콘텐츠</p>
-        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">카드에 표시할 정보를 원하는 대로 바꿔 보세요.</p>
-        <p className="mt-2 text-[12px] leading-5 text-muted-foreground">YouTube 원본: {track.title} · {track.channel}</p>
+        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">카드에 표시할 정보를 확인하고, 필요한 부분을 수정해 주세요.</p>
+        <p className="mt-2 text-[12px] leading-5 text-muted-foreground">YouTube에서 가져온 정보: {track.title} · {track.channel}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <MetadataField id="card-title" label="제목" value={meta.title} onChange={(value) => updateField("title", value)} />
         <MetadataField id="card-artist" label="아티스트" value={meta.artist} onChange={(value) => updateField("artist", value)} />
       </div>
-      <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">아티스트는 업로드 채널명 기준이며, 필요하면 수정하세요.</p>
+      <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요.</p>
       <CoverCropEditor cover={track.cover} position={track.coverPosition} onPositionChange={onCoverPositionChange} />
     </section>
   );
@@ -132,7 +133,7 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
   return (
     <div className="mt-5">
       <p className="mb-1.5 text-[13px] font-medium text-muted-foreground">앨범 커버</p>
-      <p className="text-[12px] leading-5 text-muted-foreground">정사각형 프레임을 드래그해 위치를 옮기고, 오른쪽 아래 핸들을 드래그해 크기를 조절하세요.</p>
+      <p className="text-[12px] leading-5 text-muted-foreground">정사각형 프레임을 드래그하여 위치를 옮기고, 오른쪽 아래 핸들을 드래그하여 크기를 조절해 주세요.</p>
       <div className="mt-3">
         <div
           ref={imageFrameRef}
@@ -198,7 +199,7 @@ function toPosition(offset: number, cropSize: number, frameSize: number) {
 }
 
 function MetadataField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
-  return <div><label htmlFor={id} className="mb-1.5 block text-[13px] font-medium text-muted-foreground">{label}</label><Input id={id} value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-lg text-sm md:text-sm" /></div>;
+  return <div><label htmlFor={id} className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground"><span>{label}</span><span className="font-normal">{value.length}/{MAX_META_LENGTH}</span></label><Input id={id} value={value} maxLength={MAX_META_LENGTH} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-lg text-sm md:text-sm" /></div>;
 }
 
 function clamp(value: number, min: number, max: number) {

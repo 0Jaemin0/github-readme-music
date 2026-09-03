@@ -118,7 +118,7 @@ export function parseSvgCardData(params: URLSearchParams): SvgCardData {
   return {
     style,
     title: readText(params.get("title"), "Untitled track", 120),
-    artist: readText(params.get("artist"), "Unknown artist", 80),
+    artist: readText(params.get("artist"), "Unknown artist", 120),
     duration,
     cover: readCover(params.get("cover")),
     coverPosition: {
