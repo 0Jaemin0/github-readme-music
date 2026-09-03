@@ -370,8 +370,8 @@ function readGradientDirection(value: string | null): GradientCorner | null {
 }
 
 function readText(value: string | null, fallback: string, maxLength: number) {
-  const text = value?.trim().slice(0, maxLength);
-  return text || fallback;
+  if (value === null) return fallback;
+  return value.trim().slice(0, maxLength);
 }
 
 function readDuration(value: string | null) {

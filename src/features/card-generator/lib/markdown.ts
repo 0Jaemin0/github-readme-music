@@ -13,7 +13,7 @@ export function buildMarkdown(
   const youtubeUrl = new URL(`https://www.youtube.com/watch?v=${track.videoId}`);
   if (progressSeconds > 0) youtubeUrl.searchParams.set("t", String(Math.floor(progressSeconds)));
   const cardUrl = buildCardImageUrl(track, style, meta, theme, progressSeconds, origin);
-  const alt = escapeHtmlAttribute(`${meta.title} — ${meta.artist}`);
+  const alt = escapeHtmlAttribute([meta.title.trim(), meta.artist.trim()].filter(Boolean).join(" — ") || "음악 카드");
 
   return `<a href="${youtubeUrl.toString()}"><img src="${cardUrl}" alt="${alt}" width="${CARD_OUTPUT_WIDTHS[style]}" /></a>`;
 }
