@@ -42,17 +42,29 @@ YouTube 링크를 입력하면 영상의 제목, 채널명, 재생 시간, 썸�
 
 ### 기본 카드 예시
 
-<a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
-  <img src="https://github-readme-music.vercel.app/card/NI5rV1SII_0.svg?style=player&amp;title=%EB%AF%B8%EC%B3%A4%EB%8B%A4%EA%B3%A0+%ED%95%B4&amp;artist=%EA%B9%80%EC%8A%B9%EB%AF%BC&amp;duration=3%3A25&amp;cover=https%3A%2F%2Fi.ytimg.com%2Fvi%2FNI5rV1SII_0%2Fmaxresdefault.jpg&amp;coverX=50&amp;coverY=50&amp;coverScale=100&amp;coverRatio=1.7777777777777777&amp;waveform=51%2C35%2C47%2C79%2C35%2C69&amp;tw=76.6500015258789&amp;aw=35.88750076293945&amp;pbx=56.33749961853027&amp;pby=99&amp;pbw=263.1499996185303&amp;pbh=6&amp;bg=0a0a0a&amp;border=262626&amp;text=fafafa&amp;muted=a3a3a3&amp;accent=fafafa&amp;gradient=0&amp;bw=1&amp;r=22&amp;progress=0" alt="일반형 카드 예시 — 미쳤다고 해, 김승민" width="380" />
-</a>
+#### 일반형
 
-<a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
-  <img src="https://github-readme-music.vercel.app/card/NI5rV1SII_0.svg?style=compact&amp;title=%EB%AF%B8%EC%B3%A4%EB%8B%A4%EA%B3%A0+%ED%95%B4&amp;artist=%EA%B9%80%EC%8A%B9%EB%AF%BC&amp;duration=3%3A25&amp;cover=https%3A%2F%2Fi.ytimg.com%2Fvi%2FNI5rV1SII_0%2Fmaxresdefault.jpg&amp;coverX=50&amp;coverY=50&amp;coverScale=100&amp;coverRatio=1.7777777777777777&amp;waveform=51%2C35%2C47%2C79%2C35%2C69&amp;tw=62.66250228881836&amp;aw=35.88750076293945&amp;pbx=56.33749961853027&amp;pby=99&amp;pbw=263.1499996185303&amp;pbh=6&amp;bg=0a0a0a&amp;border=262626&amp;text=fafafa&amp;muted=a3a3a3&amp;accent=fafafa&amp;gradient=0&amp;bw=1&amp;r=22&amp;progress=0" alt="가로형 카드 예시 — 미쳤다고 해, 김승민" width="460" />
-</a>
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
+    <img src="https://github-readme-music.vercel.app/card/NI5rV1SII_0.svg?style=player&amp;title=%EB%AF%B8%EC%B3%A4%EB%8B%A4%EA%B3%A0+%ED%95%B4&amp;artist=%EA%B9%80%EC%8A%B9%EB%AF%BC&amp;duration=3%3A25&amp;cover=https%3A%2F%2Fi.ytimg.com%2Fvi%2FNI5rV1SII_0%2Fmaxresdefault.jpg&amp;coverX=50&amp;coverY=50&amp;coverScale=100&amp;coverRatio=1.7777777777777777&amp;waveform=51%2C35%2C47%2C79%2C35%2C69&amp;tw=76.6500015258789&amp;aw=35.88750076293945&amp;pbx=56.33749961853027&amp;pby=99&amp;pbw=263.1499996185303&amp;pbh=6&amp;bg=0a0a0a&amp;border=262626&amp;text=fafafa&amp;muted=a3a3a3&amp;accent=fafafa&amp;gradient=0&amp;bw=1&amp;r=22&amp;progress=0" alt="일반형 카드 예시 — 미쳤다고 해, 김승민" width="380" />
+  </a>
+</p>
 
-<a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
-  <img src="https://github-readme-music.vercel.app/card/NI5rV1SII_0.svg?style=vertical&amp;title=%EB%AF%B8%EC%B3%A4%EB%8B%A4%EA%B3%A0+%ED%95%B4&amp;artist=%EA%B9%80%EC%8A%B9%EB%AF%BC&amp;duration=3%3A25&amp;cover=https%3A%2F%2Fi.ytimg.com%2Fvi%2FNI5rV1SII_0%2Fmaxresdefault.jpg&amp;coverX=50&amp;coverY=50&amp;coverScale=100&amp;coverRatio=1.7777777777777777&amp;waveform=51%2C35%2C47%2C79%2C35%2C69&amp;tw=76.6500015258789&amp;aw=35.88750076293945&amp;pbx=56.33749961853027&amp;pby=99&amp;pbw=263.1499996185303&amp;pbh=6&amp;bg=0a0a0a&amp;border=262626&amp;text=fafafa&amp;muted=a3a3a3&amp;accent=fafafa&amp;gradient=0&amp;bw=1&amp;r=22&amp;progress=0" alt="세로형 카드 예시 — 미쳤다고 해, 김승민" width="260" />
-</a>
+#### 가로형
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
+    <img src="https://github-readme-music.vercel.app/card/NI5rV1SII_0.svg?style=compact&amp;title=%EB%AF%B8%EC%B3%A4%EB%8B%A4%EA%B3%A0+%ED%95%B4&amp;artist=%EA%B9%80%EC%8A%B9%EB%AF%BC&amp;duration=3%3A25&amp;cover=https%3A%2F%2Fi.ytimg.com%2Fvi%2FNI5rV1SII_0%2Fmaxresdefault.jpg&amp;coverX=50&amp;coverY=50&amp;coverScale=100&amp;coverRatio=1.7777777777777777&amp;waveform=51%2C35%2C47%2C79%2C35%2C69&amp;tw=62.66250228881836&amp;aw=35.88750076293945&amp;pbx=56.33749961853027&amp;pby=99&amp;pbw=263.1499996185303&amp;pbh=6&amp;bg=0a0a0a&amp;border=262626&amp;text=fafafa&amp;muted=a3a3a3&amp;accent=fafafa&amp;gradient=0&amp;bw=1&amp;r=22&amp;progress=0" alt="가로형 카드 예시 — 미쳤다고 해, 김승민" width="460" />
+  </a>
+</p>
+
+#### 세로형
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
+    <img src="https://github-readme-music.vercel.app/card/NI5rV1SII_0.svg?style=vertical&amp;title=%EB%AF%B8%EC%B3%A4%EB%8B%A4%EA%B3%A0+%ED%95%B4&amp;artist=%EA%B9%80%EC%8A%B9%EB%AF%BC&amp;duration=3%3A25&amp;cover=https%3A%2F%2Fi.ytimg.com%2Fvi%2FNI5rV1SII_0%2Fmaxresdefault.jpg&amp;coverX=50&amp;coverY=50&amp;coverScale=100&amp;coverRatio=1.7777777777777777&amp;waveform=51%2C35%2C47%2C79%2C35%2C69&amp;tw=76.6500015258789&amp;aw=35.88750076293945&amp;pbx=56.33749961853027&amp;pby=99&amp;pbw=263.1499996185303&amp;pbh=6&amp;bg=0a0a0a&amp;border=262626&amp;text=fafafa&amp;muted=a3a3a3&amp;accent=fafafa&amp;gradient=0&amp;bw=1&amp;r=22&amp;progress=0" alt="세로형 카드 예시 — 미쳤다고 해, 김승민" width="260" />
+  </a>
+</p>
 
 ## 기술 스택
 
