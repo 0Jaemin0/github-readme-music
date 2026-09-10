@@ -34,6 +34,7 @@ export function useCardGenerator() {
   const [style, setStyle] = useState<CardStyleId>("player");
   const [progressSeconds, setProgressSeconds] = useState(0);
   const [theme, setTheme] = useState<CardTheme>(DEFAULT_THEME);
+  const [generatedMarkdown, setGeneratedMarkdown] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState<"success" | "error" | null>(null);
   const [, startTransition] = useTransition();
@@ -46,10 +47,11 @@ export function useCardGenerator() {
     if (copyFeedbackTimerRef.current) window.clearTimeout(copyFeedbackTimerRef.current);
   }, []);
 
-  const markdown = useMemo(
+  const currentMarkdown = useMemo(
     () => (track ? buildMarkdown(track, style, meta, theme, progressSeconds, CARD_ORIGIN) : ""),
     [meta, progressSeconds, style, theme, track],
   );
+  const hasPendingMarkdownChanges = Boolean(generatedMarkdown && generatedMarkdown !== currentMarkdown);
 
   function updateUrl(value: string) {
     setUrl(value);
@@ -120,6 +122,7 @@ export function useCardGenerator() {
 
       startTransition(() => {
         setTrack(nextTrack);
+        setGeneratedMarkdown(null);
         setProgressSeconds(0);
         setMeta({
           title: limitMetaText(suggestTitle(nextTrack.title)),
@@ -146,11 +149,18 @@ export function useCardGenerator() {
     setTrack((currentTrack) => currentTrack ? { ...currentTrack, coverPosition } : currentTrack);
   }
 
+  function generateMarkdown() {
+    if (!currentMarkdown) return;
+    setGeneratedMarkdown(currentMarkdown);
+    setCopied(false);
+    setCopyFeedback(null);
+  }
+
   async function copyMarkdown() {
-    if (!markdown) return;
+    if (!generatedMarkdown) return;
 
     try {
-      await navigator.clipboard.writeText(markdown);
+      await navigator.clipboard.writeText(generatedMarkdown);
       setCopied(true);
       showCopyFeedback("success");
     } catch {
@@ -169,8 +179,9 @@ export function useCardGenerator() {
   }
 
   return {
-    url, status, error, track, meta, style, progressSeconds, theme, copied, copyFeedback, markdown,
-    setMeta, setStyle, setProgressSeconds, setTheme, updateUrl, generate, updateCoverPosition, copyMarkdown,
+    url, status, error, track, meta, style, progressSeconds, theme, copied, copyFeedback,
+    markdown: generatedMarkdown, hasPendingMarkdownChanges,
+    setMeta, setStyle, setProgressSeconds, setTheme, updateUrl, generate, updateCoverPosition, generateMarkdown, copyMarkdown,
   };
 }
 

@@ -29,6 +29,7 @@ export function CardGenerator() {
             progressSeconds={cardGenerator.progressSeconds}
             theme={cardGenerator.theme}
             markdown={cardGenerator.markdown}
+            hasPendingMarkdownChanges={cardGenerator.hasPendingMarkdownChanges}
             copied={cardGenerator.copied}
             copyFeedback={cardGenerator.copyFeedback}
             isRefreshing={cardGenerator.status === "loading"}
@@ -37,6 +38,7 @@ export function CardGenerator() {
             onProgressChange={cardGenerator.setProgressSeconds}
             onThemeChange={cardGenerator.setTheme}
             onCopy={cardGenerator.copyMarkdown}
+            onGenerateMarkdown={cardGenerator.generateMarkdown}
           />
         ) : null}
       </div>

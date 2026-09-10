@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CARD_OUTPUT_WIDTHS, CARD_STYLES } from "../model/options";
 import { durationToSeconds, formatDuration } from "../lib/time";
 import type { CardMeta, CardStyleId, CardTheme, Track } from "../model/types";
+import { CardCustomizer } from "./CardCustomizer";
 import { MusicCard } from "./MusicCard";
 
 type CardPreviewPanelProps = {
@@ -14,6 +15,7 @@ type CardPreviewPanelProps = {
   theme: CardTheme;
   onStyleChange: (style: CardStyleId) => void;
   onProgressChange: (progressSeconds: number) => void;
+  onThemeChange: (theme: CardTheme) => void;
 };
 
 export function CardPreviewPanel({
@@ -24,6 +26,7 @@ export function CardPreviewPanel({
   theme,
   onStyleChange,
   onProgressChange,
+  onThemeChange,
 }: CardPreviewPanelProps) {
   return (
     <section className="rounded-xl border border-border bg-background p-4 sm:p-5">
@@ -39,13 +42,16 @@ export function CardPreviewPanel({
             </TabsTrigger>
           ))}
         </TabsList>
-        <div className="rounded-xl border border-border bg-background p-4 sm:p-10">
+        <div className="py-2 sm:px-6 sm:py-4">
           <div className="mx-auto max-w-full" style={{ width: CARD_OUTPUT_WIDTHS[style] }}>
             <MusicCard track={track} meta={meta} style={style} theme={theme} progressSeconds={progressSeconds} />
           </div>
           {style !== "compact" ? <PlaybackPosition value={progressSeconds} duration={track.duration} onChange={onProgressChange} /> : null}
         </div>
       </Tabs>
+      <section className="mt-6" aria-label="스타일 설정">
+        <CardCustomizer theme={theme} onChange={onThemeChange} />
+      </section>
     </section>
   );
 }

@@ -34,12 +34,12 @@ export function CardCustomizer({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <section>
-        <p className="mb-2.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="text-[13px] font-medium text-muted-foreground">
           색상
         </p>
-        <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-x-8">
+        <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 sm:gap-x-8">
           <ColorField
             label="카드 배경"
             value={theme.background}
@@ -80,10 +80,11 @@ export function CardCustomizer({
         ) : null}
       </section>
 
-      <section className="flex flex-col gap-4">
-        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+      <section>
+        <p className="text-[13px] font-medium text-muted-foreground">
           모양
         </p>
+        <div className="mt-3 flex flex-col gap-4">
         <RangeRow
           label="Border width"
           value={theme.borderWidth}
@@ -100,6 +101,7 @@ export function CardCustomizer({
           suffix="px"
           onChange={(value) => set('radius', value)}
         />
+        </div>
       </section>
     </div>
   )
