@@ -65,7 +65,7 @@ function hasExpectedImageSignature(bytes: Uint8Array, contentType: string) {
     && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
 }
 
-function isVideoThumbnailUrl(value: string, videoId: string) {
+export function isVideoThumbnailUrl(value: string, videoId: string) {
   try {
     const url = new URL(value);
     const path = url.pathname.split("/").filter(Boolean);
