@@ -30,6 +30,9 @@ export function CardGenerator() {
             theme={cardGenerator.theme}
             markdown={cardGenerator.markdown}
             hasPendingMarkdownChanges={cardGenerator.hasPendingMarkdownChanges}
+            markdownSaveStatus={cardGenerator.saveStatus}
+            markdownSaveError={cardGenerator.saveError}
+            isFallbackMarkdown={cardGenerator.isFallbackMarkdown}
             copied={cardGenerator.copied}
             copyFeedback={cardGenerator.copyFeedback}
             isRefreshing={cardGenerator.status === "loading"}

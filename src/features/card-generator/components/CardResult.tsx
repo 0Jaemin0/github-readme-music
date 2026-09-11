@@ -11,6 +11,9 @@ type CardResultProps = {
   theme: CardTheme;
   markdown: string | null;
   hasPendingMarkdownChanges: boolean;
+  markdownSaveStatus: "idle" | "saving" | "error";
+  markdownSaveError: string | null;
+  isFallbackMarkdown: boolean;
   copied: boolean;
   copyFeedback: "success" | "error" | null;
   isRefreshing: boolean;
@@ -31,6 +34,9 @@ export function CardResult({
   theme,
   markdown,
   hasPendingMarkdownChanges,
+  markdownSaveStatus,
+  markdownSaveError,
+  isFallbackMarkdown,
   copied,
   copyFeedback,
   isRefreshing,
@@ -64,6 +70,9 @@ export function CardResult({
       <MarkdownSnippet
         markdown={markdown}
         hasPendingChanges={hasPendingMarkdownChanges}
+        saveStatus={markdownSaveStatus}
+        saveError={markdownSaveError}
+        isFallbackMarkdown={isFallbackMarkdown}
         copied={copied}
         feedback={copyFeedback}
         onCopy={onCopy}
