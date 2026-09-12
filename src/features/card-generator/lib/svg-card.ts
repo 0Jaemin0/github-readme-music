@@ -25,6 +25,40 @@ export type SvgCardData = {
   progressSeconds: number;
 };
 
+export function serializeSvgCardData(data: SvgCardData) {
+  return {
+    style: data.style,
+    title: data.title,
+    artist: data.artist,
+    duration: data.duration,
+    cover: data.cover,
+    coverX: String(data.coverPosition.x),
+    coverY: String(data.coverPosition.y),
+    coverScale: String(data.coverPosition.scale),
+    coverRatio: String(data.coverPosition.aspectRatio),
+    waveform: data.waveform.join(","),
+    tw: String(data.titleWidth),
+    aw: String(data.artistWidth),
+    pbx: String(data.playerProgress.x),
+    pby: String(data.playerProgress.y),
+    pbw: String(data.playerProgress.width),
+    pbh: String(data.playerProgress.height),
+    bg: data.theme.background.slice(1),
+    border: data.theme.border.slice(1),
+    text: data.theme.text.slice(1),
+    muted: data.theme.muted.slice(1),
+    accent: data.theme.accent.slice(1),
+    gradient: data.theme.gradient ? "1" : "0",
+    ...(data.theme.gradient ? {
+      gradientDirection: data.theme.gradientDirection ?? "bottom-right",
+      gradientIntensity: String(data.theme.gradientIntensity),
+    } : {}),
+    bw: String(data.theme.borderWidth),
+    r: String(data.theme.radius),
+    progress: String(data.progressSeconds),
+  };
+}
+
 export function createSvgCardParams(track: Track, style: CardStyleId, meta: CardMeta, theme: CardTheme, progressSeconds: number) {
   const textWidths = measureTickerTextWidths(style, meta);
   const playerProgress = measurePlayerProgress(track.duration, progressSeconds, theme.borderWidth);

@@ -1,4 +1,3 @@
-import { CardCustomizer } from "./CardCustomizer";
 import { CardMetadataFields } from "./CardMetadataFields";
 import { CardPreviewPanel } from "./CardPreviewPanel";
 import { MarkdownSnippet } from "./MarkdownSnippet";
@@ -10,7 +9,11 @@ type CardResultProps = {
   style: CardStyleId;
   progressSeconds: number;
   theme: CardTheme;
-  markdown: string;
+  markdown: string | null;
+  hasPendingMarkdownChanges: boolean;
+  markdownSaveStatus: "idle" | "saving" | "error";
+  markdownSaveError: string | null;
+  isFallbackMarkdown: boolean;
   copied: boolean;
   copyFeedback: "success" | "error" | null;
   isRefreshing: boolean;
@@ -20,6 +23,7 @@ type CardResultProps = {
   onProgressChange: (progressSeconds: number) => void;
   onThemeChange: (theme: CardTheme) => void;
   onCopy: () => void;
+  onGenerateMarkdown: () => void;
 };
 
 export function CardResult({
@@ -29,6 +33,10 @@ export function CardResult({
   progressSeconds,
   theme,
   markdown,
+  hasPendingMarkdownChanges,
+  markdownSaveStatus,
+  markdownSaveError,
+  isFallbackMarkdown,
   copied,
   copyFeedback,
   isRefreshing,
@@ -38,6 +46,7 @@ export function CardResult({
   onProgressChange,
   onThemeChange,
   onCopy,
+  onGenerateMarkdown,
 }: CardResultProps) {
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card/40 p-4 sm:p-8">
@@ -56,9 +65,19 @@ export function CardResult({
         theme={theme}
         onStyleChange={onStyleChange}
         onProgressChange={onProgressChange}
+        onThemeChange={onThemeChange}
       />
-      <CardCustomizer theme={theme} onChange={onThemeChange} />
-      <MarkdownSnippet markdown={markdown} copied={copied} feedback={copyFeedback} onCopy={onCopy} />
+      <MarkdownSnippet
+        markdown={markdown}
+        hasPendingChanges={hasPendingMarkdownChanges}
+        saveStatus={markdownSaveStatus}
+        saveError={markdownSaveError}
+        isFallbackMarkdown={isFallbackMarkdown}
+        copied={copied}
+        feedback={copyFeedback}
+        onCopy={onCopy}
+        onGenerate={onGenerateMarkdown}
+      />
     </div>
   );
 }
