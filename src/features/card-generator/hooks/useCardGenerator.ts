@@ -35,7 +35,7 @@ const CARD_STORAGE_ERROR_MESSAGES = {
 } as const;
 const FALLBACK_ERROR_MESSAGE = METADATA_ERROR_MESSAGES.YOUTUBE_UNAVAILABLE;
 
-export function useCardGenerator() {
+export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?: (cardId: string) => void } = {}) {
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -229,6 +229,7 @@ export function useCardGenerator() {
       }
 
       setGeneratedMarkdown(buildStoredCardMarkdown(track, style, meta, progressSeconds, cardId, CARD_ORIGIN));
+      onStoredCardCreated?.(cardId);
       setSavedSnapshot(snapshotKey);
       setMarkdownKind("stored");
       setFailedSnapshot(null);
