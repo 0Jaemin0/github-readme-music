@@ -1,26 +1,39 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import brandMark from './icon.png'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { CardGenerator } from '@/features/card-generator/components/CardGenerator'
 
 export default function Page() {
+  const [generatorKey, setGeneratorKey] = useState(0)
+  const [isLanding, setIsLanding] = useState(true)
+
   return (
-    <div className="min-h-dvh">
-      <header>
+    <div className={isLanding ? "flex h-dvh flex-col overflow-hidden" : "flex min-h-dvh flex-col"}>
+      <header className="shrink-0">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6">
-          <Link href="/" className="flex items-center gap-2" aria-label="github-readme-music 홈">
+          <button
+            type="button"
+            className="flex cursor-pointer items-center gap-2"
+            onClick={() => {
+              setIsLanding(true)
+              setGeneratorKey((current) => current + 1)
+            }}
+            aria-label="github-readme-music 홈으로 돌아가기"
+          >
             <Image src={brandMark} alt="" priority className="size-7" />
             <span className="font-mono text-[13px] font-semibold tracking-[-0.02em]">github-readme-music</span>
-          </Link>
+          </button>
           <nav className="flex items-center" aria-label="보조 메뉴">
             <ThemeToggle />
           </nav>
         </div>
       </header>
 
-      <main>
-        <section className="mx-auto max-w-3xl px-5 pb-4 pt-16 text-center sm:pt-24">
+      <main className="flex min-h-0 flex-1 flex-col">
+        <section className="mx-auto w-full max-w-3xl shrink-0 px-5 pb-4 pt-16 text-center sm:pt-24">
           <h1 className="text-balance text-[2rem] font-semibold leading-[1.16] tracking-[-0.04em] sm:text-[3.25rem]">
             좋아하는 음악을,
             <br />
@@ -31,8 +44,8 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="mx-auto max-w-3xl px-5 pb-24 pt-8">
-          <CardGenerator />
+        <section className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-5 pb-8 pt-8">
+          <CardGenerator key={generatorKey} onLandingChange={setIsLanding} />
         </section>
       </main>
 
