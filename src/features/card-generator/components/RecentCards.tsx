@@ -7,10 +7,12 @@ import { cn } from "@/lib/utils";
 type RecentCardsProps = {
   cardIds: string[];
   isLoaded: boolean;
+  isRestoring: boolean;
   fillRemainingSpace?: boolean;
+  onSelectCard: (cardId: string) => void;
 };
 
-export function RecentCards({ cardIds, isLoaded, fillRemainingSpace = false }: RecentCardsProps) {
+export function RecentCards({ cardIds, isLoaded, isRestoring, fillRemainingSpace = false, onSelectCard }: RecentCardsProps) {
   const [failedCardIds, setFailedCardIds] = useState<Set<string>>(() => new Set());
   const [loadedCardIds, setLoadedCardIds] = useState<Set<string>>(() => new Set());
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function RecentCards({ cardIds, isLoaded, fillRemainingSpace = false }: R
         최근 생성한 카드
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
-        카드 형식별 비율을 유지한 축소 미리보기입니다.
+        카드를 선택하면 이전 설정을 불러와 이어서 수정할 수 있어요.
       </p>
       <div className={cn("mt-2 grid grid-cols-3 gap-2.5 sm:gap-3", fillRemainingSpace && "min-h-0 flex-1")}>
         {cardIds.map((cardId) => {
@@ -31,13 +33,18 @@ export function RecentCards({ cardIds, isLoaded, fillRemainingSpace = false }: R
           const hasLoaded = loadedCardIds.has(cardId);
 
           return (
-            <div
+            <button
               key={cardId}
-              className={cn("relative flex items-center justify-center overflow-hidden rounded-xl border border-border bg-card/40 p-2 sm:p-2.5", hasLoaded ? "cursor-zoom-in" : "cursor-wait", fillRemainingSpace ? "h-full" : "h-[104px] sm:h-[112px]")}
+              type="button"
+              disabled={!hasLoaded || isRestoring}
+              className={cn("relative flex items-center justify-center overflow-hidden rounded-xl border border-border bg-card/40 p-2 transition-colors duration-200 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none sm:p-2.5", hasLoaded ? "cursor-zoom-in hover:border-primary/60 hover:bg-muted/70" : "cursor-wait", fillRemainingSpace ? "h-full" : "h-[104px] sm:h-[112px]")}
               onMouseEnter={() => {
                 if (hasLoaded) setHoveredCardId(cardId);
               }}
               onMouseLeave={() => setHoveredCardId((current) => current === cardId ? null : current)}
+              onClick={() => onSelectCard(cardId)}
+              aria-label="저장된 카드 설정 불러오기"
+              aria-busy={isRestoring || undefined}
             >
               {hasFailed ? (
                 <ImageOff className="size-4 text-muted-foreground" aria-label="카드를 불러오지 못했습니다" />
@@ -55,7 +62,7 @@ export function RecentCards({ cardIds, isLoaded, fillRemainingSpace = false }: R
                   />
                 </>
               )}
-            </div>
+            </button>
           );
         })}
       </div>

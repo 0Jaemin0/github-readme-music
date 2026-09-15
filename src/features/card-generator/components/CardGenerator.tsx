@@ -28,11 +28,19 @@ export function CardGenerator({ onLandingChange }: { onLandingChange?: (isLandin
         onSubmit={cardGenerator.generate}
       />
 
-      {isLanding ? <RecentCards cardIds={recentCards.cardIds} isLoaded={recentCards.isLoaded} fillRemainingSpace /> : null}
+      {isLanding ? (
+        <RecentCards
+          cardIds={recentCards.cardIds}
+          isLoaded={recentCards.isLoaded}
+          isRestoring={cardGenerator.loadingKind === "stored-card"}
+          fillRemainingSpace
+          onSelectCard={cardGenerator.restoreStoredCard}
+        />
+      ) : null}
 
       {!isLanding ? (
         <div className="mt-8">
-          {cardGenerator.status === "loading" && !cardGenerator.track ? <LoadingPreview /> : null}
+          {cardGenerator.status === "loading" && !cardGenerator.track ? <LoadingPreview message={cardGenerator.loadingKind === "stored-card" ? "카드 설정을 불러오는 중이에요." : undefined} /> : null}
           {cardGenerator.track ? (
             <CardResult
               track={cardGenerator.track}

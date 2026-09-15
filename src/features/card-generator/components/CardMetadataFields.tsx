@@ -27,13 +27,15 @@ export function CardMetadataFields({ meta, track, onChange, onCoverPositionChang
       <div className="mb-4">
         <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">콘텐츠</p>
         <p className="mt-1 text-[13px] leading-5 text-muted-foreground">카드에 표시할 정보를 확인하고, 필요한 부분을 수정해 주세요.</p>
-        <p className="mt-2 text-[12px] leading-5 text-muted-foreground">YouTube에서 가져온 정보: {track.title} · {track.channel}</p>
+        <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
+          {track.source === "youtube" ? `YouTube에서 가져온 정보: ${track.title} · ${track.channel}` : `저장된 카드 정보: ${meta.title} · ${meta.artist}`}
+        </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <MetadataField id="card-title" label="제목" value={meta.title} onChange={(value) => updateField("title", value)} />
         <MetadataField id="card-artist" label="아티스트" value={meta.artist} onChange={(value) => updateField("artist", value)} />
       </div>
-      <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요.</p>
+      {track.source === "youtube" ? <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요.</p> : null}
       <CoverCropEditor cover={track.cover} position={track.coverPosition} onPositionChange={onCoverPositionChange} />
     </section>
   );
