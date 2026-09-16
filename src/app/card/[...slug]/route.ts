@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { isStoredCardId, normalizeStoredCardData } from "@/features/card-generator/lib/stored-card";
+import { isStoredCardId } from "@/features/card-generator/lib/stored-card";
+import { readStoredCard } from "@/features/card-generator/lib/stored-card-reader.server";
 import { embedSvgCover } from "@/features/card-generator/lib/svg-cover.server";
 import { isSvgVideoId, parseSvgCardData, renderSvgCard, type SvgCardData } from "@/features/card-generator/lib/svg-card";
 import { captureMonitoringError } from "@/lib/sentry-monitoring";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +19,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (slug.length !== 1) return new NextResponse("카드 요청이 올바르지 않습니다.", { status: 400 });
 
   if (isStoredCardId(cardKey)) {
-    const storedCard = await readStoredCard(cardKey);
-    if (storedCard instanceof NextResponse) return storedCard;
-    return renderCard(storedCard.data, storedCard.videoId);
+    return renderStoredCard(cardKey);
   }
 
   if (cardKey.startsWith("c_") || !isSvgVideoId(cardKey)) {
@@ -43,21 +41,11 @@ async function renderCard(data: SvgCardData, videoId: string) {
   });
 }
 
-async function readStoredCard(id: string): Promise<{ videoId: string; data: SvgCardData } | NextResponse> {
+async function renderStoredCard(id: string) {
   try {
-    const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase
-      .from("cards")
-      .select("video_id, card_data")
-      .eq("id", id)
-      .maybeSingle();
-
-    if (error) throw error;
-    if (!data) return new NextResponse("카드를 찾을 수 없습니다.", { status: 404 });
-
-    const videoId = typeof data.video_id === "string" ? data.video_id : "";
-    const storedCardData = normalizeStoredCardData(data.card_data, videoId);
-    if (!storedCardData) {
+    const card = await readStoredCard(id);
+    if (card.type === "not_found") return new NextResponse("카드를 찾을 수 없습니다.", { status: 404 });
+    if (card.type === "invalid_data") {
       captureMonitoringError({
         message: "저장된 카드 설정을 처리할 수 없습니다",
         errorCode: "stored_card_invalid_data",
@@ -67,7 +55,7 @@ async function readStoredCard(id: string): Promise<{ videoId: string; data: SvgC
       return new NextResponse("카드 데이터를 처리할 수 없습니다.", { status: 500 });
     }
 
-    return { videoId, data: parseSvgCardData(new URLSearchParams(storedCardData.params)) };
+    return renderCard(parseSvgCardData(new URLSearchParams(card.cardData.params)), card.videoId);
   } catch {
     captureMonitoringError({
       message: "저장된 카드 조회에 실패했습니다",

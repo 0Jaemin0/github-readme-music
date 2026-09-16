@@ -28,6 +28,7 @@ export type CoverPosition = {
 };
 
 export type Track = {
+  source: "youtube" | "stored";
   videoId: string;
   title: string;
   channel: string;
