@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
 import { isVideoThumbnailUrl } from "./svg-cover.server";
 import { isSvgVideoId, parseSvgCardData, serializeSvgCardData } from "./svg-card";
 
@@ -21,6 +22,15 @@ export function normalizeStoredCardData(value: unknown, videoId: string): Stored
   if (card.cover && !isVideoThumbnailUrl(card.cover, videoId)) return null;
 
   return { params: serializeSvgCardData(card) };
+}
+
+export function createStoredCardContentHash(videoId: string, cardData: StoredCardData) {
+  const sortedParams = Object.fromEntries(
+    Object.entries(cardData.params).sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0)),
+  );
+  const payload = JSON.stringify({ videoId, params: sortedParams });
+
+  return createHash("sha256").update(payload).digest("hex");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
