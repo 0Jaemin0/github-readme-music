@@ -1,6 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
-import { normalizeStoredCardData, type StoredCardData } from "@/features/card-generator/lib/stored-card";
+import {
+  createStoredCardContentHash,
+  normalizeStoredCardData,
+  type StoredCardData,
+} from "@/features/card-generator/lib/stored-card";
 import { isSvgVideoId } from "@/features/card-generator/lib/svg-card";
 import { captureMonitoringError } from "@/lib/sentry-monitoring";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -51,9 +55,10 @@ export async function POST(request: Request) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const id = await insertCard(supabase, payload.videoId, cardData);
-    if (!id) throw new Error("Unable to allocate a unique card id");
-    return NextResponse.json({ data: { id } }, { status: 201 });
+    const contentHash = createStoredCardContentHash(payload.videoId, cardData);
+    const result = await findOrCreateCard(supabase, payload.videoId, cardData, contentHash);
+    if (!result) throw new Error("Unable to allocate a unique card id");
+    return NextResponse.json({ data: { id: result.id } }, { status: result.created ? 201 : 200 });
   } catch {
     captureMonitoringError({
       message: "카드 설정 저장에 실패했습니다",
@@ -66,18 +71,41 @@ export async function POST(request: Request) {
   }
 }
 
-async function insertCard(
+async function findOrCreateCard(
   supabase: ReturnType<typeof createServerSupabaseClient>,
   videoId: string,
   cardData: StoredCardData,
+  contentHash: string,
 ) {
+  const existingId = await findCardIdByContentHash(supabase, contentHash);
+  if (existingId) return { id: existingId, created: false };
+
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const id = `c_${randomBytes(12).toString("base64url")}`;
-    const { error } = await supabase.from("cards").insert({ id, video_id: videoId, card_data: cardData });
-    if (!error) return id;
+    const { error } = await supabase
+      .from("cards")
+      .insert({ id, video_id: videoId, card_data: cardData, content_hash: contentHash });
+    if (!error) return { id, created: true };
     if (error.code !== "23505") throw error;
+
+    const duplicatedId = await findCardIdByContentHash(supabase, contentHash);
+    if (duplicatedId) return { id: duplicatedId, created: false };
   }
   return null;
+}
+
+async function findCardIdByContentHash(
+  supabase: ReturnType<typeof createServerSupabaseClient>,
+  contentHash: string,
+) {
+  const { data, error } = await supabase
+    .from("cards")
+    .select("id")
+    .eq("content_hash", contentHash)
+    .maybeSingle();
+
+  if (error) throw error;
+  return typeof data?.id === "string" ? data.id : null;
 }
 
 function getRequestKey(request: Request) {
