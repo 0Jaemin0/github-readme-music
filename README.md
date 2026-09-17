@@ -45,8 +45,8 @@ YouTube 링크를 입력하면 영상의 제목, 채널명, 재생 시간, 썸�
 <p align="center"><strong>일반형</strong></p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=NI5rV1SII_0&t=121">
-    <img src="https://github-readme-music.vercel.app/card/c_YJ_O08t8esVLIceX.svg" alt="미쳤다고 해 — 김승민" width="380" />
+  <a href="https://www.youtube.com/watch?v=NI5rV1SII_0">
+    <img src="https://github-readme-music.vercel.app/card/c_Qcg_qCFfwpdocig9.svg" alt="미쳤다고 해 — 김승민" width="380" />
   </a>
 </p>
 
