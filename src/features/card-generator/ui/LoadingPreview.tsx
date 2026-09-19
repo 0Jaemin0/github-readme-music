@@ -1,6 +1,6 @@
 import { Skeleton } from '@/shared/ui/skeleton';
 
-export function LoadingPreview({ message = '영상 정보를 불러오고 있습니다…' }: { message?: string }) {
+export const LoadingPreview = ({ message = '영상 정보를 불러오고 있습니다…' }: { message?: string }) => {
   return (
     <div role="status" aria-live="polite" className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
       <div className="flex items-center gap-3">
@@ -22,4 +22,4 @@ export function LoadingPreview({ message = '영상 정보를 불러오고 있습
       </div>
     </div>
   );
-}
+};

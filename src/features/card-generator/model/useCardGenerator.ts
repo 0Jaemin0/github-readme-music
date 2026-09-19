@@ -55,7 +55,7 @@ const CARD_RESTORE_ERROR_MESSAGES = {
 } as const;
 const FALLBACK_ERROR_MESSAGE = METADATA_ERROR_MESSAGES.YOUTUBE_UNAVAILABLE;
 
-export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?: (cardId: string) => void } = {}) {
+export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?: (cardId: string) => void } = {}) => {
   const [url, setUrl] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [loadingKind, setLoadingKind] = useState<LoadingKind>(null);
@@ -95,15 +95,15 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
   const hasPendingMarkdownChanges = Boolean(generatedMarkdown && savedSnapshot !== currentSnapshot);
   const isFallbackMarkdown = markdownKind === 'fallback' && savedSnapshot === currentSnapshot;
 
-  function updateUrl(value: string) {
+  const updateUrl = (value: string) => {
     setUrl(value);
     if (error) {
       setError(null);
       setStatus('idle');
     }
-  }
+  };
 
-  async function generate() {
+  const generate = async () => {
     if (!parseYouTubeId(url)) {
       setError(METADATA_ERROR_MESSAGES.INVALID_URL);
       setStatus('error');
@@ -191,39 +191,39 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
       setLoadingKind(null);
       setStatus('error');
     }
-  }
+  };
 
-  function updateCoverPosition(coverPosition: CoverPosition) {
+  const updateCoverPosition = (coverPosition: CoverPosition) => {
     resetStorageFailures();
     setTrack((currentTrack) => (currentTrack ? { ...currentTrack, coverPosition } : currentTrack));
-  }
+  };
 
-  function updateMeta(nextMeta: CardMeta) {
+  const updateMeta = (nextMeta: CardMeta) => {
     resetStorageFailures();
     setMeta(nextMeta);
-  }
+  };
 
-  function updateStyle(nextStyle: CardStyleId) {
+  const updateStyle = (nextStyle: CardStyleId) => {
     resetStorageFailures();
     setStyle(nextStyle);
-  }
+  };
 
-  function updateProgressSeconds(nextProgressSeconds: number) {
+  const updateProgressSeconds = (nextProgressSeconds: number) => {
     resetStorageFailures();
     setProgressSeconds(nextProgressSeconds);
-  }
+  };
 
-  function updateTheme(nextTheme: CardTheme) {
+  const updateTheme = (nextTheme: CardTheme) => {
     resetStorageFailures();
     setTheme(nextTheme);
-  }
+  };
 
-  function resetStorageFailures() {
+  const resetStorageFailures = () => {
     setFailedSnapshot(null);
     setStorageFailureCount(0);
-  }
+  };
 
-  async function restoreStoredCard(cardId: string) {
+  const restoreStoredCard = async (cardId: string) => {
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -318,9 +318,9 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
       // Keep the recent-card landing view visible so a transient restore failure can be retried immediately.
       setStatus('idle');
     }
-  }
+  };
 
-  async function generateMarkdown() {
+  const generateMarkdown = async () => {
     if (!track || saveStatus === 'saving') return;
 
     const snapshot = createSvgCardParams(track, style, meta, theme, progressSeconds);
@@ -419,9 +419,9 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
       );
       setSaveStatus('error');
     }
-  }
+  };
 
-  async function copyMarkdown() {
+  const copyMarkdown = async () => {
     if (!generatedMarkdown) return;
 
     try {
@@ -431,9 +431,9 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
     } catch {
       showCopyFeedback('error');
     }
-  }
+  };
 
-  function showCopyFeedback(feedback: 'success' | 'error') {
+  const showCopyFeedback = (feedback: 'success' | 'error') => {
     if (copyFeedbackTimerRef.current) window.clearTimeout(copyFeedbackTimerRef.current);
     setCopyFeedback(feedback);
     copyFeedbackTimerRef.current = window.setTimeout(() => {
@@ -441,7 +441,7 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
       setCopyFeedback(null);
       copyFeedbackTimerRef.current = null;
     }, 1800);
-  }
+  };
 
   return {
     url,
@@ -471,36 +471,36 @@ export function useCardGenerator({ onStoredCardCreated }: { onStoredCardCreated?
     generateMarkdown,
     copyMarkdown,
   };
-}
+};
 
-function getMetadataErrorMessage(code: string | undefined) {
+const getMetadataErrorMessage = (code: string | undefined) => {
   if (code && code in METADATA_ERROR_MESSAGES)
     return METADATA_ERROR_MESSAGES[code as keyof typeof METADATA_ERROR_MESSAGES];
   return FALLBACK_ERROR_MESSAGE;
-}
+};
 
-function getCardStorageErrorMessage(code: string | undefined) {
+const getCardStorageErrorMessage = (code: string | undefined) => {
   if (code && code in CARD_STORAGE_ERROR_MESSAGES)
     return CARD_STORAGE_ERROR_MESSAGES[code as keyof typeof CARD_STORAGE_ERROR_MESSAGES];
   return CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE;
-}
+};
 
-function getCardRestoreErrorMessage(code: string | undefined) {
+const getCardRestoreErrorMessage = (code: string | undefined) => {
   if (code && code in CARD_RESTORE_ERROR_MESSAGES)
     return CARD_RESTORE_ERROR_MESSAGES[code as keyof typeof CARD_RESTORE_ERROR_MESSAGES];
   return CARD_RESTORE_ERROR_MESSAGES.CARD_READ_UNAVAILABLE;
-}
+};
 
-function isStringRecord(value: unknown): value is Record<string, string> {
+const isStringRecord = (value: unknown): value is Record<string, string> => {
   return (
     typeof value === 'object' &&
     value !== null &&
     !Array.isArray(value) &&
     Object.values(value).every((item) => typeof item === 'string')
   );
-}
+};
 
-function isStoredCardResponseData(value: unknown): value is { videoId: string; params: Record<string, string> } {
+const isStoredCardResponseData = (value: unknown): value is { videoId: string; params: Record<string, string> } => {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -510,16 +510,16 @@ function isStoredCardResponseData(value: unknown): value is { videoId: string; p
     isSvgVideoId(value.videoId) &&
     isStringRecord(value.params)
   );
-}
+};
 
-function createWaveform(videoId: string) {
+const createWaveform = (videoId: string) => {
   let seed = [...videoId].reduce((total, character) => total + character.charCodeAt(0), 0);
   return Array.from({ length: 20 }, () => {
     seed = (seed * 1_103_515_245 + 12_345) & 0x7fffffff;
     return 18 + (seed % 63);
   });
-}
+};
 
-function limitMetaText(value: string) {
+const limitMetaText = (value: string) => {
   return value.slice(0, 120);
-}
+};

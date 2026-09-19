@@ -2,7 +2,7 @@ const YOUTUBE_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com'
 const SHORT_HOST = 'youtu.be';
 const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
 
-export function parseYouTubeId(input: string): string | null {
+export const parseYouTubeId = (input: string): string | null => {
   const value = input.trim();
   if (!value || value.length > 2_048) return null;
 
@@ -27,13 +27,13 @@ export function parseYouTubeId(input: string): string | null {
   }
 
   return videoId && VIDEO_ID_PATTERN.test(videoId) ? videoId : null;
-}
+};
 
-export function suggestTitle(rawTitle: string): string {
+export const suggestTitle = (rawTitle: string): string => {
   return rawTitle.replace(/\s{2,}/g, ' ').trim() || rawTitle.trim();
-}
+};
 
-export function suggestArtist(channel: string, title: string): string {
+export const suggestArtist = (channel: string, title: string): string => {
   const titleParts = title.split(/\s[-|]\s/);
   if (titleParts.length > 1) return titleParts[0].trim();
 
@@ -42,4 +42,4 @@ export function suggestArtist(channel: string, title: string): string {
     .replace(/\s*VEVO$/i, '')
     .replace(/\s*Official$/i, '')
     .trim();
-}
+};

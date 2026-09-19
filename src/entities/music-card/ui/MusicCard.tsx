@@ -34,7 +34,7 @@ type CardProps = {
   progressSeconds: number;
 };
 
-export function MusicCard({
+export const MusicCard = ({
   track,
   meta,
   style,
@@ -48,7 +48,7 @@ export function MusicCard({
   theme: CardTheme;
   progressSeconds?: number;
   className?: string;
-}) {
+}) => {
   const shellStyle: React.CSSProperties = {
     background: theme.gradient
       ? `linear-gradient(${GRADIENT_ANGLES[theme.gradientDirection ?? 'bottom-right']}deg in srgb, ${theme.background} 0%, ${mixHex(theme.background, theme.accent, theme.gradientIntensity / 100)} 100%)`
@@ -63,9 +63,9 @@ export function MusicCard({
   if (style === 'compact') return <CompactCard {...props} />;
   if (style === 'vertical') return <VerticalCard {...props} />;
   return <PlayerCard {...props} />;
-}
+};
 
-function PlayerCard({ track, meta, theme, sizeStyle, className, shellStyle, progressSeconds }: CardProps) {
+const PlayerCard = ({ track, meta, theme, sizeStyle, className, shellStyle, progressSeconds }: CardProps) => {
   return (
     <figure className={cn('w-full overflow-hidden border', sizeStyle.player, className)} style={shellStyle}>
       <div className="flex min-w-0 items-center gap-4">
@@ -85,9 +85,9 @@ function PlayerCard({ track, meta, theme, sizeStyle, className, shellStyle, prog
       </div>
     </figure>
   );
-}
+};
 
-function CompactCard({ track, meta, theme, sizeStyle, className, shellStyle }: CardProps) {
+const CompactCard = ({ track, meta, theme, sizeStyle, className, shellStyle }: CardProps) => {
   return (
     <figure
       className={cn('flex w-full items-center overflow-hidden border', sizeStyle.compact, className)}
@@ -106,9 +106,9 @@ function CompactCard({ track, meta, theme, sizeStyle, className, shellStyle }: C
       </span>
     </figure>
   );
-}
+};
 
-function VerticalCard({ track, meta, theme, sizeStyle, className, shellStyle, progressSeconds }: CardProps) {
+const VerticalCard = ({ track, meta, theme, sizeStyle, className, shellStyle, progressSeconds }: CardProps) => {
   return (
     <figure
       className={cn('flex w-full flex-col overflow-hidden border', sizeStyle.vertical, className)}
@@ -134,9 +134,9 @@ function VerticalCard({ track, meta, theme, sizeStyle, className, shellStyle, pr
       <PlaybackControls color={theme.text} className={cn('mt-auto', sizeStyle.controls)} />
     </figure>
   );
-}
+};
 
-function TrackDetails({
+const TrackDetails = ({
   meta,
   theme,
   titleClassName,
@@ -150,16 +150,16 @@ function TrackDetails({
   artistClassName: string;
   className?: string;
   fillAvailableSpace?: boolean;
-}) {
+}) => {
   return (
     <div className={cn('min-w-0', fillAvailableSpace && 'flex-1', className)}>
       <FlowingText text={meta.title} className={cn('font-semibold tracking-[-0.015em]', titleClassName)} />
       <FlowingText text={meta.artist} className={artistClassName} color={theme.muted} />
     </div>
   );
-}
+};
 
-function PlaybackTimeline({
+const PlaybackTimeline = ({
   track,
   theme,
   progressSeconds,
@@ -173,7 +173,7 @@ function PlaybackTimeline({
   durationClassName: string;
   progressClassName: string;
   className?: string;
-}) {
+}) => {
   const totalSeconds = durationToSeconds(track.duration);
   const currentSeconds = Math.min(progressSeconds, totalSeconds);
   const progress = totalSeconds ? (currentSeconds / totalSeconds) * 100 : 0;
@@ -191,9 +191,9 @@ function PlaybackTimeline({
       </span>
     </div>
   );
-}
+};
 
-function VerticalPlaybackTimeline({
+const VerticalPlaybackTimeline = ({
   track,
   theme,
   progressSeconds,
@@ -207,7 +207,7 @@ function VerticalPlaybackTimeline({
   durationClassName: string;
   progressClassName: string;
   className?: string;
-}) {
+}) => {
   const totalSeconds = durationToSeconds(track.duration);
   const currentSeconds = Math.min(progressSeconds, totalSeconds);
   const progress = totalSeconds ? (currentSeconds / totalSeconds) * 100 : 0;
@@ -225,9 +225,9 @@ function VerticalPlaybackTimeline({
       </div>
     </div>
   );
-}
+};
 
-function PlaybackControls({ color, className }: { color: string; className: string }) {
+const PlaybackControls = ({ color, className }: { color: string; className: string }) => {
   return (
     <div className={cn('flex items-center justify-center', className)} style={{ color }} aria-hidden="true">
       <SkipIcon direction="back" />
@@ -235,18 +235,18 @@ function PlaybackControls({ color, className }: { color: string; className: stri
       <SkipIcon direction="forward" />
     </div>
   );
-}
+};
 
-function PauseIcon() {
+const PauseIcon = () => {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" className="scale-125">
       <rect x="14" y="3" width="4" height="18" rx="1" />
       <rect x="5" y="3" width="4" height="18" rx="1" />
     </svg>
   );
-}
+};
 
-function SkipIcon({ direction }: { direction: 'back' | 'forward' }) {
+const SkipIcon = ({ direction }: { direction: 'back' | 'forward' }) => {
   const triangle = 'M1 0Q0 0 0 1v15q0 1 1 1l12.47-7.2q1.25-1.3 0-2.6Z';
   const positions =
     direction === 'back'
@@ -267,9 +267,9 @@ function SkipIcon({ direction }: { direction: 'back' | 'forward' }) {
       ))}
     </svg>
   );
-}
+};
 
-function CoverImage({ track, title, className }: { track: Track; title: string; className: string }) {
+const CoverImage = ({ track, title, className }: { track: Track; title: string; className: string }) => {
   const [failedCover, setFailedCover] = useState<string | null>(null);
   const hasImageError = failedCover === track.cover;
   const ratio = track.coverPosition.aspectRatio;
@@ -304,9 +304,9 @@ function CoverImage({ track, title, className }: { track: Track; title: string; 
       )}
     </div>
   );
-}
+};
 
-function ProgressBar({
+const ProgressBar = ({
   color,
   heightClassName,
   progress,
@@ -314,7 +314,7 @@ function ProgressBar({
   color: string;
   heightClassName: string;
   progress: number;
-}) {
+}) => {
   const visibleProgress = progress <= 0 ? 1 : Math.min(100, progress);
 
   return (
@@ -330,9 +330,9 @@ function ProgressBar({
       />
     </div>
   );
-}
+};
 
-function FlowingText({ text, className, color }: { text: string; className: string; color?: string }) {
+const FlowingText = ({ text, className, color }: { text: string; className: string; color?: string }) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLSpanElement>(null);
   const [shouldFlow, setShouldFlow] = useState(false);
@@ -370,9 +370,9 @@ function FlowingText({ text, className, color }: { text: string; className: stri
       )}
     </div>
   );
-}
+};
 
-function PlayingBars({ waveform, accent, className }: { waveform: number[]; accent: string; className: string }) {
+const PlayingBars = ({ waveform, accent, className }: { waveform: number[]; accent: string; className: string }) => {
   return (
     <div className={cn('flex items-center justify-between gap-0.5 overflow-hidden', className)} aria-hidden="true">
       {waveform.map((value, index) => (
@@ -388,9 +388,9 @@ function PlayingBars({ waveform, accent, className }: { waveform: number[]; acce
       ))}
     </div>
   );
-}
+};
 
-function TrackTicker({
+const TrackTicker = ({
   title,
   artist,
   titleClassName,
@@ -402,7 +402,7 @@ function TrackTicker({
   titleClassName: string;
   artistClassName: string;
   mutedColor: string;
-}) {
+}) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const firstCopyRef = useRef<HTMLSpanElement>(null);
@@ -453,4 +453,4 @@ function TrackTicker({
       </div>
     </div>
   );
-}
+};

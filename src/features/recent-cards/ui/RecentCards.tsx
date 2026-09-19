@@ -12,13 +12,13 @@ type RecentCardsProps = {
   onSelectCard: (cardId: string) => void;
 };
 
-export function RecentCards({
+export const RecentCards = ({
   cardIds,
   isLoaded,
   isRestoring,
   fillRemainingSpace = false,
   onSelectCard,
-}: RecentCardsProps) {
+}: RecentCardsProps) => {
   const [failedCardIds, setFailedCardIds] = useState<Set<string>>(() => new Set());
   const [loadedCardIds, setLoadedCardIds] = useState<Set<string>>(() => new Set());
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
@@ -97,4 +97,4 @@ export function RecentCards({
       ) : null}
     </section>
   );
-}
+};

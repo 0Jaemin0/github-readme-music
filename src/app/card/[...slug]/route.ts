@@ -16,7 +16,7 @@ type RouteContext = {
   params: Promise<{ slug: string[] }>;
 };
 
-export async function GET(request: Request, { params }: RouteContext) {
+export const GET = async (request: Request, { params }: RouteContext) => {
   const { slug } = await params;
   const [fileName] = slug;
   const cardKey = fileName?.endsWith('.svg') ? fileName.slice(0, -4) : '';
@@ -32,9 +32,9 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   return renderCard(parseSvgCardData(new URL(request.url).searchParams), cardKey);
-}
+};
 
-async function renderCard(data: SvgCardData, videoId: string) {
+const renderCard = async (data: SvgCardData, videoId: string) => {
   const card = await embedSvgCover(data, videoId);
   return new NextResponse(renderSvgCard(card.data), {
     headers: {
@@ -44,9 +44,9 @@ async function renderCard(data: SvgCardData, videoId: string) {
       'X-Content-Type-Options': 'nosniff',
     },
   });
-}
+};
 
-async function renderStoredCard(id: string) {
+const renderStoredCard = async (id: string) => {
   try {
     const card = await readStoredCard(id);
     if (card.type === 'not_found') return new NextResponse('카드를 찾을 수 없습니다.', { status: 404 });
@@ -71,4 +71,4 @@ async function renderStoredCard(id: string) {
     });
     return new NextResponse('카드를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.', { status: 503 });
   }
-}
+};

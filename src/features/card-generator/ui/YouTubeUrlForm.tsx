@@ -12,7 +12,7 @@ type YouTubeUrlFormProps = {
   onSubmit: () => void;
 };
 
-export function YouTubeUrlForm({ url, error, isLoading, onUrlChange, onSubmit }: YouTubeUrlFormProps) {
+export const YouTubeUrlForm = ({ url, error, isLoading, onUrlChange, onSubmit }: YouTubeUrlFormProps) => {
   return (
     <div>
       <form
@@ -76,4 +76,4 @@ export function YouTubeUrlForm({ url, error, isLoading, onUrlChange, onSubmit }:
       </div>
     </div>
   );
-}
+};

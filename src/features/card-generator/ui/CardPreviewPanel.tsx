@@ -25,7 +25,7 @@ type CardPreviewPanelProps = {
   onThemeChange: (theme: CardTheme) => void;
 };
 
-export function CardPreviewPanel({
+export const CardPreviewPanel = ({
   track,
   meta,
   style,
@@ -34,7 +34,7 @@ export function CardPreviewPanel({
   onStyleChange,
   onProgressChange,
   onThemeChange,
-}: CardPreviewPanelProps) {
+}: CardPreviewPanelProps) => {
   return (
     <section className="rounded-xl border border-border bg-background p-4 sm:p-5">
       <div className="mb-3">
@@ -63,9 +63,9 @@ export function CardPreviewPanel({
       </section>
     </section>
   );
-}
+};
 
-function PlaybackPosition({
+const PlaybackPosition = ({
   value,
   duration,
   onChange,
@@ -73,7 +73,7 @@ function PlaybackPosition({
   value: number;
   duration: string;
   onChange: (value: number) => void;
-}) {
+}) => {
   const totalSeconds = durationToSeconds(duration);
 
   return (
@@ -95,4 +95,4 @@ function PlaybackPosition({
       />
     </div>
   );
-}
+};

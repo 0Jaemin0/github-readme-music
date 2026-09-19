@@ -26,7 +26,7 @@ type CardResultProps = {
   onGenerateMarkdown: () => void;
 };
 
-export function CardResult({
+export const CardResult = ({
   track,
   meta,
   style,
@@ -47,7 +47,7 @@ export function CardResult({
   onThemeChange,
   onCopy,
   onGenerateMarkdown,
-}: CardResultProps) {
+}: CardResultProps) => {
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card/40 p-4 sm:p-8">
       {isRefreshing ? (
@@ -84,4 +84,4 @@ export function CardResult({
       />
     </div>
   );
-}
+};

@@ -6,7 +6,7 @@ import { createServerSupabaseClient } from '@/shared/api/supabase/server';
 export type StoredCardReadResult =
   { type: 'found'; videoId: string; cardData: StoredCardData } | { type: 'not_found' } | { type: 'invalid_data' };
 
-export async function readStoredCard(id: string): Promise<StoredCardReadResult> {
+export const readStoredCard = async (id: string): Promise<StoredCardReadResult> => {
   const supabase = createServerSupabaseClient();
   const { data, error } = await supabase.from('cards').select('video_id, card_data').eq('id', id).maybeSingle();
 
@@ -18,4 +18,4 @@ export async function readStoredCard(id: string): Promise<StoredCardReadResult> 
   if (!cardData) return { type: 'invalid_data' };
 
   return { type: 'found', videoId, cardData };
-}
+};

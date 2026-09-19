@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createClient } from '@supabase/supabase-js';
 
-export function createServerSupabaseClient() {
+export const createServerSupabaseClient = () => {
   const url = process.env.SUPABASE_URL;
   const secretKey = process.env.SUPABASE_SECRET_KEY;
 
@@ -14,4 +14,4 @@ export function createServerSupabaseClient() {
       persistSession: false,
     },
   });
-}
+};

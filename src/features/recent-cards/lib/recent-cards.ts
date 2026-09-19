@@ -2,7 +2,7 @@ const RECENT_CARD_IDS_STORAGE_KEY = 'github-readme-music-recent-card-ids';
 const MAX_RECENT_CARDS = 3;
 const STORED_CARD_ID_PATTERN = /^c_[A-Za-z0-9_-]{16}$/;
 
-export function readRecentCardIds() {
+export const readRecentCardIds = () => {
   try {
     const storedValue = window.localStorage.getItem(RECENT_CARD_IDS_STORAGE_KEY);
     if (!storedValue) return [];
@@ -14,9 +14,9 @@ export function readRecentCardIds() {
   } catch {
     return [];
   }
-}
+};
 
-export function saveRecentCardId(cardId: string) {
+export const saveRecentCardId = (cardId: string) => {
   if (!isStoredCardId(cardId)) return [];
 
   const nextCardIds = [cardId, ...readRecentCardIds().filter((id) => id !== cardId)].slice(0, MAX_RECENT_CARDS);
@@ -28,8 +28,8 @@ export function saveRecentCardId(cardId: string) {
   }
 
   return nextCardIds;
-}
+};
 
-function isStoredCardId(value: unknown): value is string {
+const isStoredCardId = (value: unknown): value is string => {
   return typeof value === 'string' && STORED_CARD_ID_PATTERN.test(value);
-}
+};

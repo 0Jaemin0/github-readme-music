@@ -8,7 +8,7 @@ type MonitoringError = {
   httpStatus?: number;
 };
 
-export function captureMonitoringError({ message, errorCode, operation, layer, httpStatus }: MonitoringError) {
+export const captureMonitoringError = ({ message, errorCode, operation, layer, httpStatus }: MonitoringError) => {
   const monitoredError = new Error(message);
 
   Sentry.withScope((scope) => {
@@ -20,4 +20,4 @@ export function captureMonitoringError({ message, errorCode, operation, layer, h
     scope.setFingerprint([errorCode]);
     Sentry.captureException(monitoredError);
   });
-}
+};

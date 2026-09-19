@@ -25,7 +25,7 @@ export type SvgCardData = {
   progressSeconds: number;
 };
 
-export function serializeSvgCardData(data: SvgCardData) {
+export const serializeSvgCardData = (data: SvgCardData) => {
   return {
     style: data.style,
     title: data.title,
@@ -59,15 +59,15 @@ export function serializeSvgCardData(data: SvgCardData) {
     r: String(data.theme.radius),
     progress: String(data.progressSeconds),
   };
-}
+};
 
-export function createSvgCardParams(
+export const createSvgCardParams = (
   track: Track,
   style: CardStyleId,
   meta: CardMeta,
   theme: CardTheme,
   progressSeconds: number,
-) {
+) => {
   const textWidths = measureTickerTextWidths(style, meta);
   const playerProgress = measurePlayerProgress(track.duration, progressSeconds, theme.borderWidth);
 
@@ -104,9 +104,9 @@ export function createSvgCardParams(
     r: String(theme.radius),
     progress: String(Math.floor(progressSeconds)),
   });
-}
+};
 
-function measureTickerTextWidths(style: CardStyleId, meta: CardMeta) {
+const measureTickerTextWidths = (style: CardStyleId, meta: CardMeta) => {
   const titleStyle =
     style === 'vertical'
       ? { fontSize: 16, fontWeight: 600, letterSpacing: -0.015 }
@@ -118,9 +118,9 @@ function measureTickerTextWidths(style: CardStyleId, meta: CardMeta) {
     title: measureTextWidth(meta.title, titleStyle),
     artist: measureTextWidth(meta.artist, { fontSize: 13, fontWeight: 400, letterSpacing: 0 }),
   };
-}
+};
 
-function measureTextWidth(value: string, style: { fontSize: number; fontWeight: number; letterSpacing: number }) {
+const measureTextWidth = (value: string, style: { fontSize: number; fontWeight: number; letterSpacing: number }) => {
   if (typeof document === 'undefined') return 0;
 
   const element = document.createElement('span');
@@ -130,9 +130,9 @@ function measureTextWidth(value: string, style: { fontSize: number; fontWeight: 
   const width = element.getBoundingClientRect().width;
   element.remove();
   return width;
-}
+};
 
-function measurePlayerProgress(duration: string, progressSeconds: number, borderWidth: number) {
+const measurePlayerProgress = (duration: string, progressSeconds: number, borderWidth: number) => {
   const totalSeconds = durationToSeconds(duration);
   const currentSeconds = Math.min(progressSeconds, totalSeconds);
   const timeStyle = { fontSize: 12, fontWeight: 400, letterSpacing: 0 };
@@ -148,13 +148,13 @@ function measurePlayerProgress(duration: string, progressSeconds: number, border
     width: contentWidth - startWidth - endWidth - gap * 2,
     height: 6,
   };
-}
+};
 
-export function isSvgVideoId(value: string) {
+export const isSvgVideoId = (value: string) => {
   return VIDEO_ID_PATTERN.test(value);
-}
+};
 
-export function parseSvgCardData(params: URLSearchParams): SvgCardData {
+export const parseSvgCardData = (params: URLSearchParams): SvgCardData => {
   const style = readStyle(params.get('style'));
   const duration = readDuration(params.get('duration'));
   const totalSeconds = durationToSeconds(duration);
@@ -195,15 +195,15 @@ export function parseSvgCardData(params: URLSearchParams): SvgCardData {
     },
     progressSeconds: Math.min(readNumber(params.get('progress'), 0, 0, totalSeconds), totalSeconds),
   };
-}
+};
 
-export function renderSvgCard(data: SvgCardData) {
+export const renderSvgCard = (data: SvgCardData) => {
   if (data.style === 'compact') return renderCompactCard(data);
   if (data.style === 'vertical') return renderVerticalCard(data);
   return renderPlayerCard(data);
-}
+};
 
-function renderPlayerCard(data: SvgCardData) {
+const renderPlayerCard = (data: SvgCardData) => {
   const width = 380;
   const height = 181;
   const coverSize = 60;
@@ -228,9 +228,9 @@ function renderPlayerCard(data: SvgCardData) {
     ${playerControls(data.theme.text, 190, 143.435 + inset, 1)}
   `,
   );
-}
+};
 
-function renderCompactCard(data: SvgCardData) {
+const renderCompactCard = (data: SvgCardData) => {
   const width = 460;
   const height = 48;
   const card = cardRect(data, width, height);
@@ -247,9 +247,9 @@ function renderCompactCard(data: SvgCardData) {
     ${text(data.duration, 444 - inset, 29, 12, data.theme.muted, 500, undefined, 'end')}
   `,
   );
-}
+};
 
-function renderVerticalCard(data: SvgCardData) {
+const renderVerticalCard = (data: SvgCardData) => {
   const width = 260;
   const height = 416;
   const coverSize = 200;
@@ -278,13 +278,13 @@ function renderVerticalCard(data: SvgCardData) {
     ${playerControls(data.theme.text, 130, verticalControlsY(height, inset), 1)}
   `,
   );
-}
+};
 
-function svgDocument(width: number, height: number, content: string) {
+const svgDocument = (width: number, height: number, content: string) => {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Music card"><style>text{font-family:'Noto Sans KR',Arial,sans-serif}</style>${content}</svg>`;
-}
+};
 
-function cardRect(data: SvgCardData, width: number, height: number) {
+const cardRect = (data: SvgCardData, width: number, height: number) => {
   const borderWidth = data.theme.borderWidth;
   const outerRadius = Math.min(data.theme.radius, width / 2, height / 2);
 
@@ -296,27 +296,27 @@ function cardRect(data: SvgCardData, width: number, height: number) {
     outerRadius: formatCoordinate(outerRadius),
     radius: formatCoordinate(Math.max(0, outerRadius - borderWidth / 2)),
   };
-}
+};
 
-function verticalControlsY(height: number, borderWidth: number) {
+const verticalControlsY = (height: number, borderWidth: number) => {
   const paddingBottom = 20;
   const controlsHeight = 30;
   return height - borderWidth - paddingBottom - controlsHeight / 2;
-}
+};
 
-function cardSurface(data: SvgCardData, card: ReturnType<typeof cardRect>, width: number, height: number) {
+const cardSurface = (data: SvgCardData, card: ReturnType<typeof cardRect>, width: number, height: number) => {
   return `<rect x="0" y="0" width="${width}" height="${height}" rx="${card.outerRadius}" fill="${backgroundFill(data)}"/><rect x="${card.x}" y="${card.y}" width="${card.width}" height="${card.height}" rx="${card.radius}" fill="none" stroke="${data.theme.border}" stroke-width="${data.theme.borderWidth}"/>`;
-}
+};
 
-function cardGradient(data: SvgCardData, id: string, width: number, height: number) {
+const cardGradient = (data: SvgCardData, id: string, width: number, height: number) => {
   if (!data.theme.gradient) return '';
   const { x1, y1, x2, y2 } = cssGradientCoordinates(data.theme.gradientDirection ?? 'bottom-right', width, height);
   const endColor = mixHex(data.theme.background, data.theme.accent, data.theme.gradientIntensity / 100);
 
   return `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" color-interpolation="sRGB"><stop stop-color="${data.theme.background}"/><stop offset="1" stop-color="${endColor}"/></linearGradient></defs>`;
-}
+};
 
-function cssGradientCoordinates(direction: GradientCorner, width: number, height: number) {
+const cssGradientCoordinates = (direction: GradientCorner, width: number, height: number) => {
   const angles: Record<GradientCorner, number> = {
     'top-left': 315,
     'top-right': 45,
@@ -336,17 +336,17 @@ function cssGradientCoordinates(direction: GradientCorner, width: number, height
     x2: formatCoordinate(centerX + horizontal * halfLength),
     y2: formatCoordinate(centerY + vertical * halfLength),
   };
-}
+};
 
-function formatCoordinate(value: number) {
+const formatCoordinate = (value: number) => {
   return Number(value.toFixed(3));
-}
+};
 
-function backgroundFill(data: SvgCardData) {
+const backgroundFill = (data: SvgCardData) => {
   return data.theme.gradient ? `url(#${data.style}-gradient)` : data.theme.background;
-}
+};
 
-function coverImage(data: SvgCardData, x: number, y: number, size: number, id: string) {
+const coverImage = (data: SvgCardData, x: number, y: number, size: number, id: string) => {
   const radius = 8;
   if (!data.cover)
     return `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}" fill="${withAlpha(data.theme.muted, 0.25)}"/>`;
@@ -362,18 +362,18 @@ function coverImage(data: SvgCardData, x: number, y: number, size: number, id: s
   const imageY = y - cropTop * renderScale;
 
   return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}"/></clipPath></defs><image href="${escapeXml(data.cover)}" x="${imageX.toFixed(2)}" y="${imageY.toFixed(2)}" width="${(sourceWidth * renderScale).toFixed(2)}" height="${(sourceHeight * renderScale).toFixed(2)}" preserveAspectRatio="none" clip-path="url(#${id})"/>`;
-}
+};
 
-function progressBar(data: SvgCardData, x: number, y: number, width: number, height: number, progress: number) {
+const progressBar = (data: SvgCardData, x: number, y: number, width: number, height: number, progress: number) => {
   const knobX = x + (width * progress) / 100;
   return `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${height / 2}" fill="${withAlpha(data.theme.muted, 0.32)}"/><rect x="${x}" y="${y}" width="${(width * progress) / 100}" height="${height}" rx="${height / 2}" fill="${data.theme.muted}"/><circle cx="${knobX}" cy="${y + height / 2}" r="5" fill="${data.theme.muted}"/>`;
-}
+};
 
-function playerControls(color: string, x: number, y: number, scale: number) {
+const playerControls = (color: string, x: number, y: number, scale: number) => {
   return `<g transform="translate(${x} ${y}) scale(${scale * 0.94})" fill="${color}" stroke="${color}" stroke-linecap="round" stroke-linejoin="round"><path d="M-53.5 -10Q-52.5 -10 -52.5 -9V9Q-52.5 10 -53.5 10L-68.5 1.35Q-70.9 0 -68.5 -1.35Z" transform="translate(-64.354 0) scale(0.88) translate(64.354 0) translate(-2.5 0)" stroke-width="2.5"/><path d="M-73.5 -10Q-72.5 -10 -72.5 -9V9Q-72.5 10 -73.5 10L-88.5 1.35Q-90.9 0 -88.5 -1.35Z" transform="translate(-79.046 0) scale(0.88) translate(79.046 0)" stroke-width="2.5"/><rect x="-9.405" y="-12.815" width="5" height="28.13" rx="1" stroke-width="5"/><rect x="5.5" y="-12.815" width="5" height="28.13" rx="1" stroke-width="5"/><path d="M53.5 -10Q52.5 -10 52.5 -9V9Q52.5 10 53.5 10L68.5 1.35Q70.9 0 68.5 -1.35Z" transform="translate(64.354 0) scale(0.88) translate(-64.354 0) translate(2.5 0)" stroke-width="2.5"/><path d="M73.5 -10Q72.5 -10 72.5 -9V9Q72.5 10 73.5 10L88.5 1.35Q90.9 0 88.5 -1.35Z" transform="translate(79.046 0) scale(0.88) translate(-79.046 0)" stroke-width="2.5"/></g>`;
-}
+};
 
-function waveform(values: number[], color: string, x: number, y: number) {
+const waveform = (values: number[], color: string, x: number, y: number) => {
   const containerWidth = 24;
   const containerHeight = 20;
   const gap = 2;
@@ -390,9 +390,9 @@ function waveform(values: number[], color: string, x: number, y: number) {
       return `<rect x="${(x + index * step).toFixed(2)}" y="${lowY.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${low.toFixed(2)}" rx="1" fill="${withAlpha(color, 0.75)}" opacity="0.55"><animate attributeName="height" values="${low};${height};${low}" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/><animate attributeName="y" values="${lowY};${highY};${lowY}" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/></rect>`;
     })
     .join('');
-}
+};
 
-function text(
+const text = (
   value: string,
   x: number,
   y: number,
@@ -401,12 +401,12 @@ function text(
   weight: number,
   maxWidth?: number,
   anchor = 'start',
-) {
+) => {
   const clipped = truncate(value, maxWidth ? Math.floor(maxWidth / (fontSize * 0.82)) : 80);
   return `<text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}" text-anchor="${anchor}">${escapeXml(clipped)}</text>`;
-}
+};
 
-function tickerText(
+const tickerText = (
   value: string,
   x: number,
   y: number,
@@ -417,7 +417,7 @@ function tickerText(
   id: string,
   measuredWidth: number,
   letterSpacing = 0,
-) {
+) => {
   const clipY = y - fontSize * 1.05;
   const estimatedWidth = measuredWidth || value.length * fontSize * 0.82;
   const content = escapeXml(value);
@@ -428,9 +428,9 @@ function tickerText(
   const gap = 32;
   const distance = Math.ceil(estimatedWidth + gap);
   return `<defs><clipPath id="${id}-clip"><rect x="${x}" y="${clipY}" width="${width}" height="${fontSize * 1.4}"/></clipPath></defs><g clip-path="url(#${id}-clip)"><g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${distance} 0" dur="12s" begin="1s" repeatCount="indefinite"/><text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}"${tracking}>${content}</text><text x="${x + distance}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}"${tracking}>${content}</text></g></g>`;
-}
+};
 
-function compactTicker(
+const compactTicker = (
   title: string,
   artist: string,
   measuredTitleWidth: number,
@@ -440,7 +440,7 @@ function compactTicker(
   width: number,
   textColor: string,
   mutedColor: string,
-) {
+) => {
   const titleWidth = measuredTitleWidth || title.length * 13 * 0.82;
   const artistX = x + titleWidth + 8;
   const artistWidth = measuredArtistWidth || artist.length * 13 * 0.82;
@@ -450,27 +450,27 @@ function compactTicker(
   const duration = 12;
 
   return `<defs><clipPath id="compact-ticker-clip"><rect x="${x}" y="${y - 15}" width="${width}" height="20"/></clipPath></defs><g clip-path="url(#compact-ticker-clip)"><g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${distance} 0" dur="${duration}s" begin="1s" repeatCount="indefinite"/><text x="${x}" y="${y}" fill="${textColor}" font-size="13" font-weight="600" letter-spacing="-0.01em">${escapeXml(title)}</text><text x="${artistX}" y="${y}" fill="${mutedColor}" font-size="13" font-weight="400">${escapeXml(artist)}</text><text x="${x + distance}" y="${y}" fill="${textColor}" font-size="13" font-weight="600" letter-spacing="-0.01em">${escapeXml(title)}</text><text x="${artistX + distance}" y="${y}" fill="${mutedColor}" font-size="13" font-weight="400">${escapeXml(artist)}</text></g></g>`;
-}
+};
 
-function readStyle(value: string | null): CardStyleId {
+const readStyle = (value: string | null): CardStyleId => {
   return STYLE_IDS.includes(value as CardStyleId) ? (value as CardStyleId) : 'player';
-}
+};
 
-function readGradientDirection(value: string | null): GradientCorner | null {
+const readGradientDirection = (value: string | null): GradientCorner | null => {
   return GRADIENT_DIRECTIONS.includes(value as GradientCorner) ? (value as GradientCorner) : null;
-}
+};
 
-function readText(value: string | null, fallback: string, maxLength: number) {
+const readText = (value: string | null, fallback: string, maxLength: number) => {
   if (value === null) return fallback;
   return value.trim().slice(0, maxLength);
-}
+};
 
-function readDuration(value: string | null) {
+const readDuration = (value: string | null) => {
   if (!value || !/^(?:\d+:)?[0-5]?\d:\d{2}$/.test(value)) return '0:00';
   return durationToSeconds(value) <= 86_399 ? value : '0:00';
-}
+};
 
-function readCover(value: string | null) {
+const readCover = (value: string | null) => {
   if (!value) return '';
   try {
     const url = new URL(value);
@@ -478,42 +478,42 @@ function readCover(value: string | null) {
   } catch {
     return '';
   }
-}
+};
 
-function readWaveform(value: string | null) {
+const readWaveform = (value: string | null) => {
   const fallback = [28, 46, 68, 38, 60, 32];
   if (!value) return fallback;
   const values = value.split(',').map((item) => Number(item));
   return values.length === 6 && values.every((item) => Number.isFinite(item) && item >= 0 && item <= 100)
     ? values
     : fallback;
-}
+};
 
-function readColor(value: string | null, fallback: string) {
+const readColor = (value: string | null, fallback: string) => {
   const color = value ? `#${value.replace('#', '')}` : fallback;
   return HEX_COLOR_PATTERN.test(color) ? color.toLowerCase() : fallback;
-}
+};
 
-function readNumber(value: string | null, fallback: number, min: number, max: number) {
+const readNumber = (value: string | null, fallback: number, min: number, max: number) => {
   const number = Number(value);
   return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback;
-}
+};
 
-function withAlpha(hex: string, alpha: number) {
+const withAlpha = (hex: string, alpha: number) => {
   const value = hex.slice(1);
   const red = Number.parseInt(value.slice(0, 2), 16);
   const green = Number.parseInt(value.slice(2, 4), 16);
   const blue = Number.parseInt(value.slice(4, 6), 16);
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-}
+};
 
-function truncate(value: string, maxLength: number) {
+const truncate = (value: string, maxLength: number) => {
   return value.length > maxLength ? `${value.slice(0, Math.max(1, maxLength - 1))}…` : value;
-}
+};
 
-function escapeXml(value: string) {
+const escapeXml = (value: string) => {
   return value.replace(
     /[<>&"']/g,
     (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character,
   );
-}
+};

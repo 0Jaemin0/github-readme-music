@@ -15,19 +15,19 @@ const options: { value: Theme; label: string; icon: typeof Laptop }[] = [
   { value: 'dark', label: '다크', icon: Moon },
 ];
 
-function getTheme(): Theme {
+const getTheme = (): Theme => {
   const stored = window.localStorage.getItem(STORAGE_KEY);
   return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
-}
+};
 
-function applyTheme(theme: Theme) {
+const applyTheme = (theme: Theme) => {
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   document.documentElement.classList.toggle('dark', isDark);
   document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-}
+};
 
-function subscribe(onStoreChange: () => void) {
+const subscribe = (onStoreChange: () => void) => {
   const media = window.matchMedia('(prefers-color-scheme: dark)');
   const synchronizeSystemTheme = () => {
     if (getTheme() === 'system') applyTheme('system');
@@ -44,16 +44,16 @@ function subscribe(onStoreChange: () => void) {
     window.removeEventListener('storage', synchronizeStorageTheme);
     window.removeEventListener(THEME_CHANGE_EVENT, synchronizeStorageTheme);
   };
-}
+};
 
-export function ThemeToggle() {
+export const ThemeToggle = () => {
   const theme = useSyncExternalStore(subscribe, getTheme, () => 'system');
 
-  function selectTheme(next: Theme) {
+  const selectTheme = (next: Theme) => {
     window.localStorage.setItem(STORAGE_KEY, next);
     applyTheme(next);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
-  }
+  };
 
   return (
     <div
@@ -86,4 +86,4 @@ export function ThemeToggle() {
       })}
     </div>
   );
-}
+};

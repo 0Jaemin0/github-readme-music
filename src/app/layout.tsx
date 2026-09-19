@@ -25,7 +25,7 @@ export const viewport: Viewport = {
   themeColor: '#f8f9fb',
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <html lang="ko" suppressHydrationWarning className={notoSansKr.variable}>
       <head>
@@ -44,4 +44,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

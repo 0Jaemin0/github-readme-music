@@ -4,9 +4,17 @@ import { randomBytes } from 'node:crypto';
 import { createServerSupabaseClient } from '@/shared/api/supabase/server';
 import { createStoredCardContentHash, type StoredCardData } from '../model/stored-card.server';
 
-export async function findOrCreateStoredCard(videoId: string, cardData: StoredCardData) {
+export const findOrCreateStoredCard = async (videoId: string, cardData: StoredCardData) => {
   const supabase = createServerSupabaseClient();
   const contentHash = createStoredCardContentHash(videoId, cardData);
+
+  const findCardIdByContentHash = async (hash: string) => {
+    const { data, error } = await supabase.from('cards').select('id').eq('content_hash', hash).maybeSingle();
+
+    if (error) throw error;
+    return typeof data?.id === 'string' ? data.id : null;
+  };
+
   const existingId = await findCardIdByContentHash(contentHash);
   if (existingId) return { id: existingId, created: false };
 
@@ -24,11 +32,4 @@ export async function findOrCreateStoredCard(videoId: string, cardData: StoredCa
   }
 
   return null;
-
-  async function findCardIdByContentHash(hash: string) {
-    const { data, error } = await supabase.from('cards').select('id').eq('content_hash', hash).maybeSingle();
-
-    if (error) throw error;
-    return typeof data?.id === 'string' ? data.id : null;
-  }
-}
+};

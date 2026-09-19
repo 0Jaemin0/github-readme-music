@@ -15,7 +15,7 @@ type MarkdownSnippetProps = {
   onGenerate: () => void;
 };
 
-export function MarkdownSnippet({
+export const MarkdownSnippet = ({
   markdown,
   hasPendingChanges,
   saveStatus,
@@ -25,7 +25,7 @@ export function MarkdownSnippet({
   feedback,
   onCopy,
   onGenerate,
-}: MarkdownSnippetProps) {
+}: MarkdownSnippetProps) => {
   const hasMarkdown = Boolean(markdown);
   const buttonLabel =
     saveStatus === 'saving'
@@ -126,4 +126,4 @@ export function MarkdownSnippet({
       )}
     </section>
   );
-}
+};

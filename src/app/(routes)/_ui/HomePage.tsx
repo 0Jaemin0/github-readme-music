@@ -6,7 +6,7 @@ import brandMark from '@/shared/assets/brand-mark.png';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { CardGeneratorWorkspace } from '@/widgets/card-generator-workspace';
 
-export function HomePage() {
+export const HomePage = () => {
   const [generatorKey, setGeneratorKey] = useState(0);
   const [isLanding, setIsLanding] = useState(true);
 
@@ -50,4 +50,4 @@ export function HomePage() {
       </main>
     </div>
   );
-}
+};

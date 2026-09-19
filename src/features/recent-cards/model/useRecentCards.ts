@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { readRecentCardIds, saveRecentCardId } from '../lib/recent-cards';
 
-export function useRecentCards() {
+export const useRecentCards = () => {
   const [cardIds, setCardIds] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -21,4 +21,4 @@ export function useRecentCards() {
   }, []);
 
   return { cardIds, isLoaded, addCardId };
-}
+};

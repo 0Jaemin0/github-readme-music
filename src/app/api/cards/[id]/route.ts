@@ -8,11 +8,11 @@ type RouteContext = {
 
 const CARD_RESTORE_CACHE_CONTROL = 'public, max-age=1800, s-maxage=3600';
 
-function errorResponse(status: number, code: string, message: string) {
+const errorResponse = (status: number, code: string, message: string) => {
   return NextResponse.json({ error: { code, message } }, { status });
-}
+};
 
-export async function GET(_request: Request, { params }: RouteContext) {
+export const GET = async (_request: Request, { params }: RouteContext) => {
   const { id } = await params;
   if (!isStoredCardId(id)) {
     return errorResponse(400, 'INVALID_CARD_ID', '카드 요청이 올바르지 않습니다.');
@@ -52,4 +52,4 @@ export async function GET(_request: Request, { params }: RouteContext) {
     });
     return errorResponse(503, 'CARD_READ_UNAVAILABLE', '카드 설정을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
   }
-}
+};

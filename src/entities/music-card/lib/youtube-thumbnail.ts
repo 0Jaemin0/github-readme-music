@@ -1,4 +1,4 @@
-export function isVideoThumbnailUrl(value: string, videoId: string) {
+export const isVideoThumbnailUrl = (value: string, videoId: string) => {
   try {
     const url = new URL(value);
     const path = url.pathname.split('/').filter(Boolean);
@@ -13,4 +13,4 @@ export function isVideoThumbnailUrl(value: string, videoId: string) {
   } catch {
     return false;
   }
-}
+};

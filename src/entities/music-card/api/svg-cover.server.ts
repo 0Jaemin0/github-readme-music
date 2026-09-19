@@ -8,15 +8,15 @@ const MAX_COVER_BYTES = 1_000_000;
 const COVER_TIMEOUT_MS = 4_000;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
-export async function embedSvgCover(data: SvgCardData, videoId: string) {
+export const embedSvgCover = async (data: SvgCardData, videoId: string) => {
   const embeddedCover = await fetchEmbeddedCover(data.cover, videoId);
   return {
     data: embeddedCover ? { ...data, cover: embeddedCover } : { ...data, cover: '' },
     hasEmbeddedCover: Boolean(embeddedCover),
   };
-}
+};
 
-async function fetchEmbeddedCover(coverUrl: string, videoId: string) {
+const fetchEmbeddedCover = async (coverUrl: string, videoId: string) => {
   if (!isVideoThumbnailUrl(coverUrl, videoId)) return null;
 
   const controller = new AbortController();
@@ -57,9 +57,9 @@ async function fetchEmbeddedCover(coverUrl: string, videoId: string) {
   } finally {
     clearTimeout(timeout);
   }
-}
+};
 
-function hasExpectedImageSignature(bytes: Uint8Array, contentType: string) {
+const hasExpectedImageSignature = (bytes: Uint8Array, contentType: string) => {
   if (contentType === 'image/jpeg')
     return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   if (contentType === 'image/png')
@@ -85,4 +85,4 @@ function hasExpectedImageSignature(bytes: Uint8Array, contentType: string) {
     bytes[10] === 0x42 &&
     bytes[11] === 0x50
   );
-}
+};

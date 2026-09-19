@@ -17,10 +17,10 @@ type CardMetadataFieldsProps = {
 
 type DragMode = 'move' | 'resize' | null;
 
-export function CardMetadataFields({ meta, track, onChange, onCoverPositionChange }: CardMetadataFieldsProps) {
-  function updateField(field: keyof CardMeta, value: string) {
+export const CardMetadataFields = ({ meta, track, onChange, onCoverPositionChange }: CardMetadataFieldsProps) => {
+  const updateField = (field: keyof CardMeta, value: string) => {
     onChange({ ...meta, [field]: value });
-  }
+  };
 
   return (
     <section className="rounded-xl border border-border bg-background p-4">
@@ -57,9 +57,9 @@ export function CardMetadataFields({ meta, track, onChange, onCoverPositionChang
       <CoverCropEditor cover={track.cover} position={track.coverPosition} onPositionChange={onCoverPositionChange} />
     </section>
   );
-}
+};
 
-function CoverCropEditor({
+const CoverCropEditor = ({
   cover,
   position,
   onPositionChange,
@@ -67,7 +67,7 @@ function CoverCropEditor({
   cover: string;
   position: CoverPosition;
   onPositionChange: (position: CoverPosition) => void;
-}) {
+}) => {
   const imageFrameRef = useRef<HTMLDivElement>(null);
   const cropFrameRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
@@ -77,14 +77,14 @@ function CoverCropEditor({
   const [dragMode, setDragMode] = useState<DragMode>(null);
   const crop = getCropFrame(ratio, position);
 
-  function stopAdjusting(event?: ReactPointerEvent<HTMLDivElement>) {
+  const stopAdjusting = (event?: ReactPointerEvent<HTMLDivElement>) => {
     if (event && event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId);
     dragModeRef.current = null;
     setDragMode(null);
-  }
+  };
 
-  function startMove(event: ReactPointerEvent<HTMLDivElement>) {
+  const startMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary || event.button !== 0) return;
     const cropRect = cropFrameRef.current?.getBoundingClientRect();
     const frame = imageFrameRef.current;
@@ -94,9 +94,9 @@ function CoverCropEditor({
     frame.setPointerCapture(event.pointerId);
     dragModeRef.current = 'move';
     setDragMode('move');
-  }
+  };
 
-  function startResize(event: ReactPointerEvent<HTMLButtonElement>) {
+  const startResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (!event.isPrimary || event.button !== 0) return;
     event.preventDefault();
     event.stopPropagation();
@@ -114,9 +114,9 @@ function CoverCropEditor({
     frame.setPointerCapture(event.pointerId);
     dragModeRef.current = 'resize';
     setDragMode('resize');
-  }
+  };
 
-  function updateCrop(event: ReactPointerEvent<HTMLDivElement>) {
+  const updateCrop = (event: ReactPointerEvent<HTMLDivElement>) => {
     const mode = dragModeRef.current;
     const frame = imageFrameRef.current;
     if (!mode || !frame) return;
@@ -163,7 +163,7 @@ function CoverCropEditor({
       x: toPosition(left, cropWidth, rect.width),
       y: toPosition(top, cropHeight, rect.height),
     });
-  }
+  };
 
   return (
     <div className="mt-5">
@@ -216,9 +216,9 @@ function CoverCropEditor({
       </div>
     </div>
   );
-}
+};
 
-function getCropFrame(ratio: number, position: CoverPosition) {
+const getCropFrame = (ratio: number, position: CoverPosition) => {
   const scale = clamp(position.scale, MIN_CROP_SCALE, 100) / 100;
   const width = ratio >= 1 ? (scale / ratio) * 100 : scale * 100;
   const height = ratio >= 1 ? scale * 100 : scale * ratio * 100;
@@ -229,14 +229,14 @@ function getCropFrame(ratio: number, position: CoverPosition) {
     left: (100 - width) * (position.x / 100),
     top: (100 - height) * (position.y / 100),
   };
-}
+};
 
-function toPosition(offset: number, cropSize: number, frameSize: number) {
+const toPosition = (offset: number, cropSize: number, frameSize: number) => {
   const availableSpace = frameSize - cropSize;
   return availableSpace > 0 ? clamp((offset / availableSpace) * 100, 0, 100) : 50;
-}
+};
 
-function MetadataField({
+const MetadataField = ({
   id,
   label,
   value,
@@ -246,7 +246,7 @@ function MetadataField({
   label: string;
   value: string;
   onChange: (value: string) => void;
-}) {
+}) => {
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground">
@@ -264,8 +264,8 @@ function MetadataField({
       />
     </div>
   );
-}
+};
 
-function clamp(value: number, min: number, max: number) {
+const clamp = (value: number, min: number, max: number) => {
   return Math.min(max, Math.max(min, value));
-}
+};

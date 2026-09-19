@@ -14,11 +14,11 @@ type CreateCardPayload = {
   params?: unknown;
 };
 
-function errorResponse(status: number, code: string, message: string) {
+const errorResponse = (status: number, code: string, message: string) => {
   return NextResponse.json({ error: { code, message } }, { status });
-}
+};
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   const contentLength = request.headers.get('content-length');
   if (contentLength && (!/^\d+$/.test(contentLength) || Number(contentLength) > MAX_REQUEST_BODY_BYTES)) {
     return errorResponse(413, 'REQUEST_TOO_LARGE', '카드 설정 내용이 너무 큽니다. 다시 시도해 주세요.');
@@ -60,15 +60,15 @@ export async function POST(request: Request) {
     });
     return errorResponse(503, 'CARD_STORAGE_UNAVAILABLE', '카드를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
   }
-}
+};
 
-function getRequestKey(request: Request) {
+const getRequestKey = (request: Request) => {
   return (
     request.headers.get('x-forwarded-for')?.split(',', 1)[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
   );
-}
+};
 
-function isRequestAllowed(key: string) {
+const isRequestAllowed = (key: string) => {
   const now = Date.now();
   const window = requestWindows.get(key);
   if (!window || now - window.startedAt >= RATE_LIMIT_WINDOW_MS) {
@@ -79,13 +79,13 @@ function isRequestAllowed(key: string) {
   if (window.count >= RATE_LIMIT_MAX_REQUESTS) return false;
   window.count += 1;
   return true;
-}
+};
 
-function pruneRequestWindows(now: number) {
+const pruneRequestWindows = (now: number) => {
   for (const [key, window] of requestWindows) {
     if (now - window.startedAt >= RATE_LIMIT_WINDOW_MS) requestWindows.delete(key);
   }
   if (requestWindows.size < RATE_LIMIT_MAX_ENTRIES) return;
   const oldestKey = requestWindows.keys().next().value;
   if (oldestKey) requestWindows.delete(oldestKey);
-}
+};

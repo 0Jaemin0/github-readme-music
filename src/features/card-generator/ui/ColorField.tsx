@@ -25,7 +25,7 @@ const PALETTE = [
   '#a3e635',
 ];
 
-export function ColorField({
+export const ColorField = ({
   label,
   value,
   onChange,
@@ -33,14 +33,14 @@ export function ColorField({
   label: string;
   value: string;
   onChange: (hex: string) => void;
-}) {
+}) => {
   const [draft, setDraft] = useState(value);
 
-  function commitDraft(next: string) {
+  const commitDraft = (next: string) => {
     setDraft(next);
     const normalized = normalizeHex(next);
     if (normalized) onChange(normalized);
-  }
+  };
 
   return (
     <div className="flex items-center justify-between gap-3">
@@ -73,18 +73,18 @@ export function ColorField({
       </div>
     </div>
   );
-}
+};
 
-function ColorPicker({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
+const ColorPicker = ({ value, onChange }: { value: string; onChange: (hex: string) => void }) => {
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value));
   const areaRef = useRef<HTMLDivElement>(null);
 
-  function update(next: Hsv) {
+  const update = (next: Hsv) => {
     setHsv(next);
     onChange(hsvToHex(next));
-  }
+  };
 
-  function handleArea(event: React.PointerEvent<HTMLDivElement>) {
+  const handleArea = (event: React.PointerEvent<HTMLDivElement>) => {
     const node = areaRef.current;
     if (!node) return;
     const rect = node.getBoundingClientRect();
@@ -93,7 +93,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
       s: clamp((event.clientX - rect.left) / rect.width),
       v: 1 - clamp((event.clientY - rect.top) / rect.height),
     });
-  }
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -155,4 +155,4 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
       </div>
     </div>
   );
-}
+};

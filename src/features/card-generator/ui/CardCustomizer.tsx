@@ -15,20 +15,20 @@ const GRADIENT_DIRECTIONS = [
   Icon: typeof ArrowUpLeft;
 }>;
 
-export function CardCustomizer({ theme, onChange }: { theme: CardTheme; onChange: (theme: CardTheme) => void }) {
+export const CardCustomizer = ({ theme, onChange }: { theme: CardTheme; onChange: (theme: CardTheme) => void }) => {
   const lowContrastRoles = [
     { name: '제목', color: theme.text },
     { name: '가수', color: theme.muted },
     { name: '포인트', color: theme.accent },
   ].filter(({ color }) => contrastRatio(theme.background, color) < 1.8);
 
-  function set<K extends keyof CardTheme>(key: K, value: CardTheme[K]) {
+  const set = <K extends keyof CardTheme>(key: K, value: CardTheme[K]) => {
     onChange({ ...theme, [key]: value });
-  }
+  };
 
-  function setGradientDirection(direction: GradientDirection) {
+  const setGradientDirection = (direction: GradientDirection) => {
     onChange({ ...theme, gradient: direction !== null, gradientDirection: direction });
-  }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -120,9 +120,9 @@ export function CardCustomizer({ theme, onChange }: { theme: CardTheme; onChange
       </section>
     </div>
   );
-}
+};
 
-function RangeRow({
+const RangeRow = ({
   label,
   value,
   min,
@@ -136,7 +136,7 @@ function RangeRow({
   max: number;
   suffix: string;
   onChange: (value: number) => void;
-}) {
+}) => {
   const id = `range-${label.replace(/\s+/g, '-').toLowerCase()}`;
   return (
     <div className="flex items-center gap-3">
@@ -158,4 +158,4 @@ function RangeRow({
       </span>
     </div>
   );
-}
+};

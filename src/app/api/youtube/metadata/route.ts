@@ -27,11 +27,11 @@ type YouTubeApiResponse = {
   error?: { errors?: Array<{ reason?: unknown }> };
 };
 
-function errorResponse(status: number, code: string, message: string) {
+const errorResponse = (status: number, code: string, message: string) => {
   return NextResponse.json({ error: { code, message } }, { status });
-}
+};
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   let payload: unknown;
   try {
     payload = JSON.parse(await readRequestBody(request));
@@ -137,11 +137,11 @@ export async function POST(request: Request) {
 
   writeCachedMetadata(videoId, metadata);
   return NextResponse.json({ data: metadata });
-}
+};
 
 class RequestBodyTooLargeError extends Error {}
 
-async function readRequestBody(request: Request) {
+const readRequestBody = async (request: Request) => {
   const contentLength = request.headers.get('content-length');
   if (contentLength && (!/^\d+$/.test(contentLength) || Number(contentLength) > MAX_REQUEST_BODY_BYTES)) {
     throw new RequestBodyTooLargeError();
@@ -174,17 +174,17 @@ async function readRequestBody(request: Request) {
     offset += chunk.byteLength;
   }
   return new TextDecoder().decode(body);
-}
+};
 
-function readCachedMetadata(videoId: string) {
+const readCachedMetadata = (videoId: string) => {
   const cached = metadataCache.get(videoId);
   if (!cached) return null;
   if (cached.expiresAt > Date.now()) return cached.data;
   metadataCache.delete(videoId);
   return null;
-}
+};
 
-function writeCachedMetadata(videoId: string, data: YouTubeMetadata) {
+const writeCachedMetadata = (videoId: string, data: YouTubeMetadata) => {
   const now = Date.now();
   for (const [key, value] of metadataCache) {
     if (value.expiresAt <= now) metadataCache.delete(key);
@@ -194,15 +194,15 @@ function writeCachedMetadata(videoId: string, data: YouTubeMetadata) {
     if (oldestKey) metadataCache.delete(oldestKey);
   }
   metadataCache.set(videoId, { data, expiresAt: now + METADATA_CACHE_TTL_MS });
-}
+};
 
-function getRequestKey(request: Request) {
+const getRequestKey = (request: Request) => {
   return (
     request.headers.get('x-forwarded-for')?.split(',', 1)[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
   );
-}
+};
 
-function isRequestAllowed(key: string) {
+const isRequestAllowed = (key: string) => {
   const now = Date.now();
   const window = requestWindows.get(key);
   if (!window || now - window.startedAt >= RATE_LIMIT_WINDOW_MS) {
@@ -213,9 +213,9 @@ function isRequestAllowed(key: string) {
   if (window.count >= RATE_LIMIT_MAX_REQUESTS) return false;
   window.count += 1;
   return true;
-}
+};
 
-function pruneRequestWindows(now: number) {
+const pruneRequestWindows = (now: number) => {
   for (const [key, window] of requestWindows) {
     if (now - window.startedAt >= RATE_LIMIT_WINDOW_MS) requestWindows.delete(key);
   }
@@ -223,13 +223,13 @@ function pruneRequestWindows(now: number) {
 
   const oldestKey = requestWindows.keys().next().value;
   if (oldestKey) requestWindows.delete(oldestKey);
-}
+};
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+};
 
-function normalizeMetadata(response: YouTubeApiResponse | null, requestedVideoId: string): YouTubeMetadata | null {
+const normalizeMetadata = (response: YouTubeApiResponse | null, requestedVideoId: string): YouTubeMetadata | null => {
   const item = response?.items?.[0];
   const title = item?.snippet?.title;
   const channel = item?.snippet?.channelTitle;
@@ -257,26 +257,26 @@ function normalizeMetadata(response: YouTubeApiResponse | null, requestedVideoId
     duration: formattedDuration,
     cover: thumbnail,
   };
-}
+};
 
-function selectThumbnail(thumbnails: Record<string, { url?: unknown } | undefined> | undefined) {
+const selectThumbnail = (thumbnails: Record<string, { url?: unknown } | undefined> | undefined) => {
   for (const size of ['maxres', 'standard', 'high', 'medium', 'default']) {
     const url = thumbnails?.[size]?.url;
     if (typeof url === 'string' && isYouTubeThumbnail(url)) return url;
   }
   return null;
-}
+};
 
-function isYouTubeThumbnail(value: string) {
+const isYouTubeThumbnail = (value: string) => {
   try {
     const url = new URL(value);
     return url.protocol === 'https:' && url.hostname === 'i.ytimg.com';
   } catch {
     return false;
   }
-}
+};
 
-function formatIsoDuration(value: string) {
+const formatIsoDuration = (value: string) => {
   const match = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(value);
   if (!match) return null;
 
@@ -289,4 +289,4 @@ function formatIsoDuration(value: string) {
   return hours > 0
     ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
     : `${totalMinutes}:${String(seconds).padStart(2, '0')}`;
-}
+};
