@@ -1,8 +1,8 @@
-import "server-only";
+import 'server-only';
 
-import { createHash } from "node:crypto";
-import { isVideoThumbnailUrl } from "../lib/youtube-thumbnail";
-import { isSvgVideoId, parseSvgCardData, serializeSvgCardData } from "../lib/svg-card";
+import { createHash } from 'node:crypto';
+import { isVideoThumbnailUrl } from '../lib/youtube-thumbnail';
+import { isSvgVideoId, parseSvgCardData, serializeSvgCardData } from '../lib/svg-card';
 
 const CARD_ID_PATTERN = /^c_[A-Za-z0-9_-]{16}$/;
 
@@ -30,15 +30,17 @@ export function createStoredCardContentHash(videoId: string, cardData: StoredCar
   );
   const payload = JSON.stringify({ videoId, params: sortedParams });
 
-  return createHash("sha256").update(payload).digest("hex");
+  return createHash('sha256').update(payload).digest('hex');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function isStringRecord(value: unknown): value is Record<string, string> {
-  return isRecord(value)
-    && Object.keys(value).length <= 30
-    && Object.values(value).every((item) => typeof item === "string" && item.length <= 512);
+  return (
+    isRecord(value) &&
+    Object.keys(value).length <= 30 &&
+    Object.values(value).every((item) => typeof item === 'string' && item.length <= 512)
+  );
 }

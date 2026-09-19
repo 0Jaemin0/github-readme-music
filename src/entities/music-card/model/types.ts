@@ -1,5 +1,5 @@
-export type CardStyleId = "player" | "compact" | "vertical";
-export type GradientDirection = "top-left" | "top-right" | "bottom-left" | "bottom-right" | null;
+export type CardStyleId = 'player' | 'compact' | 'vertical';
+export type GradientDirection = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 
 export type CardStyle = {
   id: CardStyleId;
@@ -28,7 +28,7 @@ export type CoverPosition = {
 };
 
 export type Track = {
-  source: "youtube" | "stored";
+  source: 'youtube' | 'stored';
   videoId: string;
   title: string;
   channel: string;
@@ -38,7 +38,7 @@ export type Track = {
   waveform: number[];
 };
 
-export type YouTubeMetadata = Pick<Track, "videoId" | "title" | "channel" | "duration" | "cover">;
+export type YouTubeMetadata = Pick<Track, 'videoId' | 'title' | 'channel' | 'duration' | 'cover'>;
 
 export type CardMeta = {
   title: string;

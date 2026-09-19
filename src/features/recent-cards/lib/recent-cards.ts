@@ -1,4 +1,4 @@
-const RECENT_CARD_IDS_STORAGE_KEY = "github-readme-music-recent-card-ids";
+const RECENT_CARD_IDS_STORAGE_KEY = 'github-readme-music-recent-card-ids';
 const MAX_RECENT_CARDS = 3;
 const STORED_CARD_ID_PATTERN = /^c_[A-Za-z0-9_-]{16}$/;
 
@@ -31,5 +31,5 @@ export function saveRecentCardId(cardId: string) {
 }
 
 function isStoredCardId(value: unknown): value is string {
-  return typeof value === "string" && STORED_CARD_ID_PATTERN.test(value);
+  return typeof value === 'string' && STORED_CARD_ID_PATTERN.test(value);
 }

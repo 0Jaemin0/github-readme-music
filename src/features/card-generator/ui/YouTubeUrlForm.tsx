@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ArrowRight, Link2, LoaderCircle } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
+import { ArrowRight, Link2, LoaderCircle } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 
 type YouTubeUrlFormProps = {
   url: string;
@@ -39,7 +39,7 @@ export function YouTubeUrlForm({ url, error, isLoading, onUrlChange, onSubmit }:
             value={url}
             onChange={(event) => onUrlChange(event.target.value)}
             aria-invalid={Boolean(error)}
-            aria-describedby={error ? "youtube-url-error" : undefined}
+            aria-describedby={error ? 'youtube-url-error' : undefined}
             className="h-13 rounded-xl bg-card pl-11 font-mono text-[13px] tracking-[-0.01em] md:text-[13px]"
           />
         </div>

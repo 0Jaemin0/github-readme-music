@@ -1,17 +1,17 @@
-import "server-only";
+import 'server-only';
 
-import type { SvgCardData } from "../lib/svg-card";
-import { isVideoThumbnailUrl } from "../lib/youtube-thumbnail";
-import { captureMonitoringError } from "@/shared/lib/sentry-monitoring";
+import type { SvgCardData } from '../lib/svg-card';
+import { isVideoThumbnailUrl } from '../lib/youtube-thumbnail';
+import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
 
 const MAX_COVER_BYTES = 1_000_000;
 const COVER_TIMEOUT_MS = 4_000;
-const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 export async function embedSvgCover(data: SvgCardData, videoId: string) {
   const embeddedCover = await fetchEmbeddedCover(data.cover, videoId);
   return {
-    data: embeddedCover ? { ...data, cover: embeddedCover } : { ...data, cover: "" },
+    data: embeddedCover ? { ...data, cover: embeddedCover } : { ...data, cover: '' },
     hasEmbeddedCover: Boolean(embeddedCover),
   };
 }
@@ -25,29 +25,30 @@ async function fetchEmbeddedCover(coverUrl: string, videoId: string) {
   try {
     const response = await fetch(coverUrl, {
       signal: controller.signal,
-      redirect: "error",
+      redirect: 'error',
       next: { revalidate: 300 },
     });
     if (!response.ok) return null;
     if (!isVideoThumbnailUrl(response.url, videoId)) return null;
 
-    const contentType = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+    const contentType = response.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase();
     if (!contentType || !ALLOWED_IMAGE_TYPES.has(contentType)) return null;
 
-    const contentLength = response.headers.get("content-length");
+    const contentLength = response.headers.get('content-length');
     if (contentLength && (!/^\d+$/.test(contentLength) || Number(contentLength) > MAX_COVER_BYTES)) return null;
 
     const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength === 0 || bytes.byteLength > MAX_COVER_BYTES || !hasExpectedImageSignature(bytes, contentType)) return null;
+    if (bytes.byteLength === 0 || bytes.byteLength > MAX_COVER_BYTES || !hasExpectedImageSignature(bytes, contentType))
+      return null;
 
     try {
-      return `data:${contentType};base64,${Buffer.from(bytes).toString("base64")}`;
+      return `data:${contentType};base64,${Buffer.from(bytes).toString('base64')}`;
     } catch {
       captureMonitoringError({
-        message: "앨범 커버를 카드에 넣는 중 오류가 발생했습니다",
-        errorCode: "svg_cover_embed_failed",
-        operation: "svg_cover_embed",
-        layer: "server",
+        message: '앨범 커버를 카드에 넣는 중 오류가 발생했습니다',
+        errorCode: 'svg_cover_embed_failed',
+        operation: 'svg_cover_embed',
+        layer: 'server',
       });
       return null;
     }
@@ -59,10 +60,29 @@ async function fetchEmbeddedCover(coverUrl: string, videoId: string) {
 }
 
 function hasExpectedImageSignature(bytes: Uint8Array, contentType: string) {
-  if (contentType === "image/jpeg") return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  if (contentType === "image/png") return bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
-  return bytes.length >= 12
-    && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46
-    && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
+  if (contentType === 'image/jpeg')
+    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  if (contentType === 'image/png')
+    return (
+      bytes.length >= 8 &&
+      bytes[0] === 0x89 &&
+      bytes[1] === 0x50 &&
+      bytes[2] === 0x4e &&
+      bytes[3] === 0x47 &&
+      bytes[4] === 0x0d &&
+      bytes[5] === 0x0a &&
+      bytes[6] === 0x1a &&
+      bytes[7] === 0x0a
+    );
+  return (
+    bytes.length >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  );
 }
-

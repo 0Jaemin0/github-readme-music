@@ -1,3 +1,3 @@
-"use client";
+'use client';
 
-export { ThemeToggle } from "./ui/ThemeToggle";
+export { ThemeToggle } from './ui/ThemeToggle';

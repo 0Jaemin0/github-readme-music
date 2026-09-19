@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { Input } from "@/shared/ui/input";
-import { cn } from "@/shared/lib/utils";
-import type { CardMeta, CoverPosition, Track } from "@/entities/music-card";
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { Input } from '@/shared/ui/input';
+import { cn } from '@/shared/lib/utils';
+import type { CardMeta, CoverPosition, Track } from '@/entities/music-card';
 
 const MIN_CROP_SCALE = 40;
 const MAX_META_LENGTH = 120;
@@ -15,7 +15,7 @@ type CardMetadataFieldsProps = {
   onCoverPositionChange: (position: CoverPosition) => void;
 };
 
-type DragMode = "move" | "resize" | null;
+type DragMode = 'move' | 'resize' | null;
 
 export function CardMetadataFields({ meta, track, onChange, onCoverPositionChange }: CardMetadataFieldsProps) {
   function updateField(field: keyof CardMeta, value: string) {
@@ -26,22 +26,48 @@ export function CardMetadataFields({ meta, track, onChange, onCoverPositionChang
     <section className="rounded-xl border border-border bg-background p-4">
       <div className="mb-4">
         <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">콘텐츠</p>
-        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">카드에 표시할 정보를 확인하고, 필요한 부분을 수정해 주세요.</p>
+        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
+          카드에 표시할 정보를 확인하고, 필요한 부분을 수정해 주세요.
+        </p>
         <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
-          {track.source === "youtube" ? `YouTube에서 가져온 정보: ${track.title} · ${track.channel}` : `저장된 카드 정보: ${meta.title} · ${meta.artist}`}
+          {track.source === 'youtube'
+            ? `YouTube에서 가져온 정보: ${track.title} · ${track.channel}`
+            : `저장된 카드 정보: ${meta.title} · ${meta.artist}`}
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <MetadataField id="card-title" label="제목" value={meta.title} onChange={(value) => updateField("title", value)} />
-        <MetadataField id="card-artist" label="아티스트" value={meta.artist} onChange={(value) => updateField("artist", value)} />
+        <MetadataField
+          id="card-title"
+          label="제목"
+          value={meta.title}
+          onChange={(value) => updateField('title', value)}
+        />
+        <MetadataField
+          id="card-artist"
+          label="아티스트"
+          value={meta.artist}
+          onChange={(value) => updateField('artist', value)}
+        />
       </div>
-      {track.source === "youtube" ? <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요.</p> : null}
+      {track.source === 'youtube' ? (
+        <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">
+          아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요.
+        </p>
+      ) : null}
       <CoverCropEditor cover={track.cover} position={track.coverPosition} onPositionChange={onCoverPositionChange} />
     </section>
   );
 }
 
-function CoverCropEditor({ cover, position, onPositionChange }: { cover: string; position: CoverPosition; onPositionChange: (position: CoverPosition) => void }) {
+function CoverCropEditor({
+  cover,
+  position,
+  onPositionChange,
+}: {
+  cover: string;
+  position: CoverPosition;
+  onPositionChange: (position: CoverPosition) => void;
+}) {
   const imageFrameRef = useRef<HTMLDivElement>(null);
   const cropFrameRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
@@ -52,7 +78,8 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
   const crop = getCropFrame(ratio, position);
 
   function stopAdjusting(event?: ReactPointerEvent<HTMLDivElement>) {
-    if (event && event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (event && event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
     dragModeRef.current = null;
     setDragMode(null);
   }
@@ -65,8 +92,8 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
 
     dragOffsetRef.current = { x: event.clientX - cropRect.left, y: event.clientY - cropRect.top };
     frame.setPointerCapture(event.pointerId);
-    dragModeRef.current = "move";
-    setDragMode("move");
+    dragModeRef.current = 'move';
+    setDragMode('move');
   }
 
   function startResize(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -85,8 +112,8 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
       top: cropRect.top,
     };
     frame.setPointerCapture(event.pointerId);
-    dragModeRef.current = "resize";
-    setDragMode("resize");
+    dragModeRef.current = 'resize';
+    setDragMode('resize');
   }
 
   function updateCrop(event: ReactPointerEvent<HTMLDivElement>) {
@@ -95,12 +122,18 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
     if (!mode || !frame) return;
 
     const rect = frame.getBoundingClientRect();
-    if (mode === "move" && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) {
+    if (
+      mode === 'move' &&
+      (event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom)
+    ) {
       stopAdjusting(event);
       return;
     }
 
-    if (mode === "resize") {
+    if (mode === 'resize') {
       const maxSide = Math.min(rect.right - resizeStartRef.current.left, rect.bottom - resizeStartRef.current.top);
       const delta = Math.min(event.clientX - resizeStartRef.current.x, event.clientY - resizeStartRef.current.y);
       const requestedSide = resizeStartRef.current.side + delta;
@@ -135,7 +168,9 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
   return (
     <div className="mt-5">
       <p className="mb-1.5 text-[13px] font-medium text-muted-foreground">앨범 커버</p>
-      <p className="text-[12px] leading-5 text-muted-foreground">정사각형 프레임을 드래그하여 위치를 옮기고, 오른쪽 아래 핸들을 드래그하여 크기를 조절해 주세요.</p>
+      <p className="text-[12px] leading-5 text-muted-foreground">
+        정사각형 프레임을 드래그하여 위치를 옮기고, 오른쪽 아래 핸들을 드래그하여 크기를 조절해 주세요.
+      </p>
       <div className="mt-3">
         <div
           ref={imageFrameRef}
@@ -156,7 +191,8 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
             onLoad={(event) => {
               const nextRatio = event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
               setRatio(nextRatio);
-              if (Math.abs(nextRatio - position.aspectRatio) > 0.001) onPositionChange({ ...position, aspectRatio: nextRatio });
+              if (Math.abs(nextRatio - position.aspectRatio) > 0.001)
+                onPositionChange({ ...position, aspectRatio: nextRatio });
             }}
           />
           <div
@@ -164,10 +200,10 @@ function CoverCropEditor({ cover, position, onPositionChange }: { cover: string;
             role="presentation"
             onPointerDown={startMove}
             className={cn(
-              "absolute select-none border-2 border-white shadow-[0_0_0_999px_rgb(0_0_0_/_0.35)]",
-              dragMode === "resize" ? "cursor-se-resize" : dragMode === "move" ? "cursor-grabbing" : "cursor-grab",
+              'absolute select-none border-2 border-white shadow-[0_0_0_999px_rgb(0_0_0_/_0.35)]',
+              dragMode === 'resize' ? 'cursor-se-resize' : dragMode === 'move' ? 'cursor-grabbing' : 'cursor-grab',
             )}
-            style={{ width: crop.width + "%", height: crop.height + "%", left: crop.left + "%", top: crop.top + "%" }}
+            style={{ width: crop.width + '%', height: crop.height + '%', left: crop.left + '%', top: crop.top + '%' }}
           >
             <button
               type="button"
@@ -200,8 +236,34 @@ function toPosition(offset: number, cropSize: number, frameSize: number) {
   return availableSpace > 0 ? clamp((offset / availableSpace) * 100, 0, 100) : 50;
 }
 
-function MetadataField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
-  return <div><label htmlFor={id} className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground"><span>{label}</span><span className="font-normal">{value.length}/{MAX_META_LENGTH}</span></label><Input id={id} value={value} maxLength={MAX_META_LENGTH} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-lg text-sm md:text-sm" /></div>;
+function MetadataField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground">
+        <span>{label}</span>
+        <span className="font-normal">
+          {value.length}/{MAX_META_LENGTH}
+        </span>
+      </label>
+      <Input
+        id={id}
+        value={value}
+        maxLength={MAX_META_LENGTH}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-10 rounded-lg text-sm md:text-sm"
+      />
+    </div>
+  );
 }
 
 function clamp(value: number, min: number, max: number) {

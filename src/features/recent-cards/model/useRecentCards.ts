@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { readRecentCardIds, saveRecentCardId } from "../lib/recent-cards";
+import { useCallback, useEffect, useState } from 'react';
+import { readRecentCardIds, saveRecentCardId } from '../lib/recent-cards';
 
 export function useRecentCards() {
   const [cardIds, setCardIds] = useState<string[]>([]);

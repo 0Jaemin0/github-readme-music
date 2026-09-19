@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   CARD_OUTPUT_WIDTHS,
@@ -10,9 +10,9 @@ import {
   type CardStyleId,
   type CardTheme,
   type Track,
-} from "@/entities/music-card";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-import { CardCustomizer } from "./CardCustomizer";
+} from '@/entities/music-card';
+import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { CardCustomizer } from './CardCustomizer';
 
 type CardPreviewPanelProps = {
   track: Track;
@@ -53,7 +53,9 @@ export function CardPreviewPanel({
           <div className="mx-auto max-w-full" style={{ width: CARD_OUTPUT_WIDTHS[style] }}>
             <MusicCard track={track} meta={meta} style={style} theme={theme} progressSeconds={progressSeconds} />
           </div>
-          {style !== "compact" ? <PlaybackPosition value={progressSeconds} duration={track.duration} onChange={onProgressChange} /> : null}
+          {style !== 'compact' ? (
+            <PlaybackPosition value={progressSeconds} duration={track.duration} onChange={onProgressChange} />
+          ) : null}
         </div>
       </Tabs>
       <section className="mt-6" aria-label="스타일 설정">
@@ -63,11 +65,34 @@ export function CardPreviewPanel({
   );
 }
 
-function PlaybackPosition({ value, duration, onChange }: { value: number; duration: string; onChange: (value: number) => void }) {
+function PlaybackPosition({
+  value,
+  duration,
+  onChange,
+}: {
+  value: number;
+  duration: string;
+  onChange: (value: number) => void;
+}) {
   const totalSeconds = durationToSeconds(duration);
 
-  return <div className="mx-auto mt-5 max-w-[27.5rem]">
-    <div className="flex items-center justify-between text-[12px] text-muted-foreground"><span>재생 위치</span><span>{formatDuration(value)} / {duration}</span></div>
-    <input aria-label="재생 위치" type="range" min="0" max={totalSeconds} value={Math.min(value, totalSeconds)} onChange={(event) => onChange(Number(event.target.value))} className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary" />
-  </div>;
+  return (
+    <div className="mx-auto mt-5 max-w-[27.5rem]">
+      <div className="flex items-center justify-between text-[12px] text-muted-foreground">
+        <span>재생 위치</span>
+        <span>
+          {formatDuration(value)} / {duration}
+        </span>
+      </div>
+      <input
+        aria-label="재생 위치"
+        type="range"
+        min="0"
+        max={totalSeconds}
+        value={Math.min(value, totalSeconds)}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+      />
+    </div>
+  );
 }

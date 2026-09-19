@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useRef, useState } from 'react'
-import { Input } from '@/shared/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
-import { clamp, hexToHsv, hsvToHex, normalizeHex, type Hsv } from '@/entities/music-card'
-import { cn } from '@/shared/lib/utils'
+import { useRef, useState } from 'react';
+import { Input } from '@/shared/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { clamp, hexToHsv, hsvToHex, normalizeHex, type Hsv } from '@/entities/music-card';
+import { cn } from '@/shared/lib/utils';
 
 const PALETTE = [
   '#0d1117',
@@ -23,23 +23,23 @@ const PALETTE = [
   '#22d3ee',
   '#10b981',
   '#a3e635',
-]
+];
 
 export function ColorField({
   label,
   value,
   onChange,
 }: {
-  label: string
-  value: string
-  onChange: (hex: string) => void
+  label: string;
+  value: string;
+  onChange: (hex: string) => void;
 }) {
-  const [draft, setDraft] = useState(value)
+  const [draft, setDraft] = useState(value);
 
   function commitDraft(next: string) {
-    setDraft(next)
-    const normalized = normalizeHex(next)
-    if (normalized) onChange(normalized)
+    setDraft(next);
+    const normalized = normalizeHex(next);
+    if (normalized) onChange(normalized);
   }
 
   return (
@@ -56,8 +56,8 @@ export function ColorField({
             <ColorPicker
               value={value}
               onChange={(next) => {
-                setDraft(next)
-                onChange(next)
+                setDraft(next);
+                onChange(next);
               }}
             />
           </PopoverContent>
@@ -72,27 +72,27 @@ export function ColorField({
         />
       </div>
     </div>
-  )
+  );
 }
 
 function ColorPicker({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
-  const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value))
-  const areaRef = useRef<HTMLDivElement>(null)
+  const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value));
+  const areaRef = useRef<HTMLDivElement>(null);
 
   function update(next: Hsv) {
-    setHsv(next)
-    onChange(hsvToHex(next))
+    setHsv(next);
+    onChange(hsvToHex(next));
   }
 
   function handleArea(event: React.PointerEvent<HTMLDivElement>) {
-    const node = areaRef.current
-    if (!node) return
-    const rect = node.getBoundingClientRect()
+    const node = areaRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
     update({
       ...hsv,
       s: clamp((event.clientX - rect.left) / rect.width),
       v: 1 - clamp((event.clientY - rect.top) / rect.height),
-    })
+    });
   }
 
   return (
@@ -101,16 +101,15 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
         ref={areaRef}
         role="presentation"
         onPointerDown={(event) => {
-          event.currentTarget.setPointerCapture(event.pointerId)
-          handleArea(event)
+          event.currentTarget.setPointerCapture(event.pointerId);
+          handleArea(event);
         }}
         onPointerMove={(event) => {
-          if (event.currentTarget.hasPointerCapture(event.pointerId)) handleArea(event)
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) handleArea(event);
         }}
         className="relative h-32 w-full cursor-crosshair touch-none rounded-lg border border-border"
         style={{
-          backgroundImage:
-            'linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)',
+          backgroundImage: 'linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)',
           backgroundColor: hsvToHex({ h: hsv.h, s: 1, v: 1 }),
         }}
       >
@@ -132,8 +131,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
         onChange={(event) => update({ ...hsv, h: Number(event.target.value) })}
         className="h-3 w-full cursor-pointer appearance-none rounded-full border border-border [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-transparent [&::-webkit-slider-thumb]:shadow-md"
         style={{
-          backgroundImage:
-            'linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)',
+          backgroundImage: 'linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)',
         }}
       />
 
@@ -143,8 +141,8 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
             key={swatch}
             type="button"
             onClick={() => {
-              setHsv(hexToHsv(swatch))
-              onChange(swatch)
+              setHsv(hexToHsv(swatch));
+              onChange(swatch);
             }}
             aria-label={swatch}
             className={cn(
@@ -156,5 +154,5 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -1,3 +1,3 @@
-"use client";
+'use client';
 
-export { CardGeneratorWorkspace } from "./ui/CardGeneratorWorkspace";
+export { CardGeneratorWorkspace } from './ui/CardGeneratorWorkspace';

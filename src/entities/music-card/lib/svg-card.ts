@@ -1,12 +1,12 @@
-import { durationToSeconds, formatDuration } from "./time";
-import { mixHex } from "./color";
-import { compactTickerGap } from "./ticker";
-import type { CardMeta, CardStyleId, CardTheme, CoverPosition, GradientDirection, Track } from "../model/types";
+import { durationToSeconds, formatDuration } from './time';
+import { mixHex } from './color';
+import { compactTickerGap } from './ticker';
+import type { CardMeta, CardStyleId, CardTheme, CoverPosition, GradientDirection, Track } from '../model/types';
 
 const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
-const STYLE_IDS: CardStyleId[] = ["player", "compact", "vertical"];
-const GRADIENT_DIRECTIONS = ["top-left", "top-right", "bottom-left", "bottom-right"] as const;
+const STYLE_IDS: CardStyleId[] = ['player', 'compact', 'vertical'];
+const GRADIENT_DIRECTIONS = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
 
 type GradientCorner = Exclude<GradientDirection, null>;
 
@@ -36,7 +36,7 @@ export function serializeSvgCardData(data: SvgCardData) {
     coverY: String(data.coverPosition.y),
     coverScale: String(data.coverPosition.scale),
     coverRatio: String(data.coverPosition.aspectRatio),
-    waveform: data.waveform.join(","),
+    waveform: data.waveform.join(','),
     tw: String(data.titleWidth),
     aw: String(data.artistWidth),
     pbx: String(data.playerProgress.x),
@@ -48,18 +48,26 @@ export function serializeSvgCardData(data: SvgCardData) {
     text: data.theme.text.slice(1),
     muted: data.theme.muted.slice(1),
     accent: data.theme.accent.slice(1),
-    gradient: data.theme.gradient ? "1" : "0",
-    ...(data.theme.gradient ? {
-      gradientDirection: data.theme.gradientDirection ?? "bottom-right",
-      gradientIntensity: String(data.theme.gradientIntensity),
-    } : {}),
+    gradient: data.theme.gradient ? '1' : '0',
+    ...(data.theme.gradient
+      ? {
+          gradientDirection: data.theme.gradientDirection ?? 'bottom-right',
+          gradientIntensity: String(data.theme.gradientIntensity),
+        }
+      : {}),
     bw: String(data.theme.borderWidth),
     r: String(data.theme.radius),
     progress: String(data.progressSeconds),
   };
 }
 
-export function createSvgCardParams(track: Track, style: CardStyleId, meta: CardMeta, theme: CardTheme, progressSeconds: number) {
+export function createSvgCardParams(
+  track: Track,
+  style: CardStyleId,
+  meta: CardMeta,
+  theme: CardTheme,
+  progressSeconds: number,
+) {
   const textWidths = measureTickerTextWidths(style, meta);
   const playerProgress = measurePlayerProgress(track.duration, progressSeconds, theme.borderWidth);
 
@@ -73,23 +81,25 @@ export function createSvgCardParams(track: Track, style: CardStyleId, meta: Card
     coverY: String(track.coverPosition.y),
     coverScale: String(track.coverPosition.scale),
     coverRatio: String(track.coverPosition.aspectRatio),
-    waveform: track.waveform.slice(0, 6).join(","),
+    waveform: track.waveform.slice(0, 6).join(','),
     tw: String(textWidths.title),
     aw: String(textWidths.artist),
     pbx: String(playerProgress.x),
     pby: String(playerProgress.y),
     pbw: String(playerProgress.width),
     pbh: String(playerProgress.height),
-    bg: theme.background.replace("#", ""),
-    border: theme.border.replace("#", ""),
-    text: theme.text.replace("#", ""),
-    muted: theme.muted.replace("#", ""),
-    accent: theme.accent.replace("#", ""),
-    gradient: theme.gradient ? "1" : "0",
-    ...(theme.gradient ? {
-      gradientDirection: theme.gradientDirection ?? "bottom-right",
-      gradientIntensity: String(Math.round(theme.gradientIntensity)),
-    } : {}),
+    bg: theme.background.replace('#', ''),
+    border: theme.border.replace('#', ''),
+    text: theme.text.replace('#', ''),
+    muted: theme.muted.replace('#', ''),
+    accent: theme.accent.replace('#', ''),
+    gradient: theme.gradient ? '1' : '0',
+    ...(theme.gradient
+      ? {
+          gradientDirection: theme.gradientDirection ?? 'bottom-right',
+          gradientIntensity: String(Math.round(theme.gradientIntensity)),
+        }
+      : {}),
     bw: String(theme.borderWidth),
     r: String(theme.radius),
     progress: String(Math.floor(progressSeconds)),
@@ -97,11 +107,12 @@ export function createSvgCardParams(track: Track, style: CardStyleId, meta: Card
 }
 
 function measureTickerTextWidths(style: CardStyleId, meta: CardMeta) {
-  const titleStyle = style === "vertical"
-    ? { fontSize: 16, fontWeight: 600, letterSpacing: -0.015 }
-    : style === "compact"
-      ? { fontSize: 13, fontWeight: 600, letterSpacing: -0.01 }
-      : { fontSize: 16, fontWeight: 600, letterSpacing: -0.015 };
+  const titleStyle =
+    style === 'vertical'
+      ? { fontSize: 16, fontWeight: 600, letterSpacing: -0.015 }
+      : style === 'compact'
+        ? { fontSize: 13, fontWeight: 600, letterSpacing: -0.01 }
+        : { fontSize: 16, fontWeight: 600, letterSpacing: -0.015 };
 
   return {
     title: measureTextWidth(meta.title, titleStyle),
@@ -110,9 +121,9 @@ function measureTickerTextWidths(style: CardStyleId, meta: CardMeta) {
 }
 
 function measureTextWidth(value: string, style: { fontSize: number; fontWeight: number; letterSpacing: number }) {
-  if (typeof document === "undefined") return 0;
+  if (typeof document === 'undefined') return 0;
 
-  const element = document.createElement("span");
+  const element = document.createElement('span');
   element.textContent = value;
   element.style.cssText = `position:fixed;visibility:hidden;white-space:pre;pointer-events:none;font-family:'Noto Sans KR',sans-serif;font-size:${style.fontSize}px;font-weight:${style.fontWeight};letter-spacing:${style.letterSpacing}em;`;
   document.body.append(element);
@@ -144,51 +155,51 @@ export function isSvgVideoId(value: string) {
 }
 
 export function parseSvgCardData(params: URLSearchParams): SvgCardData {
-  const style = readStyle(params.get("style"));
-  const duration = readDuration(params.get("duration"));
+  const style = readStyle(params.get('style'));
+  const duration = readDuration(params.get('duration'));
   const totalSeconds = durationToSeconds(duration);
-  const gradient = params.get("gradient") === "1";
+  const gradient = params.get('gradient') === '1';
 
   return {
     style,
-    title: readText(params.get("title"), "Untitled track", 120),
-    artist: readText(params.get("artist"), "Unknown artist", 120),
+    title: readText(params.get('title'), 'Untitled track', 120),
+    artist: readText(params.get('artist'), 'Unknown artist', 120),
     duration,
-    cover: readCover(params.get("cover")),
+    cover: readCover(params.get('cover')),
     coverPosition: {
-      x: readNumber(params.get("coverX"), 50, 0, 100),
-      y: readNumber(params.get("coverY"), 50, 0, 100),
-      scale: readNumber(params.get("coverScale"), 100, 40, 100),
-      aspectRatio: readNumber(params.get("coverRatio"), 16 / 9, 0.25, 4),
+      x: readNumber(params.get('coverX'), 50, 0, 100),
+      y: readNumber(params.get('coverY'), 50, 0, 100),
+      scale: readNumber(params.get('coverScale'), 100, 40, 100),
+      aspectRatio: readNumber(params.get('coverRatio'), 16 / 9, 0.25, 4),
     },
-    waveform: readWaveform(params.get("waveform")),
-    titleWidth: readNumber(params.get("tw"), 0, 0, 1_200),
-    artistWidth: readNumber(params.get("aw"), 0, 0, 1_200),
+    waveform: readWaveform(params.get('waveform')),
+    titleWidth: readNumber(params.get('tw'), 0, 0, 1_200),
+    artistWidth: readNumber(params.get('aw'), 0, 0, 1_200),
     playerProgress: {
-      x: readNumber(params.get("pbx"), 60, 0, 380),
-      y: readNumber(params.get("pby"), 98, 0, 181),
-      width: readNumber(params.get("pbw"), 248, 1, 380),
-      height: readNumber(params.get("pbh"), 6, 1, 20),
+      x: readNumber(params.get('pbx'), 60, 0, 380),
+      y: readNumber(params.get('pby'), 98, 0, 181),
+      width: readNumber(params.get('pbw'), 248, 1, 380),
+      height: readNumber(params.get('pbh'), 6, 1, 20),
     },
     theme: {
-      background: readColor(params.get("bg"), "#0a0a0a"),
-      border: readColor(params.get("border"), "#262626"),
-      borderWidth: readNumber(params.get("bw"), 1, 0, 6),
-      radius: readNumber(params.get("r"), 22, 0, 40),
-      text: readColor(params.get("text"), "#fafafa"),
-      muted: readColor(params.get("muted"), "#a3a3a3"),
-      accent: readColor(params.get("accent"), "#fafafa"),
+      background: readColor(params.get('bg'), '#0a0a0a'),
+      border: readColor(params.get('border'), '#262626'),
+      borderWidth: readNumber(params.get('bw'), 1, 0, 6),
+      radius: readNumber(params.get('r'), 22, 0, 40),
+      text: readColor(params.get('text'), '#fafafa'),
+      muted: readColor(params.get('muted'), '#a3a3a3'),
+      accent: readColor(params.get('accent'), '#fafafa'),
       gradient,
-      gradientDirection: gradient ? readGradientDirection(params.get("gradientDirection")) ?? "bottom-right" : null,
-      gradientIntensity: readNumber(params.get("gradientIntensity"), 14, 0, 100),
+      gradientDirection: gradient ? (readGradientDirection(params.get('gradientDirection')) ?? 'bottom-right') : null,
+      gradientIntensity: readNumber(params.get('gradientIntensity'), 14, 0, 100),
     },
-    progressSeconds: Math.min(readNumber(params.get("progress"), 0, 0, totalSeconds), totalSeconds),
+    progressSeconds: Math.min(readNumber(params.get('progress'), 0, 0, totalSeconds), totalSeconds),
   };
 }
 
 export function renderSvgCard(data: SvgCardData) {
-  if (data.style === "compact") return renderCompactCard(data);
-  if (data.style === "vertical") return renderVerticalCard(data);
+  if (data.style === 'compact') return renderCompactCard(data);
+  if (data.style === 'vertical') return renderVerticalCard(data);
   return renderPlayerCard(data);
 }
 
@@ -201,18 +212,22 @@ function renderPlayerCard(data: SvgCardData) {
   const card = cardRect(data, width, height);
   const inset = data.theme.borderWidth;
 
-  return svgDocument(width, height, `
-    ${cardGradient(data, "player-gradient", width, height)}
+  return svgDocument(
+    width,
+    height,
+    `
+    ${cardGradient(data, 'player-gradient', width, height)}
     ${cardSurface(data, card, width, height)}
-    ${coverImage(data, 20 + inset, 20 + inset, coverSize, "player-cover")}
-    ${tickerText(data.title, 96 + inset, 47 + inset, 16, data.theme.text, 600, 224 - inset * 2, "player-title", data.titleWidth, -0.015)}
-    ${tickerText(data.artist, 96 + inset, 67 + inset, 13, data.theme.muted, 400, 224 - inset * 2, "player-artist", data.artistWidth)}
+    ${coverImage(data, 20 + inset, 20 + inset, coverSize, 'player-cover')}
+    ${tickerText(data.title, 96 + inset, 47 + inset, 16, data.theme.text, 600, 224 - inset * 2, 'player-title', data.titleWidth, -0.015)}
+    ${tickerText(data.artist, 96 + inset, 67 + inset, 13, data.theme.muted, 400, 224 - inset * 2, 'player-artist', data.artistWidth)}
     ${waveform(data.waveform, data.theme.accent, 336 - inset, 40 + inset)}
     ${text(formatDuration(data.progressSeconds), 20 + inset, data.playerProgress.y + 8, 12, data.theme.muted, 400)}
     ${progressBar(data, data.playerProgress.x, data.playerProgress.y, data.playerProgress.width, data.playerProgress.height, progress)}
-    ${text(`-${formatDuration(totalSeconds - data.progressSeconds)}`, 360 - inset, data.playerProgress.y + 8, 12, data.theme.muted, 400, 80, "end")}
+    ${text(`-${formatDuration(totalSeconds - data.progressSeconds)}`, 360 - inset, data.playerProgress.y + 8, 12, data.theme.muted, 400, 80, 'end')}
     ${playerControls(data.theme.text, 190, 143.435 + inset, 1)}
-  `);
+  `,
+  );
 }
 
 function renderCompactCard(data: SvgCardData) {
@@ -221,13 +236,17 @@ function renderCompactCard(data: SvgCardData) {
   const card = cardRect(data, width, height);
   const inset = data.theme.borderWidth;
 
-  return svgDocument(width, height, `
-    ${cardGradient(data, "compact-gradient", width, height)}
+  return svgDocument(
+    width,
+    height,
+    `
+    ${cardGradient(data, 'compact-gradient', width, height)}
     ${cardSurface(data, card, width, height)}
-    ${coverImage(data, 16 + inset, 9, 30, "compact-cover")}
+    ${coverImage(data, 16 + inset, 9, 30, 'compact-cover')}
     ${compactTicker(data.title, data.artist, data.titleWidth, data.artistWidth, 58 + inset, 29, 350 - inset * 2, data.theme.text, data.theme.muted)}
-    ${text(data.duration, 444 - inset, 29, 12, data.theme.muted, 500, undefined, "end")}
-  `);
+    ${text(data.duration, 444 - inset, 29, 12, data.theme.muted, 500, undefined, 'end')}
+  `,
+  );
 }
 
 function renderVerticalCard(data: SvgCardData) {
@@ -244,17 +263,21 @@ function renderVerticalCard(data: SvgCardData) {
   const progressY = metadataTop + 54;
   const timeY = progressY + 28;
 
-  return svgDocument(width, height, `
-    ${cardGradient(data, "vertical-gradient", width, height)}
+  return svgDocument(
+    width,
+    height,
+    `
+    ${cardGradient(data, 'vertical-gradient', width, height)}
     ${cardSurface(data, card, width, height)}
-    ${coverImage(data, 30, 20 + inset, coverSize, "vertical-cover")}
-    ${tickerText(data.title, 20 + inset, titleY, 16, data.theme.text, 600, 220 - inset * 2, "vertical-title", data.titleWidth, -0.015)}
-    ${tickerText(data.artist, 20 + inset, artistY, 13, data.theme.muted, 400, 220 - inset * 2, "vertical-artist", data.artistWidth)}
+    ${coverImage(data, 30, 20 + inset, coverSize, 'vertical-cover')}
+    ${tickerText(data.title, 20 + inset, titleY, 16, data.theme.text, 600, 220 - inset * 2, 'vertical-title', data.titleWidth, -0.015)}
+    ${tickerText(data.artist, 20 + inset, artistY, 13, data.theme.muted, 400, 220 - inset * 2, 'vertical-artist', data.artistWidth)}
     ${progressBar(data, 20 + inset, progressY, 220 - inset * 2, 6, progress)}
     ${text(formatDuration(data.progressSeconds), 20 + inset, timeY, 12, data.theme.muted, 500)}
-    ${text(`-${formatDuration(totalSeconds - data.progressSeconds)}`, 240 - inset, timeY, 12, data.theme.muted, 500, 80, "end")}
+    ${text(`-${formatDuration(totalSeconds - data.progressSeconds)}`, 240 - inset, timeY, 12, data.theme.muted, 500, 80, 'end')}
     ${playerControls(data.theme.text, 130, verticalControlsY(height, inset), 1)}
-  `);
+  `,
+  );
 }
 
 function svgDocument(width: number, height: number, content: string) {
@@ -286,8 +309,8 @@ function cardSurface(data: SvgCardData, card: ReturnType<typeof cardRect>, width
 }
 
 function cardGradient(data: SvgCardData, id: string, width: number, height: number) {
-  if (!data.theme.gradient) return "";
-  const { x1, y1, x2, y2 } = cssGradientCoordinates(data.theme.gradientDirection ?? "bottom-right", width, height);
+  if (!data.theme.gradient) return '';
+  const { x1, y1, x2, y2 } = cssGradientCoordinates(data.theme.gradientDirection ?? 'bottom-right', width, height);
   const endColor = mixHex(data.theme.background, data.theme.accent, data.theme.gradientIntensity / 100);
 
   return `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" color-interpolation="sRGB"><stop stop-color="${data.theme.background}"/><stop offset="1" stop-color="${endColor}"/></linearGradient></defs>`;
@@ -295,10 +318,10 @@ function cardGradient(data: SvgCardData, id: string, width: number, height: numb
 
 function cssGradientCoordinates(direction: GradientCorner, width: number, height: number) {
   const angles: Record<GradientCorner, number> = {
-    "top-left": 315,
-    "top-right": 45,
-    "bottom-left": 225,
-    "bottom-right": 135,
+    'top-left': 315,
+    'top-right': 45,
+    'bottom-left': 225,
+    'bottom-right': 135,
   };
   const radians = (angles[direction] * Math.PI) / 180;
   const horizontal = Math.sin(radians);
@@ -325,7 +348,8 @@ function backgroundFill(data: SvgCardData) {
 
 function coverImage(data: SvgCardData, x: number, y: number, size: number, id: string) {
   const radius = 8;
-  if (!data.cover) return `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}" fill="${withAlpha(data.theme.muted, 0.25)}"/>`;
+  if (!data.cover)
+    return `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${radius}" fill="${withAlpha(data.theme.muted, 0.25)}"/>`;
 
   const ratio = data.coverPosition.aspectRatio;
   const sourceWidth = ratio >= 1 ? ratio : 1;
@@ -356,34 +380,67 @@ function waveform(values: number[], color: string, x: number, y: number) {
   const barWidth = (containerWidth - gap * (values.length - 1)) / values.length;
   const step = barWidth + gap;
 
-  return values.map((value, index) => {
-    const height = Math.max(2.4, (Math.max(12, value) / 100) * containerHeight);
-    const low = height * 0.68;
-    const delay = (index * 0.09).toFixed(2);
-    const lowY = y + (containerHeight - low) / 2;
-    const highY = y + (containerHeight - height) / 2;
-    return `<rect x="${(x + index * step).toFixed(2)}" y="${lowY.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${low.toFixed(2)}" rx="1" fill="${withAlpha(color, 0.75)}" opacity="0.55"><animate attributeName="height" values="${low};${height};${low}" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/><animate attributeName="y" values="${lowY};${highY};${lowY}" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/></rect>`;
-  }).join("");
+  return values
+    .map((value, index) => {
+      const height = Math.max(2.4, (Math.max(12, value) / 100) * containerHeight);
+      const low = height * 0.68;
+      const delay = (index * 0.09).toFixed(2);
+      const lowY = y + (containerHeight - low) / 2;
+      const highY = y + (containerHeight - height) / 2;
+      return `<rect x="${(x + index * step).toFixed(2)}" y="${lowY.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${low.toFixed(2)}" rx="1" fill="${withAlpha(color, 0.75)}" opacity="0.55"><animate attributeName="height" values="${low};${height};${low}" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/><animate attributeName="y" values="${lowY};${highY};${lowY}" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="1.8s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/></rect>`;
+    })
+    .join('');
 }
 
-function text(value: string, x: number, y: number, fontSize: number, color: string, weight: number, maxWidth?: number, anchor = "start") {
+function text(
+  value: string,
+  x: number,
+  y: number,
+  fontSize: number,
+  color: string,
+  weight: number,
+  maxWidth?: number,
+  anchor = 'start',
+) {
   const clipped = truncate(value, maxWidth ? Math.floor(maxWidth / (fontSize * 0.82)) : 80);
   return `<text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}" text-anchor="${anchor}">${escapeXml(clipped)}</text>`;
 }
 
-function tickerText(value: string, x: number, y: number, fontSize: number, color: string, weight: number, width: number, id: string, measuredWidth: number, letterSpacing = 0) {
+function tickerText(
+  value: string,
+  x: number,
+  y: number,
+  fontSize: number,
+  color: string,
+  weight: number,
+  width: number,
+  id: string,
+  measuredWidth: number,
+  letterSpacing = 0,
+) {
   const clipY = y - fontSize * 1.05;
   const estimatedWidth = measuredWidth || value.length * fontSize * 0.82;
   const content = escapeXml(value);
-  const tracking = letterSpacing ? ` letter-spacing="${letterSpacing}em"` : "";
-  if (estimatedWidth <= width) return `<text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}"${tracking}>${content}</text>`;
+  const tracking = letterSpacing ? ` letter-spacing="${letterSpacing}em"` : '';
+  if (estimatedWidth <= width)
+    return `<text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}"${tracking}>${content}</text>`;
 
   const gap = 32;
   const distance = Math.ceil(estimatedWidth + gap);
   return `<defs><clipPath id="${id}-clip"><rect x="${x}" y="${clipY}" width="${width}" height="${fontSize * 1.4}"/></clipPath></defs><g clip-path="url(#${id}-clip)"><g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${distance} 0" dur="12s" begin="1s" repeatCount="indefinite"/><text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}"${tracking}>${content}</text><text x="${x + distance}" y="${y}" fill="${color}" font-size="${fontSize}" font-weight="${weight}"${tracking}>${content}</text></g></g>`;
 }
 
-function compactTicker(title: string, artist: string, measuredTitleWidth: number, measuredArtistWidth: number, x: number, y: number, width: number, textColor: string, mutedColor: string) {
+function compactTicker(
+  title: string,
+  artist: string,
+  measuredTitleWidth: number,
+  measuredArtistWidth: number,
+  x: number,
+  y: number,
+  width: number,
+  textColor: string,
+  mutedColor: string,
+) {
   const titleWidth = measuredTitleWidth || title.length * 13 * 0.82;
   const artistX = x + titleWidth + 8;
   const artistWidth = measuredArtistWidth || artist.length * 13 * 0.82;
@@ -396,11 +453,11 @@ function compactTicker(title: string, artist: string, measuredTitleWidth: number
 }
 
 function readStyle(value: string | null): CardStyleId {
-  return STYLE_IDS.includes(value as CardStyleId) ? value as CardStyleId : "player";
+  return STYLE_IDS.includes(value as CardStyleId) ? (value as CardStyleId) : 'player';
 }
 
 function readGradientDirection(value: string | null): GradientCorner | null {
-  return GRADIENT_DIRECTIONS.includes(value as GradientCorner) ? value as GradientCorner : null;
+  return GRADIENT_DIRECTIONS.includes(value as GradientCorner) ? (value as GradientCorner) : null;
 }
 
 function readText(value: string | null, fallback: string, maxLength: number) {
@@ -409,29 +466,31 @@ function readText(value: string | null, fallback: string, maxLength: number) {
 }
 
 function readDuration(value: string | null) {
-  if (!value || !/^(?:\d+:)?[0-5]?\d:\d{2}$/.test(value)) return "0:00";
-  return durationToSeconds(value) <= 86_399 ? value : "0:00";
+  if (!value || !/^(?:\d+:)?[0-5]?\d:\d{2}$/.test(value)) return '0:00';
+  return durationToSeconds(value) <= 86_399 ? value : '0:00';
 }
 
 function readCover(value: string | null) {
-  if (!value) return "";
+  if (!value) return '';
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === "i.ytimg.com" ? url.toString() : "";
+    return url.protocol === 'https:' && url.hostname === 'i.ytimg.com' ? url.toString() : '';
   } catch {
-    return "";
+    return '';
   }
 }
 
 function readWaveform(value: string | null) {
   const fallback = [28, 46, 68, 38, 60, 32];
   if (!value) return fallback;
-  const values = value.split(",").map((item) => Number(item));
-  return values.length === 6 && values.every((item) => Number.isFinite(item) && item >= 0 && item <= 100) ? values : fallback;
+  const values = value.split(',').map((item) => Number(item));
+  return values.length === 6 && values.every((item) => Number.isFinite(item) && item >= 0 && item <= 100)
+    ? values
+    : fallback;
 }
 
 function readColor(value: string | null, fallback: string) {
-  const color = value ? `#${value.replace("#", "")}` : fallback;
+  const color = value ? `#${value.replace('#', '')}` : fallback;
   return HEX_COLOR_PATTERN.test(color) ? color.toLowerCase() : fallback;
 }
 
@@ -453,5 +512,8 @@ function truncate(value: string, maxLength: number) {
 }
 
 function escapeXml(value: string) {
-  return value.replace(/[<>&"']/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[character] ?? character);
+  return value.replace(
+    /[<>&"']/g,
+    (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character,
+  );
 }

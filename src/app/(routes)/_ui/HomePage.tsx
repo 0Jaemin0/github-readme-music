@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useState } from "react";
-import brandMark from "@/shared/assets/brand-mark.png";
-import { ThemeToggle } from "@/features/theme-toggle";
-import { CardGeneratorWorkspace } from "@/widgets/card-generator-workspace";
+import Image from 'next/image';
+import { useState } from 'react';
+import brandMark from '@/shared/assets/brand-mark.png';
+import { ThemeToggle } from '@/features/theme-toggle';
+import { CardGeneratorWorkspace } from '@/widgets/card-generator-workspace';
 
 export function HomePage() {
   const [generatorKey, setGeneratorKey] = useState(0);
   const [isLanding, setIsLanding] = useState(true);
 
   return (
-    <div className={isLanding ? "flex h-dvh flex-col overflow-hidden" : "flex min-h-dvh flex-col"}>
+    <div className={isLanding ? 'flex h-dvh flex-col overflow-hidden' : 'flex min-h-dvh flex-col'}>
       <header className="shrink-0">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6">
           <button

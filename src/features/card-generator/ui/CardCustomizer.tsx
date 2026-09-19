@@ -1,49 +1,41 @@
-'use client'
+'use client';
 
-import { ColorField } from './ColorField'
-import { ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, X } from 'lucide-react'
-import { contrastRatio, type CardTheme, type GradientDirection } from '@/entities/music-card'
+import { ColorField } from './ColorField';
+import { ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, X } from 'lucide-react';
+import { contrastRatio, type CardTheme, type GradientDirection } from '@/entities/music-card';
 
 const GRADIENT_DIRECTIONS = [
   { value: 'top-left', label: '왼쪽 위', Icon: ArrowUpLeft },
   { value: 'top-right', label: '오른쪽 위', Icon: ArrowUpRight },
   { value: 'bottom-left', label: '왼쪽 아래', Icon: ArrowDownLeft },
   { value: 'bottom-right', label: '오른쪽 아래', Icon: ArrowDownRight },
-] as const satisfies ReadonlyArray<{ value: Exclude<GradientDirection, null>; label: string; Icon: typeof ArrowUpLeft }>;
+] as const satisfies ReadonlyArray<{
+  value: Exclude<GradientDirection, null>;
+  label: string;
+  Icon: typeof ArrowUpLeft;
+}>;
 
-export function CardCustomizer({
-  theme,
-  onChange,
-}: {
-  theme: CardTheme
-  onChange: (theme: CardTheme) => void
-}) {
+export function CardCustomizer({ theme, onChange }: { theme: CardTheme; onChange: (theme: CardTheme) => void }) {
   const lowContrastRoles = [
     { name: '제목', color: theme.text },
     { name: '가수', color: theme.muted },
     { name: '포인트', color: theme.accent },
-  ].filter(({ color }) => contrastRatio(theme.background, color) < 1.8)
+  ].filter(({ color }) => contrastRatio(theme.background, color) < 1.8);
 
   function set<K extends keyof CardTheme>(key: K, value: CardTheme[K]) {
-    onChange({ ...theme, [key]: value })
+    onChange({ ...theme, [key]: value });
   }
 
   function setGradientDirection(direction: GradientDirection) {
-    onChange({ ...theme, gradient: direction !== null, gradientDirection: direction })
+    onChange({ ...theme, gradient: direction !== null, gradientDirection: direction });
   }
 
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <p className="text-[13px] font-medium text-muted-foreground">
-          색상
-        </p>
+        <p className="text-[13px] font-medium text-muted-foreground">색상</p>
         <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 sm:gap-x-8">
-          <ColorField
-            label="카드 배경"
-            value={theme.background}
-            onChange={(v) => set('background', v)}
-          />
+          <ColorField label="카드 배경" value={theme.background} onChange={(v) => set('background', v)} />
           <ColorField label="카드 테두리" value={theme.border} onChange={(v) => set('border', v)} />
           <ColorField label="제목" value={theme.text} onChange={(v) => set('text', v)} />
           <ColorField label="가수" value={theme.muted} onChange={(v) => set('muted', v)} />
@@ -52,10 +44,31 @@ export function CardCustomizer({
         <div className="mt-4 flex items-center gap-3">
           <span className="text-[13px] text-muted-foreground">포인트 색 그라데이션</span>
           <div role="radiogroup" aria-label="그라데이션 방향" className="flex items-center gap-1.5">
-            <button type="button" role="radio" aria-checked={!theme.gradient} aria-label="없음" onClick={() => setGradientDirection(null)} className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${!theme.gradient ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}><X className="size-4" /></button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!theme.gradient}
+              aria-label="없음"
+              onClick={() => setGradientDirection(null)}
+              className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${!theme.gradient ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}
+            >
+              <X className="size-4" />
+            </button>
             {GRADIENT_DIRECTIONS.map(({ value, label, Icon }) => {
-              const selected = theme.gradient && theme.gradientDirection === value
-              return <button key={value} type="button" role="radio" aria-checked={selected} aria-label={label} onClick={() => setGradientDirection(value)} className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}><Icon className="size-4" /></button>
+              const selected = theme.gradient && theme.gradientDirection === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  aria-label={label}
+                  onClick={() => setGradientDirection(value)}
+                  className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                >
+                  <Icon className="size-4" />
+                </button>
+              );
             })}
           </div>
         </div>
@@ -71,39 +84,42 @@ export function CardCustomizer({
             />
           </div>
         ) : null}
-        {theme.gradient ? <p className="mt-2 text-[12px] leading-5 text-muted-foreground">선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있습니다.</p> : null}
+        {theme.gradient ? (
+          <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
+            선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있습니다.
+          </p>
+        ) : null}
         {lowContrastRoles.length > 0 ? (
           <p role="status" className="mt-2.5 text-[13px] leading-5 text-destructive">
-            {lowContrastRoles.map(({ name }) => name).join(', ')} 색의 대비가 매우 낮습니다. README에서 읽기 어려울 수 있습니다.
+            {lowContrastRoles.map(({ name }) => name).join(', ')} 색의 대비가 매우 낮습니다. README에서 읽기 어려울 수
+            있습니다.
           </p>
         ) : null}
       </section>
 
       <section>
-        <p className="text-[13px] font-medium text-muted-foreground">
-          모양
-        </p>
+        <p className="text-[13px] font-medium text-muted-foreground">모양</p>
         <div className="mt-3 flex flex-col gap-4">
-        <RangeRow
-          label="Border width"
-          value={theme.borderWidth}
-          min={0}
-          max={6}
-          suffix="px"
-          onChange={(value) => set('borderWidth', value)}
-        />
-        <RangeRow
-          label="Corner radius"
-          value={theme.radius}
-          min={0}
-          max={28}
-          suffix="px"
-          onChange={(value) => set('radius', value)}
-        />
+          <RangeRow
+            label="Border width"
+            value={theme.borderWidth}
+            min={0}
+            max={6}
+            suffix="px"
+            onChange={(value) => set('borderWidth', value)}
+          />
+          <RangeRow
+            label="Corner radius"
+            value={theme.radius}
+            min={0}
+            max={28}
+            suffix="px"
+            onChange={(value) => set('radius', value)}
+          />
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 function RangeRow({
@@ -114,14 +130,14 @@ function RangeRow({
   suffix,
   onChange,
 }: {
-  label: string
-  value: number
-  min: number
-  max: number
-  suffix: string
-  onChange: (value: number) => void
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  suffix: string;
+  onChange: (value: number) => void;
 }) {
-  const id = `range-${label.replace(/\s+/g, '-').toLowerCase()}`
+  const id = `range-${label.replace(/\s+/g, '-').toLowerCase()}`;
   return (
     <div className="flex items-center gap-3">
       <label htmlFor={id} className="w-28 shrink-0 text-[13px] text-muted-foreground">
@@ -141,5 +157,5 @@ function RangeRow({
         {suffix}
       </span>
     </div>
-  )
+  );
 }
