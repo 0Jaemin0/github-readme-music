@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { isStoredCardId } from "@/features/card-generator/lib/stored-card";
-import { readStoredCard } from "@/features/card-generator/lib/stored-card-reader.server";
-import { captureMonitoringError } from "@/lib/sentry-monitoring";
+import { isStoredCardId, readStoredCard } from "@/entities/music-card/server";
+import { captureMonitoringError } from "@/shared/lib/sentry-monitoring";
 
 type RouteContext = {
   params: Promise<{ id: string }>;

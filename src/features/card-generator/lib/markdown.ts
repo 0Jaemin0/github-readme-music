@@ -1,6 +1,11 @@
-import { CARD_OUTPUT_WIDTHS } from "../model/options";
-import type { CardMeta, CardStyleId, CardTheme, Track } from "../model/types";
-import { createSvgCardParams } from "./svg-card";
+import {
+  CARD_OUTPUT_WIDTHS,
+  createSvgCardParams,
+  type CardMeta,
+  type CardStyleId,
+  type CardTheme,
+  type Track,
+} from "@/entities/music-card";
 
 export function buildMarkdown(
   track: Track,

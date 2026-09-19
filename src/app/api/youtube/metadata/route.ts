@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { parseYouTubeId } from "@/features/card-generator/lib/youtube";
-import type { YouTubeMetadata } from "@/features/card-generator/model/types";
-import { captureMonitoringError } from "@/lib/sentry-monitoring";
+import { parseYouTubeId, type YouTubeMetadata } from "@/entities/music-card";
+import { captureMonitoringError } from "@/shared/lib/sentry-monitoring";
 
 const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/videos";
 const MAX_REQUEST_BODY_BYTES = 4_096;

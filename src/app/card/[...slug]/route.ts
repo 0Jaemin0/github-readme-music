@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
-import { isStoredCardId } from "@/features/card-generator/lib/stored-card";
-import { readStoredCard } from "@/features/card-generator/lib/stored-card-reader.server";
-import { embedSvgCover } from "@/features/card-generator/lib/svg-cover.server";
-import { isSvgVideoId, parseSvgCardData, renderSvgCard, type SvgCardData } from "@/features/card-generator/lib/svg-card";
-import { captureMonitoringError } from "@/lib/sentry-monitoring";
+import {
+  embedSvgCover,
+  isStoredCardId,
+  isSvgVideoId,
+  parseSvgCardData,
+  readStoredCard,
+  renderSvgCard,
+  type SvgCardData,
+} from "@/entities/music-card/server";
+import { captureMonitoringError } from "@/shared/lib/sentry-monitoring";
 
 export const dynamic = "force-dynamic";
 
