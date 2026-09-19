@@ -1,4 +1,4 @@
-import type { ErrorEvent, TransactionEvent } from "@sentry/core";
+import type { ErrorEvent, TransactionEvent } from '@sentry/core';
 
 export const sentryOptions = {
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
