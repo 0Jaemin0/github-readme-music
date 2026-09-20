@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { parseYouTubeId, type YouTubeMetadata } from '@/entities/music-card';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
+import { createRequestRateLimiter } from '@/shared/lib/server/request-rate-limit';
 
 const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/videos';
 const MAX_REQUEST_BODY_BYTES = 4_096;
@@ -12,7 +13,11 @@ const RATE_LIMIT_MAX_REQUESTS = 20;
 const RATE_LIMIT_MAX_ENTRIES = 500;
 
 const metadataCache = new Map<string, { expiresAt: number; data: YouTubeMetadata }>();
-const requestWindows = new Map<string, { startedAt: number; count: number }>();
+const isRequestAllowed = createRequestRateLimiter({
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  maxRequests: RATE_LIMIT_MAX_REQUESTS,
+  maxEntries: RATE_LIMIT_MAX_ENTRIES,
+});
 
 type YouTubeApiResponse = {
   items?: Array<{
@@ -51,7 +56,7 @@ export const POST = async (request: Request) => {
   const cachedMetadata = readCachedMetadata(videoId);
   if (cachedMetadata) return NextResponse.json({ data: cachedMetadata });
 
-  if (!isRequestAllowed(getRequestKey(request))) {
+  if (!isRequestAllowed(request)) {
     return errorResponse(429, 'RATE_LIMITED', '요청이 많습니다. 잠시 후 다시 시도해 주세요.');
   }
 
@@ -196,35 +201,6 @@ const writeCachedMetadata = (videoId: string, data: YouTubeMetadata) => {
   metadataCache.set(videoId, { data, expiresAt: now + METADATA_CACHE_TTL_MS });
 };
 
-const getRequestKey = (request: Request) => {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',', 1)[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
-  );
-};
-
-const isRequestAllowed = (key: string) => {
-  const now = Date.now();
-  const window = requestWindows.get(key);
-  if (!window || now - window.startedAt >= RATE_LIMIT_WINDOW_MS) {
-    pruneRequestWindows(now);
-    requestWindows.set(key, { startedAt: now, count: 1 });
-    return true;
-  }
-  if (window.count >= RATE_LIMIT_MAX_REQUESTS) return false;
-  window.count += 1;
-  return true;
-};
-
-const pruneRequestWindows = (now: number) => {
-  for (const [key, window] of requestWindows) {
-    if (now - window.startedAt >= RATE_LIMIT_WINDOW_MS) requestWindows.delete(key);
-  }
-  if (requestWindows.size < RATE_LIMIT_MAX_ENTRIES) return;
-
-  const oldestKey = requestWindows.keys().next().value;
-  if (oldestKey) requestWindows.delete(oldestKey);
-};
-
 const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
@@ -244,8 +220,9 @@ const normalizeMetadata = (response: YouTubeApiResponse | null, requestedVideoId
     !channel.trim() ||
     typeof duration !== 'string' ||
     !thumbnail
-  )
+  ) {
     return null;
+  }
 
   const formattedDuration = formatIsoDuration(duration);
   if (!formattedDuration) return null;

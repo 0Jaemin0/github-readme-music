@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
 import { findOrCreateStoredCard, isSvgVideoId, normalizeStoredCardData } from '@/entities/music-card/server';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
+import { createRequestRateLimiter } from '@/shared/lib/server/request-rate-limit';
 
 const MAX_REQUEST_BODY_BYTES = 16_384;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 20;
 const RATE_LIMIT_MAX_ENTRIES = 500;
 
-const requestWindows = new Map<string, { startedAt: number; count: number }>();
+const isRequestAllowed = createRequestRateLimiter({
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  maxRequests: RATE_LIMIT_MAX_REQUESTS,
+  maxEntries: RATE_LIMIT_MAX_ENTRIES,
+});
 
 type CreateCardPayload = {
   videoId?: unknown;
@@ -42,7 +47,7 @@ export const POST = async (request: Request) => {
   const cardData = normalizeStoredCardData({ params: payload.params }, payload.videoId);
   if (!cardData) return errorResponse(400, 'INVALID_REQUEST', '카드 설정을 확인할 수 없습니다. 다시 시도해 주세요.');
 
-  if (!isRequestAllowed(getRequestKey(request))) {
+  if (!isRequestAllowed(request)) {
     return errorResponse(429, 'RATE_LIMITED', '요청이 많습니다. 잠시 후 다시 시도해 주세요.');
   }
 
@@ -60,32 +65,4 @@ export const POST = async (request: Request) => {
     });
     return errorResponse(503, 'CARD_STORAGE_UNAVAILABLE', '카드를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
   }
-};
-
-const getRequestKey = (request: Request) => {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',', 1)[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
-  );
-};
-
-const isRequestAllowed = (key: string) => {
-  const now = Date.now();
-  const window = requestWindows.get(key);
-  if (!window || now - window.startedAt >= RATE_LIMIT_WINDOW_MS) {
-    pruneRequestWindows(now);
-    requestWindows.set(key, { startedAt: now, count: 1 });
-    return true;
-  }
-  if (window.count >= RATE_LIMIT_MAX_REQUESTS) return false;
-  window.count += 1;
-  return true;
-};
-
-const pruneRequestWindows = (now: number) => {
-  for (const [key, window] of requestWindows) {
-    if (now - window.startedAt >= RATE_LIMIT_WINDOW_MS) requestWindows.delete(key);
-  }
-  if (requestWindows.size < RATE_LIMIT_MAX_ENTRIES) return;
-  const oldestKey = requestWindows.keys().next().value;
-  if (oldestKey) requestWindows.delete(oldestKey);
 };

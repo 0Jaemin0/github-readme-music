@@ -1,7 +1,18 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { requestStoredCard, requestStoredCardCreation, requestYouTubeMetadata } from '../api/card-generator.client';
 import { buildMarkdown, buildStoredCardMarkdown } from '../lib/markdown';
+import { getStorageFailureCount, shouldUseCompatibilityFallback } from './card-generator-snapshot';
+import {
+  CARD_RESTORE_ERROR_MESSAGES,
+  CARD_STORAGE_ERROR_MESSAGES,
+  FALLBACK_ERROR_MESSAGE,
+  getCardRestoreErrorMessage,
+  getCardStorageErrorMessage,
+  getMetadataErrorMessage,
+  METADATA_ERROR_MESSAGES,
+} from './card-generator-errors';
 import {
   createSvgCardParams,
   DEFAULT_THEME,
@@ -15,46 +26,17 @@ import {
   type CardTheme,
   type CoverPosition,
   type Track,
-  type YouTubeMetadata,
 } from '@/entities/music-card';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';
 type SaveStatus = 'idle' | 'saving' | 'error';
 type LoadingKind = 'metadata' | 'stored-card' | null;
-type MetadataResponse = { data?: YouTubeMetadata; error?: { code?: string } };
-type CreateCardResponse = { data?: { id?: string }; error?: { code?: string } };
-type ReadCardResponse = { data?: { videoId?: unknown; params?: unknown }; error?: { code?: string } };
 type RestoredCard = { id: string; snapshot: string };
 
 const INITIAL_META: CardMeta = { title: '', artist: '' };
 const INITIAL_COVER_POSITION: CoverPosition = { x: 50, y: 50, scale: 100, aspectRatio: 16 / 9 };
 const CARD_ORIGIN = 'https://github-readme-music.vercel.app';
-const FALLBACK_AFTER_FAILURES = 5;
-const METADATA_ERROR_MESSAGES = {
-  INVALID_REQUEST: 'YouTube 영상 링크를 확인해 주세요.',
-  INVALID_URL: 'YouTube 영상 링크를 확인해 주세요.',
-  SERVER_CONFIGURATION_ERROR: '일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.',
-  VIDEO_NOT_FOUND: '영상을 찾을 수 없거나 해당 영상은 카드에 사용할 수 없습니다.',
-  YOUTUBE_QUOTA_EXCEEDED: '현재 요청이 많습니다. 잠시 후 다시 시도해 주세요.',
-  RATE_LIMITED: '요청이 많습니다. 잠시 후 다시 시도해 주세요.',
-  REQUEST_TOO_LARGE: '요청 내용이 너무 큽니다. YouTube 링크만 입력해 주세요.',
-  YOUTUBE_UNAVAILABLE: '영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
-} as const;
-const CARD_STORAGE_ERROR_MESSAGES = {
-  INVALID_REQUEST: '카드 설정을 확인할 수 없습니다. 다시 시도해 주세요.',
-  REQUEST_TOO_LARGE: '카드 설정 내용이 너무 큽니다. 다시 시도해 주세요.',
-  RATE_LIMITED: '요청이 많습니다. 잠시 후 다시 시도해 주세요.',
-  CARD_STORAGE_UNAVAILABLE: '카드를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
-} as const;
-const CARD_RESTORE_ERROR_MESSAGES = {
-  INVALID_CARD_ID: '카드 요청이 올바르지 않습니다.',
-  CARD_NOT_FOUND: '카드를 찾을 수 없어요. 최근 생성 카드가 삭제되었을 수 있습니다.',
-  CARD_DATA_INVALID: '카드 설정을 처리할 수 없습니다.',
-  CARD_READ_UNAVAILABLE: '카드 설정을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
-} as const;
-const FALLBACK_ERROR_MESSAGE = METADATA_ERROR_MESSAGES.YOUTUBE_UNAVAILABLE;
-
 export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?: (cardId: string) => void } = {}) => {
   const [url, setUrl] = useState('');
   const [status, setStatus] = useState<Status>('idle');
@@ -123,14 +105,8 @@ export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?
     let receivedResponse = false;
 
     try {
-      const response = await fetch('/api/youtube/metadata', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-        signal: controller.signal,
-      });
+      const { response, body } = await requestYouTubeMetadata(url, controller.signal);
       receivedResponse = true;
-      const body = (await response.json().catch(() => null)) as MetadataResponse | null;
 
       if (!body || (response.ok && !body.data)) {
         captureMonitoringError({
@@ -246,9 +222,8 @@ export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?
     let receivedResponse = false;
 
     try {
-      const response = await fetch(`/api/cards/${encodeURIComponent(cardId)}`, { signal: controller.signal });
+      const { response, body } = await requestStoredCard(cardId, controller.signal);
       receivedResponse = true;
-      const body = (await response.json().catch(() => null)) as ReadCardResponse | null;
       const responseData = body?.data;
 
       if (!body || (response.ok && !isStoredCardResponseData(responseData))) {
@@ -347,13 +322,8 @@ export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?
     let receivedResponse = false;
     let canUseCompatibilityFallback = false;
     try {
-      const response = await fetch('/api/cards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId: track.videoId, params: Object.fromEntries(snapshot) }),
-      });
+      const { response, body } = await requestStoredCardCreation(track.videoId, Object.fromEntries(snapshot));
       receivedResponse = true;
-      const body = (await response.json().catch(() => null)) as CreateCardResponse | null;
       const cardId = body?.data?.id;
 
       if (!body || (response.ok && !cardId)) {
@@ -401,11 +371,11 @@ export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?
         return;
       }
 
-      const nextFailureCount = failedSnapshot === snapshotKey ? storageFailureCount + 1 : 1;
+      const nextFailureCount = getStorageFailureCount(failedSnapshot, storageFailureCount, snapshotKey);
       setFailedSnapshot(snapshotKey);
       setStorageFailureCount(nextFailureCount);
 
-      if (nextFailureCount % FALLBACK_AFTER_FAILURES === 0) {
+      if (shouldUseCompatibilityFallback(nextFailureCount)) {
         setGeneratedMarkdown(buildMarkdown(track, style, meta, theme, progressSeconds, CARD_ORIGIN));
         setSavedSnapshot(snapshotKey);
         setMarkdownKind('fallback');
@@ -471,24 +441,6 @@ export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?
     generateMarkdown,
     copyMarkdown,
   };
-};
-
-const getMetadataErrorMessage = (code: string | undefined) => {
-  if (code && code in METADATA_ERROR_MESSAGES)
-    return METADATA_ERROR_MESSAGES[code as keyof typeof METADATA_ERROR_MESSAGES];
-  return FALLBACK_ERROR_MESSAGE;
-};
-
-const getCardStorageErrorMessage = (code: string | undefined) => {
-  if (code && code in CARD_STORAGE_ERROR_MESSAGES)
-    return CARD_STORAGE_ERROR_MESSAGES[code as keyof typeof CARD_STORAGE_ERROR_MESSAGES];
-  return CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE;
-};
-
-const getCardRestoreErrorMessage = (code: string | undefined) => {
-  if (code && code in CARD_RESTORE_ERROR_MESSAGES)
-    return CARD_RESTORE_ERROR_MESSAGES[code as keyof typeof CARD_RESTORE_ERROR_MESSAGES];
-  return CARD_RESTORE_ERROR_MESSAGES.CARD_READ_UNAVAILABLE;
 };
 
 const isStringRecord = (value: unknown): value is Record<string, string> => {

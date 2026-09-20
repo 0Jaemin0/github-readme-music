@@ -1,33 +1,23 @@
 import 'server-only';
 
 import { randomBytes } from 'node:crypto';
-import { createServerSupabaseClient } from '@/shared/api/supabase/server';
 import { createStoredCardContentHash, type StoredCardData } from '../model/stored-card.server';
+import { createStoredCardRepository } from './stored-card.repository.server';
 
 export const findOrCreateStoredCard = async (videoId: string, cardData: StoredCardData) => {
-  const supabase = createServerSupabaseClient();
+  const repository = createStoredCardRepository();
   const contentHash = createStoredCardContentHash(videoId, cardData);
-
-  const findCardIdByContentHash = async (hash: string) => {
-    const { data, error } = await supabase.from('cards').select('id').eq('content_hash', hash).maybeSingle();
-
-    if (error) throw error;
-    return typeof data?.id === 'string' ? data.id : null;
-  };
-
-  const existingId = await findCardIdByContentHash(contentHash);
+  const existingId = await repository.findIdByContentHash(contentHash);
   if (existingId) return { id: existingId, created: false };
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const id = `c_${randomBytes(12).toString('base64url')}`;
-    const { error } = await supabase
-      .from('cards')
-      .insert({ id, video_id: videoId, card_data: cardData, content_hash: contentHash });
+    const { error } = await repository.insert(id, videoId, cardData, contentHash);
 
     if (!error) return { id, created: true };
     if (error.code !== '23505') throw error;
 
-    const duplicatedId = await findCardIdByContentHash(contentHash);
+    const duplicatedId = await repository.findIdByContentHash(contentHash);
     if (duplicatedId) return { id: duplicatedId, created: false };
   }
 
