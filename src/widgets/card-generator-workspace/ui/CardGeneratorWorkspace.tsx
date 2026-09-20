@@ -5,7 +5,11 @@ import { CardResult, LoadingPreview, useCardGenerator, YouTubeUrlForm } from '@/
 import { RecentCards, useRecentCards } from '@/features/recent-cards';
 import { cn } from '@/shared/lib/utils';
 
-export const CardGeneratorWorkspace = ({ onLandingChange }: { onLandingChange?: (isLanding: boolean) => void }) => {
+interface CardGeneratorWorkspaceProps {
+  onLandingChange?: (isLanding: boolean) => void;
+}
+
+export const CardGeneratorWorkspace = ({ onLandingChange }: CardGeneratorWorkspaceProps) => {
   const recentCards = useRecentCards();
   const cardGenerator = useCardGenerator({ onStoredCardCreated: recentCards.addCardId });
   const isLanding = !cardGenerator.track && cardGenerator.status === 'idle';

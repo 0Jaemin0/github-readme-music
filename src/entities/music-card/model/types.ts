@@ -1,13 +1,13 @@
 export type CardStyleId = 'player' | 'compact' | 'vertical';
 export type GradientDirection = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 
-export type CardStyle = {
+export interface CardStyle {
   id: CardStyleId;
   name: string;
   hint: string;
-};
+}
 
-export type CardTheme = {
+export interface CardTheme {
   background: string;
   border: string;
   borderWidth: number;
@@ -18,16 +18,16 @@ export type CardTheme = {
   gradient: boolean;
   gradientDirection: GradientDirection;
   gradientIntensity: number;
-};
+}
 
-export type CoverPosition = {
+export interface CoverPosition {
   x: number;
   y: number;
   scale: number;
   aspectRatio: number;
-};
+}
 
-export type Track = {
+export interface Track {
   source: 'youtube' | 'stored';
   videoId: string;
   title: string;
@@ -36,11 +36,11 @@ export type Track = {
   cover: string;
   coverPosition: CoverPosition;
   waveform: number[];
-};
+}
 
 export type YouTubeMetadata = Pick<Track, 'videoId' | 'title' | 'channel' | 'duration' | 'cover'>;
 
-export type CardMeta = {
+export interface CardMeta {
   title: string;
   artist: string;
-};
+}

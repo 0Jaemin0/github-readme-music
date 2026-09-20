@@ -23,7 +23,12 @@ const PALETTE = [
   '#a3e635',
 ];
 
-export const ColorPicker = ({ value, onChange }: { value: string; onChange: (hex: string) => void }) => {
+interface ColorPickerProps {
+  value: string;
+  onChange: (hex: string) => void;
+}
+
+export const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value));
   const areaRef = useRef<HTMLDivElement>(null);
 

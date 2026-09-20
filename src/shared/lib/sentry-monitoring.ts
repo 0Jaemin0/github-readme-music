@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/nextjs';
 
-type MonitoringError = {
+interface MonitoringError {
   message: string;
   errorCode: string;
   operation: string;
   layer: 'client' | 'server';
   httpStatus?: number;
-};
+}
 
 export const captureMonitoringError = ({ message, errorCode, operation, layer, httpStatus }: MonitoringError) => {
   const monitoredError = new Error(message);

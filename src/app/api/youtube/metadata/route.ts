@@ -19,18 +19,38 @@ const isRequestAllowed = createRequestRateLimiter({
   maxEntries: RATE_LIMIT_MAX_ENTRIES,
 });
 
-type YouTubeApiResponse = {
-  items?: Array<{
-    id?: unknown;
-    snippet?: {
-      title?: unknown;
-      channelTitle?: unknown;
-      thumbnails?: Record<string, { url?: unknown } | undefined>;
-    };
-    contentDetails?: { duration?: unknown };
-  }>;
-  error?: { errors?: Array<{ reason?: unknown }> };
-};
+interface YouTubeApiThumbnail {
+  url?: unknown;
+}
+
+interface YouTubeApiSnippet {
+  title?: unknown;
+  channelTitle?: unknown;
+  thumbnails?: Record<string, YouTubeApiThumbnail | undefined>;
+}
+
+interface YouTubeApiContentDetails {
+  duration?: unknown;
+}
+
+interface YouTubeApiItem {
+  id?: unknown;
+  snippet?: YouTubeApiSnippet;
+  contentDetails?: YouTubeApiContentDetails;
+}
+
+interface YouTubeApiErrorDetail {
+  reason?: unknown;
+}
+
+interface YouTubeApiError {
+  errors?: YouTubeApiErrorDetail[];
+}
+
+interface YouTubeApiResponse {
+  items?: YouTubeApiItem[];
+  error?: YouTubeApiError;
+}
 
 const errorResponse = (status: number, code: string, message: string) => {
   return NextResponse.json({ error: { code, message } }, { status });
@@ -236,7 +256,7 @@ const normalizeMetadata = (response: YouTubeApiResponse | null, requestedVideoId
   };
 };
 
-const selectThumbnail = (thumbnails: Record<string, { url?: unknown } | undefined> | undefined) => {
+const selectThumbnail = (thumbnails: Record<string, YouTubeApiThumbnail | undefined> | undefined) => {
   for (const size of ['maxres', 'standard', 'high', 'medium', 'default']) {
     const url = thumbnails?.[size]?.url;
     if (typeof url === 'string' && isYouTubeThumbnail(url)) return url;

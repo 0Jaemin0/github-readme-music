@@ -32,12 +32,19 @@ import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
 type Status = 'idle' | 'loading' | 'ready' | 'error';
 type SaveStatus = 'idle' | 'saving' | 'error';
 type LoadingKind = 'metadata' | 'stored-card' | null;
-type RestoredCard = { id: string; snapshot: string };
+interface RestoredCard {
+  id: string;
+  snapshot: string;
+}
 
 const INITIAL_META: CardMeta = { title: '', artist: '' };
 const INITIAL_COVER_POSITION: CoverPosition = { x: 50, y: 50, scale: 100, aspectRatio: 16 / 9 };
 const CARD_ORIGIN = 'https://github-readme-music.vercel.app';
-export const useCardGenerator = ({ onStoredCardCreated }: { onStoredCardCreated?: (cardId: string) => void } = {}) => {
+interface UseCardGeneratorOptions {
+  onStoredCardCreated?: (cardId: string) => void;
+}
+
+export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOptions = {}) => {
   const [url, setUrl] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [loadingKind, setLoadingKind] = useState<LoadingKind>(null);

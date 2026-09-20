@@ -24,7 +24,7 @@ const CARD_STYLE = {
 } as const;
 const GRADIENT_ANGLES = { 'top-left': 315, 'top-right': 45, 'bottom-left': 225, 'bottom-right': 135 } as const;
 
-type CardProps = {
+interface CardProps {
   track: Track;
   meta: CardMeta;
   theme: CardTheme;
@@ -32,23 +32,18 @@ type CardProps = {
   className?: string;
   shellStyle: React.CSSProperties;
   progressSeconds: number;
-};
+}
 
-export const MusicCard = ({
-  track,
-  meta,
-  style,
-  theme,
-  progressSeconds = 0,
-  className,
-}: {
+interface MusicCardProps {
   track: Track;
   meta: CardMeta;
   style: CardStyleId;
   theme: CardTheme;
   progressSeconds?: number;
   className?: string;
-}) => {
+}
+
+export const MusicCard = ({ track, meta, style, theme, progressSeconds = 0, className }: MusicCardProps) => {
   const shellStyle: React.CSSProperties = {
     background: theme.gradient
       ? `linear-gradient(${GRADIENT_ANGLES[theme.gradientDirection ?? 'bottom-right']}deg in srgb, ${theme.background} 0%, ${mixHex(theme.background, theme.accent, theme.gradientIntensity / 100)} 100%)`
@@ -136,6 +131,15 @@ const VerticalCard = ({ track, meta, theme, sizeStyle, className, shellStyle, pr
   );
 };
 
+interface TrackDetailsProps {
+  meta: CardMeta;
+  theme: CardTheme;
+  titleClassName: string;
+  artistClassName: string;
+  className?: string;
+  fillAvailableSpace?: boolean;
+}
+
 const TrackDetails = ({
   meta,
   theme,
@@ -143,14 +147,7 @@ const TrackDetails = ({
   artistClassName,
   className,
   fillAvailableSpace = true,
-}: {
-  meta: CardMeta;
-  theme: CardTheme;
-  titleClassName: string;
-  artistClassName: string;
-  className?: string;
-  fillAvailableSpace?: boolean;
-}) => {
+}: TrackDetailsProps) => {
   return (
     <div className={cn('min-w-0', fillAvailableSpace && 'flex-1', className)}>
       <FlowingText text={meta.title} className={cn('font-semibold tracking-[-0.015em]', titleClassName)} />
@@ -159,6 +156,15 @@ const TrackDetails = ({
   );
 };
 
+interface PlaybackTimelineProps {
+  track: Track;
+  theme: CardTheme;
+  progressSeconds: number;
+  durationClassName: string;
+  progressClassName: string;
+  className?: string;
+}
+
 const PlaybackTimeline = ({
   track,
   theme,
@@ -166,14 +172,7 @@ const PlaybackTimeline = ({
   durationClassName,
   progressClassName,
   className,
-}: {
-  track: Track;
-  theme: CardTheme;
-  progressSeconds: number;
-  durationClassName: string;
-  progressClassName: string;
-  className?: string;
-}) => {
+}: PlaybackTimelineProps) => {
   const totalSeconds = durationToSeconds(track.duration);
   const currentSeconds = Math.min(progressSeconds, totalSeconds);
   const progress = totalSeconds ? (currentSeconds / totalSeconds) * 100 : 0;
@@ -193,6 +192,15 @@ const PlaybackTimeline = ({
   );
 };
 
+interface VerticalPlaybackTimelineProps {
+  track: Track;
+  theme: CardTheme;
+  progressSeconds: number;
+  durationClassName: string;
+  progressClassName: string;
+  className?: string;
+}
+
 const VerticalPlaybackTimeline = ({
   track,
   theme,
@@ -200,14 +208,7 @@ const VerticalPlaybackTimeline = ({
   durationClassName,
   progressClassName,
   className,
-}: {
-  track: Track;
-  theme: CardTheme;
-  progressSeconds: number;
-  durationClassName: string;
-  progressClassName: string;
-  className?: string;
-}) => {
+}: VerticalPlaybackTimelineProps) => {
   const totalSeconds = durationToSeconds(track.duration);
   const currentSeconds = Math.min(progressSeconds, totalSeconds);
   const progress = totalSeconds ? (currentSeconds / totalSeconds) * 100 : 0;
@@ -227,7 +228,12 @@ const VerticalPlaybackTimeline = ({
   );
 };
 
-const PlaybackControls = ({ color, className }: { color: string; className: string }) => {
+interface PlaybackControlsProps {
+  color: string;
+  className: string;
+}
+
+const PlaybackControls = ({ color, className }: PlaybackControlsProps) => {
   return (
     <div className={cn('flex items-center justify-center', className)} style={{ color }} aria-hidden="true">
       <SkipIcon direction="back" />
@@ -246,7 +252,11 @@ const PauseIcon = () => {
   );
 };
 
-const SkipIcon = ({ direction }: { direction: 'back' | 'forward' }) => {
+interface SkipIconProps {
+  direction: 'back' | 'forward';
+}
+
+const SkipIcon = ({ direction }: SkipIconProps) => {
   const triangle = 'M1 0Q0 0 0 1v15q0 1 1 1l12.47-7.2q1.25-1.3 0-2.6Z';
   const positions =
     direction === 'back'
@@ -269,7 +279,13 @@ const SkipIcon = ({ direction }: { direction: 'back' | 'forward' }) => {
   );
 };
 
-const CoverImage = ({ track, title, className }: { track: Track; title: string; className: string }) => {
+interface CoverImageProps {
+  track: Track;
+  title: string;
+  className: string;
+}
+
+const CoverImage = ({ track, title, className }: CoverImageProps) => {
   const [failedCover, setFailedCover] = useState<string | null>(null);
   const hasImageError = failedCover === track.cover;
   const ratio = track.coverPosition.aspectRatio;
@@ -306,15 +322,13 @@ const CoverImage = ({ track, title, className }: { track: Track; title: string; 
   );
 };
 
-const ProgressBar = ({
-  color,
-  heightClassName,
-  progress,
-}: {
+interface ProgressBarProps {
   color: string;
   heightClassName: string;
   progress: number;
-}) => {
+}
+
+const ProgressBar = ({ color, heightClassName, progress }: ProgressBarProps) => {
   const visibleProgress = progress <= 0 ? 1 : Math.min(100, progress);
 
   return (
@@ -332,7 +346,13 @@ const ProgressBar = ({
   );
 };
 
-const FlowingText = ({ text, className, color }: { text: string; className: string; color?: string }) => {
+interface FlowingTextProps {
+  text: string;
+  className: string;
+  color?: string;
+}
+
+const FlowingText = ({ text, className, color }: FlowingTextProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLSpanElement>(null);
   const [shouldFlow, setShouldFlow] = useState(false);
@@ -372,7 +392,13 @@ const FlowingText = ({ text, className, color }: { text: string; className: stri
   );
 };
 
-const PlayingBars = ({ waveform, accent, className }: { waveform: number[]; accent: string; className: string }) => {
+interface PlayingBarsProps {
+  waveform: number[];
+  accent: string;
+  className: string;
+}
+
+const PlayingBars = ({ waveform, accent, className }: PlayingBarsProps) => {
   return (
     <div className={cn('flex items-center justify-between gap-0.5 overflow-hidden', className)} aria-hidden="true">
       {waveform.map((value, index) => (
@@ -390,19 +416,15 @@ const PlayingBars = ({ waveform, accent, className }: { waveform: number[]; acce
   );
 };
 
-const TrackTicker = ({
-  title,
-  artist,
-  titleClassName,
-  artistClassName,
-  mutedColor,
-}: {
+interface TrackTickerProps {
   title: string;
   artist: string;
   titleClassName: string;
   artistClassName: string;
   mutedColor: string;
-}) => {
+}
+
+const TrackTicker = ({ title, artist, titleClassName, artistClassName, mutedColor }: TrackTickerProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const firstCopyRef = useRef<HTMLSpanElement>(null);

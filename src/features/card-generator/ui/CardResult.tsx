@@ -3,7 +3,7 @@ import { CardPreviewPanel } from './CardPreviewPanel';
 import { MarkdownSnippet } from './MarkdownSnippet';
 import type { CardMeta, CardStyleId, CardTheme, CoverPosition, Track } from '@/entities/music-card';
 
-type CardResultProps = {
+interface CardResultProps {
   track: Track;
   meta: CardMeta;
   style: CardStyleId;
@@ -24,7 +24,7 @@ type CardResultProps = {
   onThemeChange: (theme: CardTheme) => void;
   onCopy: () => void;
   onGenerateMarkdown: () => void;
-};
+}
 
 export const CardResult = ({
   track,

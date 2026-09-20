@@ -7,11 +7,11 @@ import { clampCropValue, getCropFrame, MIN_CROP_SCALE, toCropPosition } from '..
 
 type DragMode = 'move' | 'resize' | null;
 
-type CoverCropEditorProps = {
+interface CoverCropEditorProps {
   cover: string;
   position: CoverPosition;
   onPositionChange: (position: CoverPosition) => void;
-};
+}
 
 export const CoverCropEditor = ({ cover, position, onPositionChange }: CoverCropEditorProps) => {
   const imageFrameRef = useRef<HTMLDivElement>(null);

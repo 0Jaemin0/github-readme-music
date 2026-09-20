@@ -3,7 +3,11 @@
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 
-const GlobalError = ({ error }: { error: Error & { digest?: string } }) => {
+interface GlobalErrorProps {
+  error: Error & { digest?: string };
+}
+
+const GlobalError = ({ error }: GlobalErrorProps) => {
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);

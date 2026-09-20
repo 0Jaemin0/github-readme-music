@@ -6,15 +6,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { normalizeHex } from '@/entities/music-card';
 import { ColorPicker } from './ColorPicker';
 
-export const ColorField = ({
-  label,
-  value,
-  onChange,
-}: {
+interface ColorFieldProps {
   label: string;
   value: string;
   onChange: (hex: string) => void;
-}) => {
+}
+
+export const ColorField = ({ label, value, onChange }: ColorFieldProps) => {
   const [draft, setDraft] = useState(value);
 
   const commitDraft = (next: string) => {

@@ -4,13 +4,13 @@ import { ArrowRight, Link2, LoaderCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 
-type YouTubeUrlFormProps = {
+interface YouTubeUrlFormProps {
   url: string;
   error: string | null;
   isLoading: boolean;
   onUrlChange: (value: string) => void;
   onSubmit: () => void;
-};
+}
 
 export const YouTubeUrlForm = ({ url, error, isLoading, onUrlChange, onSubmit }: YouTubeUrlFormProps) => {
   return (

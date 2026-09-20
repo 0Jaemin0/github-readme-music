@@ -1,4 +1,8 @@
-export type Hsv = { h: number; s: number; v: number };
+export interface Hsv {
+  h: number;
+  s: number;
+  v: number;
+}
 
 export const clamp = (value: number, min = 0, max = 1) => {
   return Math.min(max, Math.max(min, value));

@@ -3,7 +3,7 @@
 import { Check, Code2, Copy } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
-type MarkdownSnippetProps = {
+interface MarkdownSnippetProps {
   markdown: string | null;
   hasPendingChanges: boolean;
   saveStatus: 'idle' | 'saving' | 'error';
@@ -13,7 +13,7 @@ type MarkdownSnippetProps = {
   feedback: 'success' | 'error' | null;
   onCopy: () => void;
   onGenerate: () => void;
-};
+}
 
 export const MarkdownSnippet = ({
   markdown,

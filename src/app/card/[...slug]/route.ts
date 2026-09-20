@@ -12,9 +12,13 @@ import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
 
 export const dynamic = 'force-dynamic';
 
-type RouteContext = {
-  params: Promise<{ slug: string[] }>;
-};
+interface CardSlugRouteParams {
+  slug: string[];
+}
+
+interface RouteContext {
+  params: Promise<CardSlugRouteParams>;
+}
 
 export const GET = async (request: Request, { params }: RouteContext) => {
   const { slug } = await params;

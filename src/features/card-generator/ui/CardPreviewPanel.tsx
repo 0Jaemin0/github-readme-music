@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { CardCustomizer } from './CardCustomizer';
 
-type CardPreviewPanelProps = {
+interface CardPreviewPanelProps {
   track: Track;
   meta: CardMeta;
   style: CardStyleId;
@@ -23,7 +23,7 @@ type CardPreviewPanelProps = {
   onStyleChange: (style: CardStyleId) => void;
   onProgressChange: (progressSeconds: number) => void;
   onThemeChange: (theme: CardTheme) => void;
-};
+}
 
 export const CardPreviewPanel = ({
   track,
@@ -65,15 +65,13 @@ export const CardPreviewPanel = ({
   );
 };
 
-const PlaybackPosition = ({
-  value,
-  duration,
-  onChange,
-}: {
+interface PlaybackPositionProps {
   value: number;
   duration: string;
   onChange: (value: number) => void;
-}) => {
+}
+
+const PlaybackPosition = ({ value, duration, onChange }: PlaybackPositionProps) => {
   const totalSeconds = durationToSeconds(duration);
 
   return (

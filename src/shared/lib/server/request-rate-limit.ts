@@ -1,13 +1,13 @@
-type RequestRateLimitOptions = {
+interface RequestRateLimitOptions {
   windowMs: number;
   maxRequests: number;
   maxEntries: number;
-};
+}
 
-type RequestWindow = {
+interface RequestWindow {
   startedAt: number;
   count: number;
-};
+}
 
 export const createRequestRateLimiter = ({ windowMs, maxRequests, maxEntries }: RequestRateLimitOptions) => {
   const requestWindows = new Map<string, RequestWindow>();

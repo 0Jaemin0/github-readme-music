@@ -6,12 +6,12 @@ import { CoverCropEditor } from './CoverCropEditor';
 
 const MAX_META_LENGTH = 120;
 
-type CardMetadataFieldsProps = {
+interface CardMetadataFieldsProps {
   meta: CardMeta;
   track: Track;
   onChange: (nextMeta: CardMeta) => void;
   onCoverPositionChange: (position: CoverPosition) => void;
-};
+}
 
 export const CardMetadataFields = ({ meta, track, onChange, onCoverPositionChange }: CardMetadataFieldsProps) => {
   const updateField = (field: keyof CardMeta, value: string) => {
@@ -55,17 +55,14 @@ export const CardMetadataFields = ({ meta, track, onChange, onCoverPositionChang
   );
 };
 
-const MetadataField = ({
-  id,
-  label,
-  value,
-  onChange,
-}: {
+interface MetadataFieldProps {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
-}) => {
+}
+
+const MetadataField = ({ id, label, value, onChange }: MetadataFieldProps) => {
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground">

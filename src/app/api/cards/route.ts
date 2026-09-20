@@ -14,10 +14,10 @@ const isRequestAllowed = createRequestRateLimiter({
   maxEntries: RATE_LIMIT_MAX_ENTRIES,
 });
 
-type CreateCardPayload = {
+interface CreateCardPayload {
   videoId?: unknown;
   params?: unknown;
-};
+}
 
 const errorResponse = (status: number, code: string, message: string) => {
   return NextResponse.json({ error: { code, message } }, { status });

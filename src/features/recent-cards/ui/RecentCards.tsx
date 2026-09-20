@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { ImageOff } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-type RecentCardsProps = {
+interface RecentCardsProps {
   cardIds: string[];
   isLoaded: boolean;
   isRestoring: boolean;
   fillRemainingSpace?: boolean;
   onSelectCard: (cardId: string) => void;
-};
+}
 
 export const RecentCards = ({
   cardIds,

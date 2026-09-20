@@ -1,15 +1,35 @@
 import type { YouTubeMetadata } from '@/entities/music-card';
 
-type ApiError = { code?: string };
+interface ApiError {
+  code?: string;
+}
 
-export type MetadataResponse = { data?: YouTubeMetadata; error?: ApiError };
-export type CreateCardResponse = { data?: { id?: string }; error?: ApiError };
-export type ReadCardResponse = { data?: { videoId?: unknown; params?: unknown }; error?: ApiError };
+interface StoredCardIdentifier {
+  id?: string;
+}
 
-type ApiResult<T> = {
+interface StoredCardPayload {
+  videoId?: unknown;
+  params?: unknown;
+}
+
+export interface MetadataResponse {
+  data?: YouTubeMetadata;
+  error?: ApiError;
+}
+export interface CreateCardResponse {
+  data?: StoredCardIdentifier;
+  error?: ApiError;
+}
+export interface ReadCardResponse {
+  data?: StoredCardPayload;
+  error?: ApiError;
+}
+
+interface ApiResult<T> {
   response: Response;
   body: T | null;
-};
+}
 
 const readJsonResponse = async <T>(response: Response): Promise<ApiResult<T>> => {
   const body = (await response.json().catch(() => null)) as T | null;

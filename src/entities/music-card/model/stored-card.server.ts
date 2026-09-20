@@ -6,9 +6,9 @@ import { isSvgVideoId, parseSvgCardData, serializeSvgCardData } from '../lib/svg
 
 const CARD_ID_PATTERN = /^c_[A-Za-z0-9_-]{16}$/;
 
-export type StoredCardData = {
+export interface StoredCardData {
   params: Record<string, string>;
-};
+}
 
 export const isStoredCardId = (value: string) => {
   return CARD_ID_PATTERN.test(value);

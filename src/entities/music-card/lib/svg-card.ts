@@ -10,7 +10,7 @@ const GRADIENT_DIRECTIONS = ['top-left', 'top-right', 'bottom-left', 'bottom-rig
 
 type GradientCorner = Exclude<GradientDirection, null>;
 
-export type SvgCardData = {
+export interface SvgCardData {
   style: CardStyleId;
   title: string;
   artist: string;
@@ -20,10 +20,23 @@ export type SvgCardData = {
   waveform: number[];
   titleWidth: number;
   artistWidth: number;
-  playerProgress: { x: number; y: number; width: number; height: number };
+  playerProgress: PlayerProgress;
   theme: CardTheme;
   progressSeconds: number;
-};
+}
+
+interface PlayerProgress {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface TextMeasurementStyle {
+  fontSize: number;
+  fontWeight: number;
+  letterSpacing: number;
+}
 
 export const serializeSvgCardData = (data: SvgCardData) => {
   return {
@@ -120,7 +133,7 @@ const measureTickerTextWidths = (style: CardStyleId, meta: CardMeta) => {
   };
 };
 
-const measureTextWidth = (value: string, style: { fontSize: number; fontWeight: number; letterSpacing: number }) => {
+const measureTextWidth = (value: string, style: TextMeasurementStyle) => {
   if (typeof document === 'undefined') return 0;
 
   const element = document.createElement('span');

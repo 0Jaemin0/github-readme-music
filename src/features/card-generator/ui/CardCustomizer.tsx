@@ -15,7 +15,12 @@ const GRADIENT_DIRECTIONS = [
   Icon: typeof ArrowUpLeft;
 }>;
 
-export const CardCustomizer = ({ theme, onChange }: { theme: CardTheme; onChange: (theme: CardTheme) => void }) => {
+interface CardCustomizerProps {
+  theme: CardTheme;
+  onChange: (theme: CardTheme) => void;
+}
+
+export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
   const lowContrastRoles = [
     { name: '제목', color: theme.text },
     { name: '가수', color: theme.muted },
@@ -122,21 +127,16 @@ export const CardCustomizer = ({ theme, onChange }: { theme: CardTheme; onChange
   );
 };
 
-const RangeRow = ({
-  label,
-  value,
-  min,
-  max,
-  suffix,
-  onChange,
-}: {
+interface RangeRowProps {
   label: string;
   value: number;
   min: number;
   max: number;
   suffix: string;
   onChange: (value: number) => void;
-}) => {
+}
+
+const RangeRow = ({ label, value, min, max, suffix, onChange }: RangeRowProps) => {
   const id = `range-${label.replace(/\s+/g, '-').toLowerCase()}`;
   return (
     <div className="flex items-center gap-3">
