@@ -1,37 +1,37 @@
-import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR } from "next/font/google";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Noto_Sans_KR } from 'next/font/google';
+import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
+import './globals.css';
 
 const notoSansKr = Noto_Sans_KR({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-sans-kr",
-  display: "swap",
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-noto-sans-kr',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "github-readme-music",
-  description: "YouTube 링크 하나로 GitHub README용 음악 카드를 만들어 보세요.",
+  title: 'github-readme-music',
+  description: 'YouTube 링크 하나로 GitHub README용 음악 카드를 만들어 보세요.',
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
+    icon: '/icon.png',
+    apple: '/icon.png',
   },
 };
 
 export const viewport: Viewport = {
-  colorScheme: "light dark",
-  themeColor: "#f8f9fb",
+  colorScheme: 'light dark',
+  themeColor: '#f8f9fb',
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html
-      lang="ko"
-      suppressHydrationWarning
-      className={notoSansKr.variable}
-    >
+    <html lang="ko" suppressHydrationWarning className={notoSansKr.variable}>
       <head>
         <Script
           id="github-readme-music-theme"
@@ -48,4 +48,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
