@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isStoredCardId, readStoredCard } from '@/entities/music-card/server';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
-import { ONE_HOUR_SECONDS, THIRTY_MINUTES_SECONDS } from '@/shared/lib/server/cache-policy';
+import { NO_STORE_CACHE_CONTROL, THIRTY_DAYS_IMMUTABLE_CACHE_CONTROL } from '@/shared/lib/server/cache-policy';
 
 interface CardRouteParams {
   id: string;
@@ -11,10 +11,11 @@ interface RouteContext {
   params: Promise<CardRouteParams>;
 }
 
-const CARD_RESTORE_CACHE_CONTROL = `public, max-age=${THIRTY_MINUTES_SECONDS}, s-maxage=${ONE_HOUR_SECONDS}`;
-
 const errorResponse = (status: number, code: string, message: string) => {
-  return NextResponse.json({ error: { code, message } }, { status });
+  return NextResponse.json(
+    { error: { code, message } },
+    { status, headers: { 'Cache-Control': NO_STORE_CACHE_CONTROL } },
+  );
 };
 
 export const GET = async (_request: Request, { params }: RouteContext) => {
@@ -45,7 +46,7 @@ export const GET = async (_request: Request, { params }: RouteContext) => {
           params: card.cardData.params,
         },
       },
-      { headers: { 'Cache-Control': CARD_RESTORE_CACHE_CONTROL } },
+      { headers: { 'Cache-Control': THIRTY_DAYS_IMMUTABLE_CACHE_CONTROL } },
     );
   } catch {
     captureMonitoringError({
