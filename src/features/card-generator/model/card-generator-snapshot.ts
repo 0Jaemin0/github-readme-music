@@ -1,3 +1,5 @@
+const COMPATIBILITY_FALLBACK_INTERVAL = 3;
+
 export const getStorageFailureCount = (
   failedSnapshot: string | null,
   storageFailureCount: number,
@@ -7,5 +9,5 @@ export const getStorageFailureCount = (
 };
 
 export const shouldUseCompatibilityFallback = (failureCount: number) => {
-  return failureCount % 5 === 0;
+  return failureCount % COMPATIBILITY_FALLBACK_INTERVAL === 0;
 };

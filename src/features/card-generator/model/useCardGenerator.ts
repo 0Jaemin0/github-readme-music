@@ -368,12 +368,16 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
         });
       }
 
+      const errorMessage = !receivedResponse
+        ? CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE
+        : requestError instanceof Error
+          ? requestError.message
+          : CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE;
+
       if (!canUseCompatibilityFallback) {
         setFailedSnapshot(null);
         setStorageFailureCount(0);
-        setSaveError(
-          requestError instanceof Error ? requestError.message : CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE,
-        );
+        setSaveError(errorMessage);
         setSaveStatus('error');
         return;
       }
@@ -391,9 +395,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
         return;
       }
 
-      setSaveError(
-        requestError instanceof Error ? requestError.message : CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE,
-      );
+      setSaveError(errorMessage);
       setSaveStatus('error');
     }
   };
