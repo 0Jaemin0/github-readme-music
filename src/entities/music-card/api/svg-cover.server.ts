@@ -3,6 +3,7 @@ import 'server-only';
 import type { SvgCardData } from '../lib/svg-card';
 import { isVideoThumbnailUrl } from '../lib/youtube-thumbnail';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
+import { FIVE_MINUTES_SECONDS } from '@/shared/lib/server/cache-policy';
 
 const MAX_COVER_BYTES = 1_000_000;
 const COVER_TIMEOUT_MS = 4_000;
@@ -26,7 +27,7 @@ const fetchEmbeddedCover = async (coverUrl: string, videoId: string) => {
     const response = await fetch(coverUrl, {
       signal: controller.signal,
       redirect: 'error',
-      next: { revalidate: 300 },
+      next: { revalidate: FIVE_MINUTES_SECONDS },
     });
     if (!response.ok) return null;
     if (!isVideoThumbnailUrl(response.url, videoId)) return null;

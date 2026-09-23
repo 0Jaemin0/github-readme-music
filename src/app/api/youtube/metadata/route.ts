@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { parseYouTubeId, type YouTubeMetadata } from '@/entities/music-card';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
+import { NO_STORE_CACHE_CONTROL, ONE_HOUR_MS } from '@/shared/lib/server/cache-policy';
 import { createRequestRateLimiter } from '@/shared/lib/server/request-rate-limit';
 
 const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/videos';
 const MAX_REQUEST_BODY_BYTES = 4_096;
 const YOUTUBE_REQUEST_TIMEOUT_MS = 5_000;
-const METADATA_CACHE_TTL_MS = 60 * 60 * 1_000;
 const METADATA_CACHE_MAX_ENTRIES = 200;
 const RATE_LIMIT_WINDOW_MS = 60 * 1_000;
 const RATE_LIMIT_MAX_REQUESTS = 20;
@@ -103,7 +103,7 @@ export const POST = async (request: Request) => {
     const query = new URLSearchParams({ part: 'snippet,contentDetails', id: videoId, key: apiKey });
     upstreamResponse = await fetch(`${YOUTUBE_API_URL}?${query.toString()}`, {
       signal: controller.signal,
-      cache: 'no-store',
+      cache: NO_STORE_CACHE_CONTROL,
     });
   } catch {
     clearTimeout(timeout);
@@ -218,7 +218,7 @@ const writeCachedMetadata = (videoId: string, data: YouTubeMetadata) => {
     const oldestKey = metadataCache.keys().next().value;
     if (oldestKey) metadataCache.delete(oldestKey);
   }
-  metadataCache.set(videoId, { data, expiresAt: now + METADATA_CACHE_TTL_MS });
+  metadataCache.set(videoId, { data, expiresAt: now + ONE_HOUR_MS });
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {

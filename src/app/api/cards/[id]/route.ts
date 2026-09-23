@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isStoredCardId, readStoredCard } from '@/entities/music-card/server';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
+import { ONE_HOUR_SECONDS, THIRTY_MINUTES_SECONDS } from '@/shared/lib/server/cache-policy';
 
 interface CardRouteParams {
   id: string;
@@ -10,7 +11,7 @@ interface RouteContext {
   params: Promise<CardRouteParams>;
 }
 
-const CARD_RESTORE_CACHE_CONTROL = 'public, max-age=1800, s-maxage=3600';
+const CARD_RESTORE_CACHE_CONTROL = `public, max-age=${THIRTY_MINUTES_SECONDS}, s-maxage=${ONE_HOUR_SECONDS}`;
 
 const errorResponse = (status: number, code: string, message: string) => {
   return NextResponse.json({ error: { code, message } }, { status });

@@ -9,6 +9,7 @@ import {
   type SvgCardData,
 } from '@/entities/music-card/server';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
+import { FIVE_MINUTES_CACHE_CONTROL, NO_STORE_CACHE_CONTROL } from '@/shared/lib/server/cache-policy';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ const renderCard = async (data: SvgCardData, videoId: string) => {
   return new NextResponse(renderSvgCard(card.data), {
     headers: {
       'Content-Type': 'image/svg+xml; charset=utf-8',
-      'Cache-Control': card.hasEmbeddedCover ? 'public, max-age=300, s-maxage=300' : 'no-store',
+      'Cache-Control': card.hasEmbeddedCover ? FIVE_MINUTES_CACHE_CONTROL : NO_STORE_CACHE_CONTROL,
       'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; img-src data:",
       'X-Content-Type-Options': 'nosniff',
     },
