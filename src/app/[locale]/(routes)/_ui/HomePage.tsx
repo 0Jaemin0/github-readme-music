@@ -5,12 +5,13 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import brandMark from '@/shared/assets/brand-mark.png';
 import { ThemeToggle } from '@/features/theme-toggle';
-import { CardGeneratorWorkspace } from '@/widgets/card-generator-workspace';
+import { LocaleSwitcher } from '@/features/locale-switcher';
+import { CardGeneratorWorkspace, useCardGeneratorContext } from '@/widgets/card-generator-workspace';
 
 export const HomePage = () => {
   const t = useTranslations('Home');
-  const [generatorKey, setGeneratorKey] = useState(0);
-  const [isLanding, setIsLanding] = useState(true);
+  const { isLanding, isBusy, resetEditor } = useCardGeneratorContext();
+  const [isLanguageChanging, setIsLanguageChanging] = useState(false);
 
   return (
     <div className={isLanding ? 'flex h-dvh flex-col overflow-hidden' : 'flex min-h-dvh flex-col'}>
@@ -19,16 +20,15 @@ export const HomePage = () => {
           <button
             type="button"
             className="flex cursor-pointer items-center gap-2"
-            onClick={() => {
-              setIsLanding(true);
-              setGeneratorKey((current) => current + 1);
-            }}
+            onClick={resetEditor}
             aria-label="github-readme-music 홈으로 돌아가기"
           >
             <Image src={brandMark} alt="" priority className="size-7" />
             <span className="font-mono text-[13px] font-semibold tracking-[-0.02em]">github-readme-music</span>
           </button>
           <nav className="flex items-center" aria-label="보조 메뉴">
+            <LocaleSwitcher disabled={isBusy} onPendingChange={setIsLanguageChanging} />
+            <span aria-hidden="true" className="mx-3 h-4 w-px bg-border" />
             <ThemeToggle />
           </nav>
         </div>
@@ -46,8 +46,12 @@ export const HomePage = () => {
           </p>
         </section>
 
-        <section className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-5 pb-8 pt-8">
-          <CardGeneratorWorkspace key={generatorKey} onLandingChange={setIsLanding} />
+        <section
+          inert={isLanguageChanging}
+          aria-busy={isLanguageChanging}
+          className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-5 pb-8 pt-8"
+        >
+          <CardGeneratorWorkspace />
         </section>
       </main>
     </div>

@@ -1,12 +1,12 @@
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
-import * as rootParams from 'next/root-params';
-import { notFound } from 'next/navigation';
 import { routing } from './routing';
 
-export default getRequestConfig(async ({ locale }) => {
-  const requestedLocale = locale ?? (await rootParams.locale());
-  if (!hasLocale(routing.locales, requestedLocale)) notFound();
+export default getRequestConfig(async ({ locale, requestLocale }) => {
+  const candidate = locale ?? (await requestLocale);
+  // The root not-found page has no locale segment. LocaleLayout rejects
+  // unsupported route segments while the common root can use the default.
+  const requestedLocale = hasLocale(routing.locales, candidate) ? candidate : routing.defaultLocale;
 
   const messages =
     requestedLocale === 'ko'

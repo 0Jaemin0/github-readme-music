@@ -137,6 +137,9 @@ const measureTextWidth = (value: string, style: TextMeasurementStyle) => {
   if (typeof document === 'undefined') return 0;
 
   const element = document.createElement('span');
+  // Keep fallback font metrics consistent with the original Korean editor,
+  // regardless of the UI locale. These measurements are part of the card snapshot.
+  element.lang = 'ko';
   element.textContent = value;
   element.style.cssText = `position:fixed;visibility:hidden;white-space:pre;pointer-events:none;font-family:'Noto Sans KR',sans-serif;font-size:${style.fontSize}px;font-weight:${style.fontWeight};letter-spacing:${style.letterSpacing}em;`;
   document.body.append(element);

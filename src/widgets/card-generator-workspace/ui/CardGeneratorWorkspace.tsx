@@ -1,22 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
-import { CardResult, LoadingPreview, useCardGenerator, YouTubeUrlForm } from '@/features/card-generator';
-import { RecentCards, useRecentCards } from '@/features/recent-cards';
+import { CardResult, LoadingPreview, YouTubeUrlForm } from '@/features/card-generator';
+import { RecentCards } from '@/features/recent-cards';
+import { useCardGeneratorContext } from '../model/CardGeneratorProvider';
 import { cn } from '@/shared/lib/utils';
 
-interface CardGeneratorWorkspaceProps {
-  onLandingChange?: (isLanding: boolean) => void;
-}
-
-export const CardGeneratorWorkspace = ({ onLandingChange }: CardGeneratorWorkspaceProps) => {
-  const recentCards = useRecentCards();
-  const cardGenerator = useCardGenerator({ onStoredCardCreated: recentCards.addCardId });
-  const isLanding = !cardGenerator.track && cardGenerator.status === 'idle';
-
-  useEffect(() => {
-    onLandingChange?.(isLanding);
-  }, [isLanding, onLandingChange]);
+export const CardGeneratorWorkspace = () => {
+  const { recentCards, cardGenerator, isLanding } = useCardGeneratorContext();
 
   return (
     <div className={cn('w-full', isLanding && 'flex min-h-0 flex-1 flex-col')}>

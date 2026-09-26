@@ -1,4 +1,8 @@
 {
+  "LocaleSwitcher": {
+    "label": "언어 선택",
+    "busy": "처리가 끝나면 언어를 변경할 수 있습니다."
+  },
   "Home": {
     "heading": "좋아하는 음악을,",
     "headingAccent": "README에 담아 보세요.",

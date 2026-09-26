@@ -1,4 +1,8 @@
 {
+  "LocaleSwitcher": {
+    "label": "Select language",
+    "busy": "You can change the language once the current operation is complete."
+  },
   "Home": {
     "heading": "Your favorite music,",
     "headingAccent": "in your README.",

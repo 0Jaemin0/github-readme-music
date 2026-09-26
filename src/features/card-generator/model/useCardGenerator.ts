@@ -29,9 +29,10 @@ import {
 } from '@/entities/music-card';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
 
-type Status = 'idle' | 'loading' | 'ready' | 'error';
-type SaveStatus = 'idle' | 'saving' | 'error';
 type LoadingKind = 'metadata' | 'stored-card' | null;
+type GeneratorStatus = 'idle' | 'loading' | 'ready' | 'error';
+type MarkdownSaveStatus = 'idle' | 'saving' | 'error';
+
 interface RestoredCard {
   id: string;
   snapshot: string;
@@ -46,7 +47,7 @@ interface UseCardGeneratorOptions {
 
 export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOptions = {}) => {
   const [url, setUrl] = useState('');
-  const [status, setStatus] = useState<Status>('idle');
+  const [status, setStatus] = useState<GeneratorStatus>('idle');
   const [loadingKind, setLoadingKind] = useState<LoadingKind>(null);
   const [error, setError] = useState<string | null>(null);
   const [track, setTrack] = useState<Track | null>(null);
@@ -60,7 +61,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
   const [markdownKind, setMarkdownKind] = useState<'stored' | 'fallback' | null>(null);
   const [failedSnapshot, setFailedSnapshot] = useState<string | null>(null);
   const [storageFailureCount, setStorageFailureCount] = useState(0);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [saveStatus, setSaveStatus] = useState<MarkdownSaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState<'success' | 'error' | null>(null);
@@ -68,14 +69,16 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
   const copyFeedbackTimerRef = useRef<number | null>(null);
+  const isSessionActiveRef = useRef(true);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    isSessionActiveRef.current = true;
+    return () => {
+      isSessionActiveRef.current = false;
       abortControllerRef.current?.abort();
       if (copyFeedbackTimerRef.current) window.clearTimeout(copyFeedbackTimerRef.current);
-    },
-    [],
-  );
+    };
+  }, []);
 
   const currentSnapshot = useMemo(() => {
     if (!track) return '';
@@ -330,6 +333,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
     let canUseCompatibilityFallback = false;
     try {
       const { response, body } = await requestStoredCardCreation(track.videoId, Object.fromEntries(snapshot));
+      if (!isSessionActiveRef.current) return;
       receivedResponse = true;
       const cardId = body?.data?.id;
 
@@ -358,6 +362,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
       setStorageFailureCount(0);
       setSaveStatus('idle');
     } catch (requestError) {
+      if (!isSessionActiveRef.current) return;
       if (!receivedResponse) {
         canUseCompatibilityFallback = true;
         captureMonitoringError({
@@ -405,9 +410,11 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
 
     try {
       await navigator.clipboard.writeText(generatedMarkdown);
+      if (!isSessionActiveRef.current) return;
       setCopied(true);
       showCopyFeedback('success');
     } catch {
+      if (!isSessionActiveRef.current) return;
       showCopyFeedback('error');
     }
   };
