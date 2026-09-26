@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
-import './globals.css';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
+import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
+import '../globals.css';
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ['latin'],
@@ -54,11 +57,17 @@ export const viewport: Viewport = {
 
 interface RootLayoutProps {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }
 
-const RootLayout = ({ children }: RootLayoutProps) => {
+export const generateStaticParams = () => routing.locales.map((locale) => ({ locale }));
+
+const RootLayout = async ({ children, params }: RootLayoutProps) => {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+
   return (
-    <html lang="ko" suppressHydrationWarning className={notoSansKr.variable}>
+    <html lang={locale} suppressHydrationWarning className={notoSansKr.variable}>
       <head>
         <Script
           id="github-readme-music-theme"
@@ -70,7 +79,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
         />
       </head>
       <body className="font-sans antialiased">
-        {children}
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
         <Analytics />
       </body>
     </html>

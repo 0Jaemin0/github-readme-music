@@ -2,11 +2,13 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import brandMark from '@/shared/assets/brand-mark.png';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { CardGeneratorWorkspace } from '@/widgets/card-generator-workspace';
 
 export const HomePage = () => {
+  const t = useTranslations('Home');
   const [generatorKey, setGeneratorKey] = useState(0);
   const [isLanding, setIsLanding] = useState(true);
 
@@ -35,12 +37,12 @@ export const HomePage = () => {
       <main className="flex min-h-0 flex-1 flex-col">
         <section className="mx-auto w-full max-w-3xl shrink-0 px-5 pb-4 pt-16 text-center sm:pt-24">
           <h1 className="text-balance text-[2rem] font-semibold leading-[1.16] tracking-[-0.04em] sm:text-[3.25rem]">
-            좋아하는 음악을,
+            {t('heading')}
             <br />
-            <span className="text-primary">README에 담아 보세요.</span>
+            <span className="text-primary">{t('headingAccent')}</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-[15px] leading-7 text-muted-foreground sm:max-w-none sm:text-base">
-            YouTube 링크 하나로 나를 소개하는 음악 카드를 만들어 README에 남겨 보세요.
+            {t('description')}
           </p>
         </section>
 
