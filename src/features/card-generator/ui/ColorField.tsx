@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Input } from '@/shared/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { normalizeHex } from '@/entities/music-card';
@@ -13,6 +14,7 @@ interface ColorFieldProps {
 }
 
 export const ColorField = ({ label, value, onChange }: ColorFieldProps) => {
+  const t = useTranslations('CardEditor.style.colorPicker');
   const [draft, setDraft] = useState(value);
 
   const commitDraft = (next: string) => {
@@ -27,7 +29,7 @@ export const ColorField = ({ label, value, onChange }: ColorFieldProps) => {
       <div className="flex items-center gap-1.5 rounded-lg border border-border bg-background p-1 pr-2">
         <Popover>
           <PopoverTrigger
-            aria-label={`${label} 색 선택`}
+            aria-label={t('selectColor', { label })}
             className="size-6 shrink-0 cursor-pointer rounded-md border border-border/80 ring-offset-background transition-shadow hover:ring-2 hover:ring-ring/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             style={{ backgroundColor: value }}
           />
@@ -46,7 +48,7 @@ export const ColorField = ({ label, value, onChange }: ColorFieldProps) => {
           onChange={(event) => commitDraft(event.target.value)}
           onBlur={() => setDraft(value)}
           spellCheck={false}
-          aria-label={`${label} 색상 코드`}
+          aria-label={t('colorCode', { label })}
           className="h-6 w-20 border-0 bg-transparent px-0 font-mono text-[12px] uppercase shadow-none focus-visible:ring-0 md:text-[12px] dark:bg-transparent"
         />
       </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ImageOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 
 interface RecentCardsProps {
@@ -19,6 +20,7 @@ export const RecentCards = ({
   fillRemainingSpace = false,
   onSelectCard,
 }: RecentCardsProps) => {
+  const t = useTranslations('RecentCards');
   const [failedCardIds, setFailedCardIds] = useState<Set<string>>(() => new Set());
   const [loadedCardIds, setLoadedCardIds] = useState<Set<string>>(() => new Set());
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
@@ -31,11 +33,9 @@ export const RecentCards = ({
       aria-labelledby="recent-cards-heading"
     >
       <h2 id="recent-cards-heading" className="text-sm font-semibold tracking-[-0.02em]">
-        최근 생성한 카드
+        {t('title')}
       </h2>
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">
-        카드를 선택하면 이전 설정을 불러와 이어서 수정할 수 있어요.
-      </p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{t('description')}</p>
       <div className={cn('mt-2 grid grid-cols-3 gap-2.5 sm:gap-3', fillRemainingSpace && 'min-h-0 flex-1')}>
         {cardIds.map((cardId) => {
           const hasFailed = failedCardIds.has(cardId);
@@ -56,11 +56,11 @@ export const RecentCards = ({
               }}
               onMouseLeave={() => setHoveredCardId((current) => (current === cardId ? null : current))}
               onClick={() => onSelectCard(cardId)}
-              aria-label="저장된 카드 설정 불러오기"
+              aria-label={t('restoreLabel')}
               aria-busy={isRestoring || undefined}
             >
               {hasFailed ? (
-                <ImageOff className="size-4 text-muted-foreground" aria-label="카드를 불러오지 못했습니다" />
+                <ImageOff className="size-4 text-muted-foreground" aria-label={t('imageError')} />
               ) : (
                 <>
                   {!hasLoaded ? (
@@ -70,7 +70,7 @@ export const RecentCards = ({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`/card/${encodeURIComponent(cardId)}.svg`}
-                    alt="최근 생성한 카드"
+                    alt={t('imageAlt')}
                     className={cn(
                       'relative max-h-full max-w-full object-contain transition-opacity duration-200',
                       hasLoaded ? 'opacity-100' : 'opacity-0',

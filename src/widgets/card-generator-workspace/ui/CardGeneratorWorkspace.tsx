@@ -1,22 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
-import { CardResult, LoadingPreview, useCardGenerator, YouTubeUrlForm } from '@/features/card-generator';
-import { RecentCards, useRecentCards } from '@/features/recent-cards';
+import { CardResult, LoadingPreview, YouTubeUrlForm } from '@/features/card-generator';
+import { useTranslations } from 'next-intl';
+import { RecentCards } from '@/features/recent-cards';
+import { useCardGeneratorContext } from '../model/CardGeneratorProvider';
 import { cn } from '@/shared/lib/utils';
 
-interface CardGeneratorWorkspaceProps {
-  onLandingChange?: (isLanding: boolean) => void;
-}
-
-export const CardGeneratorWorkspace = ({ onLandingChange }: CardGeneratorWorkspaceProps) => {
-  const recentCards = useRecentCards();
-  const cardGenerator = useCardGenerator({ onStoredCardCreated: recentCards.addCardId });
-  const isLanding = !cardGenerator.track && cardGenerator.status === 'idle';
-
-  useEffect(() => {
-    onLandingChange?.(isLanding);
-  }, [isLanding, onLandingChange]);
+export const CardGeneratorWorkspace = () => {
+  const t = useTranslations('CardEditor.status');
+  const { recentCards, cardGenerator, isLanding } = useCardGeneratorContext();
 
   return (
     <div className={cn('w-full', isLanding && 'flex min-h-0 flex-1 flex-col')}>
@@ -42,7 +34,7 @@ export const CardGeneratorWorkspace = ({ onLandingChange }: CardGeneratorWorkspa
         <div className="mt-8">
           {cardGenerator.status === 'loading' && !cardGenerator.track ? (
             <LoadingPreview
-              message={cardGenerator.loadingKind === 'stored-card' ? '카드 설정을 불러오는 중이에요.' : undefined}
+              message={cardGenerator.loadingKind === 'stored-card' ? t('loadingStoredCard') : undefined}
             />
           ) : null}
           {cardGenerator.track ? (

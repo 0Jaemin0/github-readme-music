@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ImageOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { mixHex, withAlpha } from '../lib/color';
 import { durationToSeconds, formatDuration } from '../lib/time';
@@ -286,6 +287,7 @@ interface CoverImageProps {
 }
 
 const CoverImage = ({ track, title, className }: CoverImageProps) => {
+  const t = useTranslations('CardEditor.cover');
   const [failedCover, setFailedCover] = useState<string | null>(null);
   const hasImageError = failedCover === track.cover;
   const ratio = track.coverPosition.aspectRatio;
@@ -310,13 +312,13 @@ const CoverImage = ({ track, title, className }: CoverImageProps) => {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={track.cover}
-          alt={`${title} cover art`}
+          alt={`${title} ${t('title')}`}
           className="absolute max-w-none"
           style={imageStyle}
           onError={() => setFailedCover(track.cover)}
         />
       ) : (
-        <ImageOff className="size-1/3 text-muted-foreground/70" aria-label="앨범 커버를 불러올 수 없습니다" />
+        <ImageOff className="size-1/3 text-muted-foreground/70" aria-label={t('error')} />
       )}
     </div>
   );

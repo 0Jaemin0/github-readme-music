@@ -12,6 +12,7 @@ import {
   type Track,
 } from '@/entities/music-card';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { useTranslations } from 'next-intl';
 import { CardCustomizer } from './CardCustomizer';
 
 interface CardPreviewPanelProps {
@@ -35,17 +36,21 @@ export const CardPreviewPanel = ({
   onProgressChange,
   onThemeChange,
 }: CardPreviewPanelProps) => {
+  const t = useTranslations('CardEditor.preview');
+  const styleLabels = { player: t('styles.player'), compact: t('styles.compact'), vertical: t('styles.vertical') };
   return (
     <section className="rounded-xl border border-border bg-background p-4 sm:p-5">
       <div className="mb-3">
-        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">미리보기</p>
-        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">README에 표시될 카드 모습을 확인해 주세요.</p>
+        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {t('title')}
+        </p>
+        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{t('description')}</p>
       </div>
       <Tabs value={style} onValueChange={(value) => onStyleChange(value as CardStyleId)}>
         <TabsList className="mb-4 grid w-full grid-cols-3">
           {CARD_STYLES.map((option) => (
             <TabsTrigger key={option.id} value={option.id}>
-              {option.name}
+              {styleLabels[option.id]}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -58,7 +63,7 @@ export const CardPreviewPanel = ({
           ) : null}
         </div>
       </Tabs>
-      <section className="mt-6" aria-label="스타일 설정">
+      <section className="mt-6" aria-label={t('settingsLabel')}>
         <CardCustomizer theme={theme} onChange={onThemeChange} />
       </section>
     </section>
@@ -72,18 +77,19 @@ interface PlaybackPositionProps {
 }
 
 const PlaybackPosition = ({ value, duration, onChange }: PlaybackPositionProps) => {
+  const t = useTranslations('CardEditor.preview');
   const totalSeconds = durationToSeconds(duration);
 
   return (
     <div className="mx-auto mt-5 max-w-[27.5rem]">
       <div className="flex items-center justify-between text-[12px] text-muted-foreground">
-        <span>재생 위치</span>
+        <span>{t('playbackPosition')}</span>
         <span>
           {formatDuration(value)} / {duration}
         </span>
       </div>
       <input
-        aria-label="재생 위치"
+        aria-label={t('playbackPosition')}
         type="range"
         min="0"
         max={totalSeconds}

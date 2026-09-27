@@ -1,18 +1,22 @@
 'use client';
 
 import { ArrowRight, Link2, LoaderCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import type { CardGeneratorErrorKey } from '../model/card-generator-errors';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 
 interface YouTubeUrlFormProps {
   url: string;
-  error: string | null;
+  error: CardGeneratorErrorKey | null;
   isLoading: boolean;
   onUrlChange: (value: string) => void;
   onSubmit: () => void;
 }
 
 export const YouTubeUrlForm = ({ url, error, isLoading, onUrlChange, onSubmit }: YouTubeUrlFormProps) => {
+  const t = useTranslations('CardEditor.input');
+  const tErrors = useTranslations('Errors');
   return (
     <div>
       <form
@@ -28,7 +32,7 @@ export const YouTubeUrlForm = ({ url, error, isLoading, onUrlChange, onSubmit }:
             aria-hidden="true"
           />
           <label htmlFor="youtube-url" className="sr-only">
-            YouTube 링크
+            {t('linkLabel')}
           </label>
           <Input
             id="youtube-url"
@@ -52,11 +56,11 @@ export const YouTubeUrlForm = ({ url, error, isLoading, onUrlChange, onSubmit }:
           {isLoading ? (
             <>
               <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-              불러오는 중
+              {t('loading')}
             </>
           ) : (
             <>
-              카드 만들기
+              {t('submit')}
               <ArrowRight className="size-4" aria-hidden="true" />
             </>
           )}
@@ -66,12 +70,10 @@ export const YouTubeUrlForm = ({ url, error, isLoading, onUrlChange, onSubmit }:
       <div className="mt-3 flex min-h-6 flex-wrap items-center gap-x-3 gap-y-1 text-[13px] leading-5">
         {error ? (
           <p id="youtube-url-error" role="alert" className="text-destructive">
-            {error}
+            {tErrors(error)}
           </p>
         ) : (
-          <p className="text-muted-foreground">
-            YouTube 링크를 입력하시면 제목과 아티스트를 확인한 뒤 카드를 만들 수 있습니다.
-          </p>
+          <p className="text-muted-foreground">{t('hint')}</p>
         )}
       </div>
     </div>

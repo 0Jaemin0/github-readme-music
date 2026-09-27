@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+import type { CardGeneratorErrorKey } from '../model/card-generator-errors';
 import { CardMetadataFields } from './CardMetadataFields';
 import { CardPreviewPanel } from './CardPreviewPanel';
 import { MarkdownSnippet } from './MarkdownSnippet';
@@ -12,7 +14,7 @@ interface CardResultProps {
   markdown: string | null;
   hasPendingMarkdownChanges: boolean;
   markdownSaveStatus: 'idle' | 'saving' | 'error';
-  markdownSaveError: string | null;
+  markdownSaveError: CardGeneratorErrorKey | null;
   isFallbackMarkdown: boolean;
   copied: boolean;
   copyFeedback: 'success' | 'error' | null;
@@ -48,11 +50,12 @@ export const CardResult = ({
   onCopy,
   onGenerateMarkdown,
 }: CardResultProps) => {
+  const t = useTranslations('CardEditor.status');
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card/40 p-4 sm:p-8">
       {isRefreshing ? (
         <p className="text-[13px] text-muted-foreground" role="status">
-          새 영상 정보를 불러오고 있습니다. 현재 카드는 그대로 유지됩니다.
+          {t('refreshingMetadata')}
         </p>
       ) : null}
       <CardMetadataFields

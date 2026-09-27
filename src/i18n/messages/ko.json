@@ -1,0 +1,150 @@
+{
+  "SEO": {
+    "title": "github-readme-music | GitHub README 음악 카드 만들기",
+    "description": "YouTube 링크로 나만의 음악 카드를 만들고 GitHub README에 담아 보세요. 카드 디자인을 꾸민 뒤 SVG 카드와 Markdown 코드를 사용할 수 있습니다.",
+    "imageAlt": "github-readme-music — README에 좋아하는 음악을 담아 보세요"
+  },
+  "Home": {
+    "heading": "좋아하는 음악을,",
+    "headingAccent": "README에 담아 보세요.",
+    "description": "YouTube 링크 하나로 나를 소개하는 음악 카드를 만들어 README에 남겨 보세요.",
+    "homeLabel": "github-readme-music 홈으로 돌아가기",
+    "navigationLabel": "보조 메뉴"
+  },
+  "LocaleSwitcher": {
+    "label": "언어 선택",
+    "busy": "처리가 끝나면 언어를 변경할 수 있습니다."
+  },
+  "ThemeToggle": {
+    "label": "화면 테마 선택",
+    "system": "시스템 모드",
+    "light": "라이트 모드",
+    "dark": "다크 모드"
+  },
+  "RecentCards": {
+    "title": "최근 생성한 카드",
+    "description": "카드를 선택하면 이전 설정을 불러와 이어서 수정할 수 있어요.",
+    "restoreLabel": "저장된 카드 설정 불러오기",
+    "imageAlt": "최근 생성한 카드",
+    "imageError": "카드를 불러오지 못했습니다"
+  },
+  "CardEditor": {
+    "input": {
+      "linkLabel": "YouTube 링크",
+      "loading": "불러오는 중",
+      "submit": "카드 만들기",
+      "hint": "YouTube 링크를 입력하시면 제목과 아티스트를 확인한 뒤 카드를 만들 수 있습니다."
+    },
+    "content": {
+      "heading": "콘텐츠",
+      "description": "카드에 표시할 정보를 확인하고, 필요한 부분을 수정해 주세요.",
+      "youtubeInfo": "YouTube에서 가져온 정보: {title} · {artist}",
+      "storedInfo": "저장된 카드 정보: {title} · {artist}",
+      "title": "제목",
+      "artist": "아티스트",
+      "artistHint": "아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요."
+    },
+    "cover": {
+      "title": "앨범 커버",
+      "hint": "정사각형 프레임을 드래그하여 위치를 옮기고, 오른쪽 아래 모서리를 드래그하여 크기를 조절해 주세요.",
+      "selectAlt": "앨범 커버 영역 선택",
+      "resizeLabel": "앨범 프레임 크기 조절",
+      "error": "앨범 커버를 불러올 수 없습니다"
+    },
+    "preview": {
+      "title": "미리보기",
+      "description": "README에 표시될 카드 모습을 확인해 주세요.",
+      "styles": {
+        "player": "일반형",
+        "compact": "가로형",
+        "vertical": "세로형"
+      },
+      "settingsLabel": "스타일 설정",
+      "playbackPosition": "재생 위치"
+    },
+    "style": {
+      "colors": "색상",
+      "background": "카드 배경",
+      "border": "카드 테두리",
+      "title": "제목",
+      "artist": "가수",
+      "accent": "포인트",
+      "gradient": {
+        "label": "포인트 색 그라데이션",
+        "direction": "그라데이션 방향",
+        "none": "없음",
+        "topLeft": "왼쪽 위",
+        "topRight": "오른쪽 위",
+        "bottomLeft": "왼쪽 아래",
+        "bottomRight": "오른쪽 아래",
+        "intensity": "그라데이션 강도",
+        "hint": "선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있습니다."
+      },
+      "contrastWarning": "{roles} 색의 대비가 매우 낮습니다. README에서 읽기 어려울 수 있습니다.",
+      "shape": "모양",
+      "borderWidth": "테두리 두께",
+      "cornerRadius": "모서리 둥글기",
+      "colorPicker": {
+        "selectColor": "{label} 색 선택",
+        "colorCode": "{label} 색상 코드",
+        "hue": "색조"
+      }
+    },
+    "status": {
+      "loadingMetadata": "영상 정보를 불러오고 있습니다…",
+      "loadingStoredCard": "카드 설정을 불러오는 중이에요.",
+      "refreshingMetadata": "새 영상 정보를 불러오고 있습니다. 현재 카드는 그대로 유지됩니다."
+    }
+  },
+  "Markdown": {
+    "title": "Markdown 코드",
+    "buttons": {
+      "saving": "카드 저장 중...",
+      "generate": "Markdown 코드 생성",
+      "regenerate": "새 Markdown 코드 생성",
+      "retryShortUrl": "짧은 URL로 다시 생성"
+    },
+    "readyDescription": "생성된 코드를 GitHub README에 붙여 넣어 카드를 표시할 수 있습니다.",
+    "prepareDescription": "현재 설정으로 GitHub README에 붙여 넣을 Markdown 코드를 준비합니다.",
+    "pendingChanges": "변경사항이 있습니다. 현재 미리보기를 반영하려면 새 Markdown 코드를 생성해 주세요.",
+    "fallbackNotice": "카드 저장 서버의 응답이 지연되어, 현재 설정을 바로 사용할 수 있는 호환 URL 코드로 생성했습니다. 나중에 다시 생성하면 짧은 URL 코드로 바꿀 수 있습니다.",
+    "copy": {
+      "label": "Markdown 복사",
+      "success": "README 삽입 코드를 복사했습니다.",
+      "failure": "복사하지 못했습니다. 코드를 직접 선택해 복사해 주세요."
+    },
+    "empty": {
+      "title": "Markdown 코드를 아직 생성하지 않았습니다.",
+      "hint": "커스텀을 마친 뒤 버튼을 눌러 카드를 저장하고 코드를 생성해 주세요."
+    }
+  },
+  "Errors": {
+    "metadata": {
+      "invalidLink": "YouTube 영상 링크를 확인해 주세요.",
+      "configuration": "일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+      "notFound": "영상을 찾을 수 없거나 해당 영상은 카드에 사용할 수 없습니다.",
+      "quota": "현재 요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+      "tooLarge": "요청 내용이 너무 큽니다. YouTube 링크만 입력해 주세요.",
+      "unavailable": "영상 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
+    },
+    "common": {
+      "rateLimited": "요청이 많습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "storage": {
+      "invalid": "카드 설정을 확인할 수 없습니다. 다시 시도해 주세요.",
+      "tooLarge": "카드 설정 내용이 너무 큽니다. 다시 시도해 주세요.",
+      "unavailable": "카드를 저장하지 못했어요. 잠시 후 다시 시도해 주세요."
+    },
+    "restore": {
+      "invalidId": "카드 요청이 올바르지 않습니다.",
+      "notFound": "카드를 찾을 수 없어요. 최근 생성 카드가 삭제되었을 수 있습니다.",
+      "invalidData": "카드 설정을 처리할 수 없습니다.",
+      "unavailable": "카드 설정을 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
+    }
+  },
+  "GlobalError": {
+    "title": "문제가 발생했습니다.",
+    "description": "페이지를 새로고침한 뒤 다시 시도해 주세요.",
+    "reload": "새로고침"
+  }
+}

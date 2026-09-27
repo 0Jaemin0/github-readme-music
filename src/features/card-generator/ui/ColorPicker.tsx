@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { clamp, hexToHsv, hsvToHex, type Hsv } from '@/entities/music-card';
 import { cn } from '@/shared/lib/utils';
 
@@ -29,6 +30,7 @@ interface ColorPickerProps {
 }
 
 export const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
+  const t = useTranslations('CardEditor.style.colorPicker');
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value));
   const areaRef = useRef<HTMLDivElement>(null);
 
@@ -73,7 +75,7 @@ export const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
       </div>
 
       <label className="sr-only" htmlFor="hue-slider">
-        색조
+        {t('hue')}
       </label>
       <input
         id="hue-slider"

@@ -1,14 +1,15 @@
 'use client';
 
 import { ColorField } from './ColorField';
+import { useTranslations } from 'next-intl';
 import { ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, X } from 'lucide-react';
 import { contrastRatio, type CardTheme, type GradientDirection } from '@/entities/music-card';
 
 const GRADIENT_DIRECTIONS = [
-  { value: 'top-left', label: '왼쪽 위', Icon: ArrowUpLeft },
-  { value: 'top-right', label: '오른쪽 위', Icon: ArrowUpRight },
-  { value: 'bottom-left', label: '왼쪽 아래', Icon: ArrowDownLeft },
-  { value: 'bottom-right', label: '오른쪽 아래', Icon: ArrowDownRight },
+  { value: 'top-left', label: 'gradient.topLeft', Icon: ArrowUpLeft },
+  { value: 'top-right', label: 'gradient.topRight', Icon: ArrowUpRight },
+  { value: 'bottom-left', label: 'gradient.bottomLeft', Icon: ArrowDownLeft },
+  { value: 'bottom-right', label: 'gradient.bottomRight', Icon: ArrowDownRight },
 ] as const satisfies ReadonlyArray<{
   value: Exclude<GradientDirection, null>;
   label: string;
@@ -21,10 +22,11 @@ interface CardCustomizerProps {
 }
 
 export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
+  const t = useTranslations('CardEditor.style');
   const lowContrastRoles = [
-    { name: '제목', color: theme.text },
-    { name: '가수', color: theme.muted },
-    { name: '포인트', color: theme.accent },
+    { name: t('title'), color: theme.text },
+    { name: t('artist'), color: theme.muted },
+    { name: t('accent'), color: theme.accent },
   ].filter(({ color }) => contrastRatio(theme.background, color) < 1.8);
 
   const set = <K extends keyof CardTheme>(key: K, value: CardTheme[K]) => {
@@ -38,22 +40,22 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <p className="text-[13px] font-medium text-muted-foreground">색상</p>
+        <p className="text-[13px] font-medium text-muted-foreground">{t('colors')}</p>
         <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 sm:gap-x-8">
-          <ColorField label="카드 배경" value={theme.background} onChange={(v) => set('background', v)} />
-          <ColorField label="카드 테두리" value={theme.border} onChange={(v) => set('border', v)} />
-          <ColorField label="제목" value={theme.text} onChange={(v) => set('text', v)} />
-          <ColorField label="가수" value={theme.muted} onChange={(v) => set('muted', v)} />
-          <ColorField label="포인트" value={theme.accent} onChange={(v) => set('accent', v)} />
+          <ColorField label={t('background')} value={theme.background} onChange={(v) => set('background', v)} />
+          <ColorField label={t('border')} value={theme.border} onChange={(v) => set('border', v)} />
+          <ColorField label={t('title')} value={theme.text} onChange={(v) => set('text', v)} />
+          <ColorField label={t('artist')} value={theme.muted} onChange={(v) => set('muted', v)} />
+          <ColorField label={t('accent')} value={theme.accent} onChange={(v) => set('accent', v)} />
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <span className="text-[13px] text-muted-foreground">포인트 색 그라데이션</span>
-          <div role="radiogroup" aria-label="그라데이션 방향" className="flex items-center gap-1.5">
+          <span className="text-[13px] text-muted-foreground">{t('gradient.label')}</span>
+          <div role="radiogroup" aria-label={t('gradient.direction')} className="flex items-center gap-1.5">
             <button
               type="button"
               role="radio"
               aria-checked={!theme.gradient}
-              aria-label="없음"
+              aria-label={t('gradient.none')}
               onClick={() => setGradientDirection(null)}
               className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${!theme.gradient ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}
             >
@@ -67,7 +69,7 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={label}
+                  aria-label={t(label)}
                   onClick={() => setGradientDirection(value)}
                   className={`flex size-8 cursor-pointer items-center justify-center rounded-md border transition-colors ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted'}`}
                 >
@@ -80,7 +82,8 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
         {theme.gradient ? (
           <div className="mt-3">
             <RangeRow
-              label="그라데이션 강도"
+              id="range-gradient-intensity"
+              label={t('gradient.intensity')}
               value={theme.gradientIntensity}
               min={0}
               max={100}
@@ -90,23 +93,21 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
           </div>
         ) : null}
         {theme.gradient ? (
-          <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
-            선택한 방향의 밝은 영역에서는 텍스트가 다르게 보일 수 있습니다.
-          </p>
+          <p className="mt-2 text-[12px] leading-5 text-muted-foreground">{t('gradient.hint')}</p>
         ) : null}
         {lowContrastRoles.length > 0 ? (
           <p role="status" className="mt-2.5 text-[13px] leading-5 text-destructive">
-            {lowContrastRoles.map(({ name }) => name).join(', ')} 색의 대비가 매우 낮습니다. README에서 읽기 어려울 수
-            있습니다.
+            {t('contrastWarning', { roles: lowContrastRoles.map(({ name }) => name).join(', ') })}
           </p>
         ) : null}
       </section>
 
       <section>
-        <p className="text-[13px] font-medium text-muted-foreground">모양</p>
+        <p className="text-[13px] font-medium text-muted-foreground">{t('shape')}</p>
         <div className="mt-3 flex flex-col gap-4">
           <RangeRow
-            label="Border width"
+            id="range-border-width"
+            label={t('borderWidth')}
             value={theme.borderWidth}
             min={0}
             max={6}
@@ -114,7 +115,8 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
             onChange={(value) => set('borderWidth', value)}
           />
           <RangeRow
-            label="Corner radius"
+            id="range-corner-radius"
+            label={t('cornerRadius')}
             value={theme.radius}
             min={0}
             max={28}
@@ -128,6 +130,7 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
 };
 
 interface RangeRowProps {
+  id: string;
   label: string;
   value: number;
   min: number;
@@ -136,8 +139,7 @@ interface RangeRowProps {
   onChange: (value: number) => void;
 }
 
-const RangeRow = ({ label, value, min, max, suffix, onChange }: RangeRowProps) => {
-  const id = `range-${label.replace(/\s+/g, '-').toLowerCase()}`;
+const RangeRow = ({ id, label, value, min, max, suffix, onChange }: RangeRowProps) => {
   return (
     <div className="flex items-center gap-3">
       <label htmlFor={id} className="w-28 shrink-0 text-[13px] text-muted-foreground">

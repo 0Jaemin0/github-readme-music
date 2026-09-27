@@ -5,13 +5,15 @@ import { requestStoredCard, requestStoredCardCreation, requestYouTubeMetadata } 
 import { buildMarkdown, buildStoredCardMarkdown } from '../lib/markdown';
 import { getStorageFailureCount, shouldUseCompatibilityFallback } from './card-generator-snapshot';
 import {
-  CARD_RESTORE_ERROR_MESSAGES,
-  CARD_STORAGE_ERROR_MESSAGES,
-  FALLBACK_ERROR_MESSAGE,
-  getCardRestoreErrorMessage,
-  getCardStorageErrorMessage,
-  getMetadataErrorMessage,
-  METADATA_ERROR_MESSAGES,
+  CARD_RESTORE_ERROR_KEYS,
+  CARD_STORAGE_ERROR_KEYS,
+  FALLBACK_ERROR_KEY,
+  getCardRestoreErrorKey,
+  getCardStorageErrorKey,
+  getMetadataErrorKey,
+  METADATA_ERROR_KEYS,
+  getRequestErrorKey,
+  type CardGeneratorErrorKey,
 } from './card-generator-errors';
 import {
   createSvgCardParams,
@@ -29,9 +31,10 @@ import {
 } from '@/entities/music-card';
 import { captureMonitoringError } from '@/shared/lib/sentry-monitoring';
 
-type Status = 'idle' | 'loading' | 'ready' | 'error';
-type SaveStatus = 'idle' | 'saving' | 'error';
 type LoadingKind = 'metadata' | 'stored-card' | null;
+type GeneratorStatus = 'idle' | 'loading' | 'ready' | 'error';
+type MarkdownSaveStatus = 'idle' | 'saving' | 'error';
+
 interface RestoredCard {
   id: string;
   snapshot: string;
@@ -46,9 +49,9 @@ interface UseCardGeneratorOptions {
 
 export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOptions = {}) => {
   const [url, setUrl] = useState('');
-  const [status, setStatus] = useState<Status>('idle');
+  const [status, setStatus] = useState<GeneratorStatus>('idle');
   const [loadingKind, setLoadingKind] = useState<LoadingKind>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<CardGeneratorErrorKey | null>(null);
   const [track, setTrack] = useState<Track | null>(null);
   const [meta, setMeta] = useState<CardMeta>(INITIAL_META);
   const [style, setStyle] = useState<CardStyleId>('player');
@@ -60,22 +63,24 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
   const [markdownKind, setMarkdownKind] = useState<'stored' | 'fallback' | null>(null);
   const [failedSnapshot, setFailedSnapshot] = useState<string | null>(null);
   const [storageFailureCount, setStorageFailureCount] = useState(0);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<MarkdownSaveStatus>('idle');
+  const [saveError, setSaveError] = useState<CardGeneratorErrorKey | null>(null);
   const [copied, setCopied] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState<'success' | 'error' | null>(null);
   const [, startTransition] = useTransition();
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
   const copyFeedbackTimerRef = useRef<number | null>(null);
+  const isSessionActiveRef = useRef(true);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    isSessionActiveRef.current = true;
+    return () => {
+      isSessionActiveRef.current = false;
       abortControllerRef.current?.abort();
       if (copyFeedbackTimerRef.current) window.clearTimeout(copyFeedbackTimerRef.current);
-    },
-    [],
-  );
+    };
+  }, []);
 
   const currentSnapshot = useMemo(() => {
     if (!track) return '';
@@ -94,7 +99,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
 
   const generate = async () => {
     if (!parseYouTubeId(url)) {
-      setError(METADATA_ERROR_MESSAGES.INVALID_URL);
+      setError(METADATA_ERROR_KEYS.INVALID_URL);
       setStatus('error');
       return;
     }
@@ -123,10 +128,10 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
           layer: 'client',
           httpStatus: response.status,
         });
-        throw new Error(FALLBACK_ERROR_MESSAGE);
+        throw new Error(FALLBACK_ERROR_KEY);
       }
 
-      if (!response.ok || !body.data) throw new Error(getMetadataErrorMessage(body.error?.code));
+      if (!response.ok || !body.data) throw new Error(getMetadataErrorKey(body.error?.code));
       if (requestId !== requestIdRef.current) return;
 
       const nextTrack: Track = {
@@ -164,13 +169,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
           layer: 'client',
         });
       }
-      setError(
-        !receivedResponse
-          ? FALLBACK_ERROR_MESSAGE
-          : requestError instanceof Error
-            ? requestError.message
-            : FALLBACK_ERROR_MESSAGE,
-      );
+      setError(!receivedResponse ? FALLBACK_ERROR_KEY : getRequestErrorKey(requestError, FALLBACK_ERROR_KEY));
       setLoadingKind(null);
       setStatus('error');
     }
@@ -241,11 +240,11 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
           layer: 'client',
           httpStatus: response.status,
         });
-        throw new Error(CARD_RESTORE_ERROR_MESSAGES.CARD_READ_UNAVAILABLE);
+        throw new Error(CARD_RESTORE_ERROR_KEYS.CARD_READ_UNAVAILABLE);
       }
 
       if (!response.ok || !isStoredCardResponseData(responseData)) {
-        throw new Error(getCardRestoreErrorMessage(body?.error?.code));
+        throw new Error(getCardRestoreErrorKey(body?.error?.code));
       }
       if (controller.signal.aborted || requestId !== requestIdRef.current) return;
 
@@ -291,10 +290,8 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
       }
       setError(
         !receivedResponse
-          ? CARD_RESTORE_ERROR_MESSAGES.CARD_READ_UNAVAILABLE
-          : requestError instanceof Error
-            ? requestError.message
-            : CARD_RESTORE_ERROR_MESSAGES.CARD_READ_UNAVAILABLE,
+          ? CARD_RESTORE_ERROR_KEYS.CARD_READ_UNAVAILABLE
+          : getRequestErrorKey(requestError, CARD_RESTORE_ERROR_KEYS.CARD_READ_UNAVAILABLE),
       );
       setLoadingKind(null);
       // Keep the recent-card landing view visible so a transient restore failure can be retried immediately.
@@ -330,6 +327,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
     let canUseCompatibilityFallback = false;
     try {
       const { response, body } = await requestStoredCardCreation(track.videoId, Object.fromEntries(snapshot));
+      if (!isSessionActiveRef.current) return;
       receivedResponse = true;
       const cardId = body?.data?.id;
 
@@ -342,12 +340,12 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
           layer: 'client',
           httpStatus: response.status,
         });
-        throw new Error(CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE);
+        throw new Error(CARD_STORAGE_ERROR_KEYS.CARD_STORAGE_UNAVAILABLE);
       }
 
       if (!response.ok || !cardId) {
         canUseCompatibilityFallback = body.error?.code === 'CARD_STORAGE_UNAVAILABLE';
-        throw new Error(getCardStorageErrorMessage(body.error?.code));
+        throw new Error(getCardStorageErrorKey(body.error?.code));
       }
 
       setGeneratedMarkdown(buildStoredCardMarkdown(track, style, meta, progressSeconds, cardId, CARD_ORIGIN));
@@ -358,6 +356,7 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
       setStorageFailureCount(0);
       setSaveStatus('idle');
     } catch (requestError) {
+      if (!isSessionActiveRef.current) return;
       if (!receivedResponse) {
         canUseCompatibilityFallback = true;
         captureMonitoringError({
@@ -369,10 +368,8 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
       }
 
       const errorMessage = !receivedResponse
-        ? CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE
-        : requestError instanceof Error
-          ? requestError.message
-          : CARD_STORAGE_ERROR_MESSAGES.CARD_STORAGE_UNAVAILABLE;
+        ? CARD_STORAGE_ERROR_KEYS.CARD_STORAGE_UNAVAILABLE
+        : getRequestErrorKey(requestError, CARD_STORAGE_ERROR_KEYS.CARD_STORAGE_UNAVAILABLE);
 
       if (!canUseCompatibilityFallback) {
         setFailedSnapshot(null);
@@ -405,9 +402,11 @@ export const useCardGenerator = ({ onStoredCardCreated }: UseCardGeneratorOption
 
     try {
       await navigator.clipboard.writeText(generatedMarkdown);
+      if (!isSessionActiveRef.current) return;
       setCopied(true);
       showCopyFeedback('success');
     } catch {
+      if (!isSessionActiveRef.current) return;
       showCopyFeedback('error');
     }
   };

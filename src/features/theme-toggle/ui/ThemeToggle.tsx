@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { Laptop, Moon, Sun } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 
 const STORAGE_KEY = 'github-readme-music-theme';
@@ -9,10 +10,10 @@ const THEME_CHANGE_EVENT = 'github-readme-music-theme-change';
 
 type Theme = 'system' | 'light' | 'dark';
 
-const options: { value: Theme; label: string; icon: typeof Laptop }[] = [
-  { value: 'system', label: '시스템', icon: Laptop },
-  { value: 'light', label: '라이트', icon: Sun },
-  { value: 'dark', label: '다크', icon: Moon },
+const options: { value: Theme; labelKey: 'system' | 'light' | 'dark'; icon: typeof Laptop }[] = [
+  { value: 'system', labelKey: 'system', icon: Laptop },
+  { value: 'light', labelKey: 'light', icon: Sun },
+  { value: 'dark', labelKey: 'dark', icon: Moon },
 ];
 
 const getTheme = (): Theme => {
@@ -47,6 +48,7 @@ const subscribe = (onStoreChange: () => void) => {
 };
 
 export const ThemeToggle = () => {
+  const t = useTranslations('ThemeToggle');
   const theme = useSyncExternalStore(subscribe, getTheme, () => 'system');
 
   const selectTheme = (next: Theme) => {
@@ -59,10 +61,11 @@ export const ThemeToggle = () => {
     <div
       className="inline-flex items-center rounded-lg border border-border bg-card p-0.5 shadow-none"
       role="group"
-      aria-label="화면 테마 선택"
+      aria-label={t('label')}
     >
-      {options.map(({ value, label, icon: Icon }) => {
+      {options.map(({ value, labelKey, icon: Icon }) => {
         const active = theme === value;
+        const label = t(labelKey);
 
         return (
           <button
@@ -70,8 +73,8 @@ export const ThemeToggle = () => {
             type="button"
             onClick={() => selectTheme(value)}
             aria-pressed={active}
-            aria-label={`${label} 모드`}
-            title={`${label} 모드`}
+            aria-label={`${label} ${t('label')}`}
+            title={`${label} ${t('label')}`}
             className={cn(
               'inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-[11px] font-medium transition-colors',
               'hover:bg-accent hover:text-accent-foreground',
