@@ -1,4 +1,9 @@
 {
+  "SEO": {
+    "title": "github-readme-music | Music Cards for Your GitHub README",
+    "description": "Create a personalized music card from a YouTube link for your GitHub README. Customize the design and generate an SVG card with ready-to-use Markdown code.",
+    "imageAlt": "github-readme-music — Add your favorite music to your README"
+  },
   "Home": {
     "heading": "Your favorite music,",
     "headingAccent": "in your README.",
