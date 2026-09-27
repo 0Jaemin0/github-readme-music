@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState } from 'react';
 import { Menu } from '@base-ui/react/menu';
 import { Check, ChevronDown, Languages } from 'lucide-react';
-import { hasLocale, useLocale, useTranslations } from 'next-intl';
-import { usePathname, useRouter } from '@/i18n/navigation';
-import { routing } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
+import { useLocaleNavigation } from '../model/useLocaleNavigation';
 
 interface LocaleSwitcherProps {
   disabled?: boolean;
@@ -18,28 +17,13 @@ const languages = [
 ] as const;
 
 export const LocaleSwitcher = ({ disabled = false, onPendingChange }: LocaleSwitcherProps) => {
-  const locale = useLocale();
   const t = useTranslations('LocaleSwitcher');
-  const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const isDisabled = disabled || isPending;
-
-  useEffect(() => {
-    onPendingChange?.(isPending);
-  }, [isPending, onPendingChange]);
-
-  const selectLocale = (nextLocale: unknown) => {
-    if (isDisabled || !hasLocale(routing.locales, nextLocale) || nextLocale === locale) return;
-
-    onPendingChange?.(true);
-    setOpen(false);
-    const suffix = `${window.location.search}${window.location.hash}`;
-    startTransition(() => {
-      router.replace(`${pathname}${suffix}`, { locale: nextLocale, scroll: false });
-    });
-  };
+  const { locale, isDisabled, prefetchOtherLocale, changeLocale } = useLocaleNavigation({
+    disabled,
+    onPendingChange,
+    onNavigationStart: () => setOpen(false),
+  });
 
   return (
     <Menu.Root open={open && !isDisabled} onOpenChange={setOpen} modal={false}>
@@ -48,6 +32,8 @@ export const LocaleSwitcher = ({ disabled = false, onPendingChange }: LocaleSwit
         delay={100}
         closeDelay={150}
         disabled={isDisabled}
+        onMouseEnter={prefetchOtherLocale}
+        onFocus={prefetchOtherLocale}
         aria-label={t('label')}
         title={isDisabled ? t('busy') : t('label')}
         className="inline-flex h-8 cursor-pointer items-center justify-center gap-1 rounded-md px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait disabled:opacity-50 data-popup-open:bg-accent data-popup-open:text-foreground"
@@ -58,7 +44,7 @@ export const LocaleSwitcher = ({ disabled = false, onPendingChange }: LocaleSwit
       <Menu.Portal>
         <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
           <Menu.Popup className="min-w-32 rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-md outline-none">
-            <Menu.RadioGroup value={locale} onValueChange={selectLocale} aria-label={t('label')}>
+            <Menu.RadioGroup value={locale} onValueChange={changeLocale} aria-label={t('label')}>
               {languages.map((language) => (
                 <Menu.RadioItem
                   key={language.locale}
