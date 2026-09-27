@@ -1,11 +1,13 @@
 'use client';
 
 import { CardResult, LoadingPreview, YouTubeUrlForm } from '@/features/card-generator';
+import { useTranslations } from 'next-intl';
 import { RecentCards } from '@/features/recent-cards';
 import { useCardGeneratorContext } from '../model/CardGeneratorProvider';
 import { cn } from '@/shared/lib/utils';
 
 export const CardGeneratorWorkspace = () => {
+  const t = useTranslations('CardEditor.status');
   const { recentCards, cardGenerator, isLanding } = useCardGeneratorContext();
 
   return (
@@ -32,7 +34,7 @@ export const CardGeneratorWorkspace = () => {
         <div className="mt-8">
           {cardGenerator.status === 'loading' && !cardGenerator.track ? (
             <LoadingPreview
-              message={cardGenerator.loadingKind === 'stored-card' ? '카드 설정을 불러오는 중이에요.' : undefined}
+              message={cardGenerator.loadingKind === 'stored-card' ? t('loadingStoredCard') : undefined}
             />
           ) : null}
           {cardGenerator.track ? (

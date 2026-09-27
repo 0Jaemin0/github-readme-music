@@ -1,11 +1,145 @@
 {
+  "Home": {
+    "heading": "Your favorite music,",
+    "headingAccent": "in your README.",
+    "description": "Turn a YouTube link into a music card that shares a little about you in your README.",
+    "homeLabel": "Return to github-readme-music home",
+    "navigationLabel": "Utility navigation"
+  },
   "LocaleSwitcher": {
     "label": "Select language",
     "busy": "You can change the language once the current operation is complete."
   },
-  "Home": {
-    "heading": "Your favorite music,",
-    "headingAccent": "in your README.",
-    "description": "Turn a YouTube link into a music card that shares a little about you in your README."
+  "ThemeToggle": {
+    "label": "Select appearance",
+    "system": "System mode",
+    "light": "Light mode",
+    "dark": "Dark mode"
+  },
+  "RecentCards": {
+    "title": "Recent cards",
+    "description": "Select a card to restore its settings and continue editing.",
+    "restoreLabel": "Restore saved card settings",
+    "imageAlt": "Recently created card",
+    "imageError": "Couldn't load the card"
+  },
+  "CardEditor": {
+    "input": {
+      "linkLabel": "YouTube link",
+      "loading": "Loading",
+      "submit": "Create card",
+      "hint": "Enter a YouTube link to load the title and artist, then customize your card."
+    },
+    "content": {
+      "heading": "Content",
+      "description": "Review the information shown on your card and edit it as needed.",
+      "youtubeInfo": "Information from YouTube: {title} · {artist}",
+      "storedInfo": "Saved card information: {title} · {artist}",
+      "title": "Title",
+      "artist": "Artist",
+      "artistHint": "The artist is initially taken from the upload channel name. Edit it if needed."
+    },
+    "cover": {
+      "title": "Album cover",
+      "hint": "Drag the square frame to reposition it. Drag its bottom-right corner to resize it.",
+      "selectAlt": "Album cover crop selection",
+      "resizeLabel": "Resize album cover frame",
+      "error": "Couldn't load the album cover"
+    },
+    "preview": {
+      "title": "Preview",
+      "description": "See how your card will look in your README.",
+      "styles": {
+        "player": "Player",
+        "compact": "Compact",
+        "vertical": "Vertical"
+      },
+      "settingsLabel": "Style settings",
+      "playbackPosition": "Playback position"
+    },
+    "style": {
+      "colors": "Colors",
+      "background": "Card background",
+      "border": "Card border",
+      "title": "Title",
+      "artist": "Artist",
+      "accent": "Accent",
+      "gradient": {
+        "label": "Accent gradient",
+        "direction": "Gradient direction",
+        "none": "None",
+        "topLeft": "Top left",
+        "topRight": "Top right",
+        "bottomLeft": "Bottom left",
+        "bottomRight": "Bottom right",
+        "intensity": "Gradient intensity",
+        "hint": "Text may look different in the brighter areas of the selected gradient."
+      },
+      "contrastWarning": "{roles} colors have very low contrast and may be hard to read in your README.",
+      "shape": "Shape",
+      "borderWidth": "Border width",
+      "cornerRadius": "Corner radius",
+      "colorPicker": {
+        "selectColor": "Select {label} color",
+        "colorCode": "{label} color code",
+        "hue": "Hue"
+      }
+    },
+    "status": {
+      "loadingMetadata": "Loading video information…",
+      "loadingStoredCard": "Loading saved card settings…",
+      "refreshingMetadata": "Loading new video information. Your current card will stay in place."
+    }
+  },
+  "Markdown": {
+    "title": "Markdown code",
+    "buttons": {
+      "saving": "Saving card...",
+      "generate": "Generate Markdown",
+      "regenerate": "Generate new Markdown",
+      "retryShortUrl": "Retry short URL"
+    },
+    "readyDescription": "Paste the generated code into your GitHub README to display your card.",
+    "prepareDescription": "Generate Markdown for your current settings to use in your GitHub README.",
+    "pendingChanges": "You have unsaved changes. Generate new Markdown to include your current settings.",
+    "fallbackNotice": "The card storage service hasn't responded reliably, so we generated a compatible URL you can use with your current settings. Try generating again later to get a short URL.",
+    "copy": {
+      "label": "Copy Markdown",
+      "success": "README embed code copied.",
+      "failure": "Couldn't copy the code. Select it and copy it manually."
+    },
+    "empty": {
+      "title": "You haven't generated Markdown yet.",
+      "hint": "Finish customizing, then use the button to save your card and generate the code."
+    }
+  },
+  "Errors": {
+    "metadata": {
+      "invalidLink": "Please check your YouTube video link.",
+      "configuration": "Something went wrong temporarily. Please try again shortly.",
+      "notFound": "The video couldn't be found or can't be used for a card.",
+      "quota": "The service is receiving too many requests. Please try again shortly.",
+      "tooLarge": "The request is too large. Please enter only a YouTube link.",
+      "unavailable": "Couldn't load video information. Please try again shortly."
+    },
+    "common": {
+      "rateLimited": "Too many requests. Please try again shortly."
+    },
+    "storage": {
+      "invalid": "Couldn't validate the card settings. Please try again.",
+      "tooLarge": "The card settings are too large. Please try again.",
+      "unavailable": "Couldn't save the card. Please try again shortly."
+    },
+    "restore": {
+      "invalidId": "The card request is invalid.",
+      "notFound": "Couldn't find the card. It may have been deleted.",
+      "invalidData": "Couldn't process the card settings.",
+      "unavailable": "Couldn't load card settings. Please try again shortly."
+    }
+  },
+  "GlobalError": {
+    "title": "Something went wrong.",
+    "description": "Reload the page and try again.",
+    "reload": "Reload"
   }
 }

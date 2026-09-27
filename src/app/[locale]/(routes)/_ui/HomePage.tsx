@@ -21,12 +21,12 @@ export const HomePage = () => {
             type="button"
             className="flex cursor-pointer items-center gap-2"
             onClick={resetEditor}
-            aria-label="github-readme-music 홈으로 돌아가기"
+            aria-label={t('homeLabel')}
           >
             <Image src={brandMark} alt="" priority className="size-7" />
             <span className="font-mono text-[13px] font-semibold tracking-[-0.02em]">github-readme-music</span>
           </button>
-          <nav className="flex items-center" aria-label="보조 메뉴">
+          <nav className="flex items-center" aria-label={t('navigationLabel')}>
             <LocaleSwitcher disabled={isBusy} onPendingChange={setIsLanguageChanging} />
             <span aria-hidden="true" className="mx-3 h-4 w-px bg-border" />
             <ThemeToggle />

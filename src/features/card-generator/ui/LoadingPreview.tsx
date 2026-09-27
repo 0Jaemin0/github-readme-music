@@ -1,10 +1,12 @@
+import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/shared/ui/skeleton';
 
 interface LoadingPreviewProps {
   message?: string;
 }
 
-export const LoadingPreview = ({ message = '영상 정보를 불러오고 있습니다…' }: LoadingPreviewProps) => {
+export const LoadingPreview = ({ message }: LoadingPreviewProps) => {
+  const t = useTranslations('CardEditor.status');
   return (
     <div role="status" aria-live="polite" className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
       <div className="flex items-center gap-3">
@@ -17,7 +19,7 @@ export const LoadingPreview = ({ message = '영상 정보를 불러오고 있습
             />
           ))}
         </div>
-        <p className="text-[13px] leading-5 text-muted-foreground">{message}</p>
+        <p className="text-[13px] leading-5 text-muted-foreground">{message ?? t('loadingMetadata')}</p>
       </div>
       <div className="mt-6 space-y-3">
         <Skeleton className="h-4 w-2/3" />

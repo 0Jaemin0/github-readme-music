@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from '@/shared/ui/input';
+import { useTranslations } from 'next-intl';
 import type { CardMeta, CoverPosition, Track } from '@/entities/music-card';
 import { CoverCropEditor } from './CoverCropEditor';
 
@@ -14,6 +15,7 @@ interface CardMetadataFieldsProps {
 }
 
 export const CardMetadataFields = ({ meta, track, onChange, onCoverPositionChange }: CardMetadataFieldsProps) => {
+  const t = useTranslations('CardEditor.content');
   const updateField = (field: keyof CardMeta, value: string) => {
     onChange({ ...meta, [field]: value });
   };
@@ -21,34 +23,32 @@ export const CardMetadataFields = ({ meta, track, onChange, onCoverPositionChang
   return (
     <section className="rounded-xl border border-border bg-background p-4">
       <div className="mb-4">
-        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">콘텐츠</p>
-        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
-          카드에 표시할 정보를 확인하고, 필요한 부분을 수정해 주세요.
+        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {t('heading')}
         </p>
+        <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{t('description')}</p>
         <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
           {track.source === 'youtube'
-            ? `YouTube에서 가져온 정보: ${track.title} · ${track.channel}`
-            : `저장된 카드 정보: ${meta.title} · ${meta.artist}`}
+            ? t('youtubeInfo', { title: track.title, artist: track.channel })
+            : t('storedInfo', { title: meta.title, artist: meta.artist })}
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <MetadataField
           id="card-title"
-          label="제목"
+          label={t('title')}
           value={meta.title}
           onChange={(value) => updateField('title', value)}
         />
         <MetadataField
           id="card-artist"
-          label="아티스트"
+          label={t('artist')}
           value={meta.artist}
           onChange={(value) => updateField('artist', value)}
         />
       </div>
       {track.source === 'youtube' ? (
-        <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">
-          아티스트는 업로드 채널명을 기준으로 입력됩니다. 필요한 경우 수정해 주세요.
-        </p>
+        <p className="mt-2.5 text-[12px] leading-5 text-muted-foreground">{t('artistHint')}</p>
       ) : null}
       <CoverCropEditor cover={track.cover} position={track.coverPosition} onPositionChange={onCoverPositionChange} />
     </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import type { CoverPosition } from '@/entities/music-card';
 import { cn } from '@/shared/lib/utils';
 import { clampCropValue, getCropFrame, MIN_CROP_SCALE, toCropPosition } from '../model/cover-crop';
@@ -14,6 +15,7 @@ interface CoverCropEditorProps {
 }
 
 export const CoverCropEditor = ({ cover, position, onPositionChange }: CoverCropEditorProps) => {
+  const t = useTranslations('CardEditor.cover');
   const imageFrameRef = useRef<HTMLDivElement>(null);
   const cropFrameRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
@@ -114,10 +116,8 @@ export const CoverCropEditor = ({ cover, position, onPositionChange }: CoverCrop
 
   return (
     <div className="mt-5">
-      <p className="mb-1.5 text-[13px] font-medium text-muted-foreground">앨범 커버</p>
-      <p className="text-[12px] leading-5 text-muted-foreground">
-        정사각형 프레임을 드래그하여 위치를 옮기고, 오른쪽 아래 모서리를 드래그하여 크기를 조절해 주세요.
-      </p>
+      <p className="mb-1.5 text-[13px] font-medium text-muted-foreground">{t('title')}</p>
+      <p className="text-[12px] leading-5 text-muted-foreground">{t('hint')}</p>
       <div className="mt-3">
         <div
           ref={imageFrameRef}
@@ -132,7 +132,7 @@ export const CoverCropEditor = ({ cover, position, onPositionChange }: CoverCrop
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cover}
-            alt="앨범 커버 영역 선택"
+            alt={t('selectAlt')}
             draggable={false}
             className="size-full select-none object-contain"
             onLoad={(event) => {
@@ -155,7 +155,7 @@ export const CoverCropEditor = ({ cover, position, onPositionChange }: CoverCrop
           >
             <button
               type="button"
-              aria-label="앨범 프레임 크기 조절"
+              aria-label={t('resizeLabel')}
               onPointerDown={startResize}
               className="absolute bottom-1 right-1 size-6 cursor-se-resize rounded-sm border-2 border-background bg-primary shadow-sm"
             />
