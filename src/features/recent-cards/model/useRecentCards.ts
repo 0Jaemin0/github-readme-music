@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { readRecentCardIds, saveRecentCardId } from '../lib/recent-cards';
+import { readRecentCardIds, removeRecentCardId, saveRecentCardId } from '../lib/recent-cards';
 
 export const useRecentCards = () => {
   const [cardIds, setCardIds] = useState<string[]>([]);
@@ -20,5 +20,10 @@ export const useRecentCards = () => {
     setCardIds(saveRecentCardId(cardId));
   }, []);
 
-  return { cardIds, isLoaded, addCardId };
+  const removeCardId = useCallback((cardId: string) => {
+    removeRecentCardId(cardId);
+    setCardIds((current) => current.filter((id) => id !== cardId));
+  }, []);
+
+  return { cardIds, isLoaded, addCardId, removeCardId };
 };

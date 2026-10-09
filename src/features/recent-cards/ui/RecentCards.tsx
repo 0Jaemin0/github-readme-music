@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ImageOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
+import { isRecentCardImageMissing } from '../api/check-recent-card-image.client';
 
 interface RecentCardsProps {
   cardIds: string[];
@@ -11,6 +12,7 @@ interface RecentCardsProps {
   isRestoring: boolean;
   fillRemainingSpace?: boolean;
   onSelectCard: (cardId: string) => void;
+  onMissingCard: (cardId: string) => void;
 }
 
 export const RecentCards = ({
@@ -19,11 +21,17 @@ export const RecentCards = ({
   isRestoring,
   fillRemainingSpace = false,
   onSelectCard,
+  onMissingCard,
 }: RecentCardsProps) => {
   const t = useTranslations('RecentCards');
   const [failedCardIds, setFailedCardIds] = useState<Set<string>>(() => new Set());
   const [loadedCardIds, setLoadedCardIds] = useState<Set<string>>(() => new Set());
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+
+  const handleImageError = async (cardId: string) => {
+    setFailedCardIds((current) => new Set(current).add(cardId));
+    if (await isRecentCardImageMissing(cardId)) onMissingCard(cardId);
+  };
 
   if (!isLoaded || cardIds.length === 0) return null;
 
@@ -76,7 +84,7 @@ export const RecentCards = ({
                       hasLoaded ? 'opacity-100' : 'opacity-0',
                     )}
                     onLoad={() => setLoadedCardIds((current) => new Set(current).add(cardId))}
-                    onError={() => setFailedCardIds((current) => new Set(current).add(cardId))}
+                    onError={() => void handleImageError(cardId)}
                   />
                 </>
               )}

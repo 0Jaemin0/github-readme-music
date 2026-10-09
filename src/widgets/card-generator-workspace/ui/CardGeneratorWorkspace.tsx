@@ -27,6 +27,7 @@ export const CardGeneratorWorkspace = () => {
           isRestoring={cardGenerator.loadingKind === 'stored-card'}
           fillRemainingSpace
           onSelectCard={cardGenerator.restoreStoredCard}
+          onMissingCard={recentCards.removeCardId}
         />
       ) : null}
 
