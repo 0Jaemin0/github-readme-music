@@ -1,7 +1,8 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import { Laptop, Moon, Sun } from 'lucide-react';
+import { Menu } from '@base-ui/react/menu';
+import { Check, ChevronDown, Laptop, Moon, Sun } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 
@@ -49,7 +50,8 @@ const subscribe = (onStoreChange: () => void) => {
 
 export const ThemeToggle = () => {
   const t = useTranslations('ThemeToggle');
-  const theme = useSyncExternalStore(subscribe, getTheme, () => 'system');
+  const theme = useSyncExternalStore<Theme>(subscribe, getTheme, () => 'system');
+  const CurrentIcon = options.find(({ value }) => value === theme)?.icon ?? Laptop;
 
   const selectTheme = (next: Theme) => {
     window.localStorage.setItem(STORAGE_KEY, next);
@@ -58,35 +60,78 @@ export const ThemeToggle = () => {
   };
 
   return (
-    <div
-      className="inline-flex items-center rounded-lg border border-border bg-card p-0.5 shadow-none"
-      role="group"
-      aria-label={t('label')}
-    >
-      {options.map(({ value, labelKey, icon: Icon }) => {
-        const active = theme === value;
-        const label = t(labelKey);
+    <>
+      <Menu.Root modal={false}>
+        <Menu.Trigger
+          aria-label={`${t('label')}: ${t(theme)}`}
+          title={`${t('label')}: ${t(theme)}`}
+          className="inline-flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-accent data-popup-open:text-foreground sm:hidden"
+        >
+          <CurrentIcon className="size-4" aria-hidden="true" />
+          <ChevronDown className="size-3" aria-hidden="true" />
+        </Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
+            <Menu.Popup className="min-w-32 rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-md outline-none">
+              <Menu.RadioGroup
+                value={theme}
+                onValueChange={(value) => {
+                  if (value === 'system' || value === 'light' || value === 'dark') selectTheme(value);
+                }}
+                aria-label={t('label')}
+              >
+                {options.map(({ value, labelKey, icon: Icon }) => (
+                  <Menu.RadioItem
+                    key={value}
+                    value={value}
+                    label={t(labelKey)}
+                    closeOnClick
+                    className="flex cursor-pointer items-center justify-between gap-5 rounded-md px-3 py-2 text-[13px] outline-none data-checked:font-semibold data-checked:text-primary data-highlighted:bg-accent data-highlighted:text-accent-foreground"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon className="size-3.5" aria-hidden="true" />
+                      {t(labelKey)}
+                    </span>
+                    <Menu.RadioItemIndicator>
+                      <Check className="size-3.5" aria-hidden="true" />
+                    </Menu.RadioItemIndicator>
+                  </Menu.RadioItem>
+                ))}
+              </Menu.RadioGroup>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
+      <div
+        className="hidden items-center rounded-lg border border-border bg-card p-0.5 shadow-none sm:inline-flex"
+        role="group"
+        aria-label={t('label')}
+      >
+        {options.map(({ value, labelKey, icon: Icon }) => {
+          const active = theme === value;
+          const label = t(labelKey);
 
-        return (
-          <button
-            key={value}
-            type="button"
-            onClick={() => selectTheme(value)}
-            aria-pressed={active}
-            aria-label={`${label} ${t('label')}`}
-            title={`${label} ${t('label')}`}
-            className={cn(
-              'inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-[11px] font-medium transition-colors',
-              'hover:bg-accent hover:text-accent-foreground',
-              active
-                ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground'
-                : 'text-muted-foreground',
-            )}
-          >
-            <Icon className="size-3.5" aria-hidden="true" />
-          </button>
-        );
-      })}
-    </div>
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => selectTheme(value)}
+              aria-pressed={active}
+              aria-label={`${label} ${t('label')}`}
+              title={`${label} ${t('label')}`}
+              className={cn(
+                'inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-[11px] font-medium transition-colors',
+                'hover:bg-accent hover:text-accent-foreground',
+                active
+                  ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground'
+                  : 'text-muted-foreground',
+              )}
+            >
+              <Icon className="size-3.5" aria-hidden="true" />
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 };

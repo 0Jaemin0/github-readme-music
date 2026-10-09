@@ -44,7 +44,9 @@ export const RecentCards = ({
         {t('title')}
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted-foreground">{t('description')}</p>
-      <div className={cn('mt-2 grid grid-cols-3 gap-2.5 sm:gap-3', fillRemainingSpace && 'min-h-0 flex-1')}>
+      <div
+        className={cn('mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-3', fillRemainingSpace && 'sm:h-[120px]')}
+      >
         {cardIds.map((cardId) => {
           const hasFailed = failedCardIds.has(cardId);
           const hasLoaded = loadedCardIds.has(cardId);
@@ -57,7 +59,7 @@ export const RecentCards = ({
               className={cn(
                 'relative flex items-center justify-center overflow-hidden rounded-xl border border-border bg-card/40 p-2 transition-colors duration-200 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none sm:p-2.5',
                 hasLoaded ? 'cursor-zoom-in hover:border-primary/60 hover:bg-muted/70' : 'cursor-wait',
-                fillRemainingSpace ? 'h-full' : 'h-[104px] sm:h-[112px]',
+                fillRemainingSpace ? 'h-[160px] sm:h-full' : 'h-[160px] sm:h-[112px]',
               )}
               onMouseEnter={() => {
                 if (hasLoaded) setHoveredCardId(cardId);
