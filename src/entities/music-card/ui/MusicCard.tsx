@@ -361,7 +361,7 @@ const FlowingText = ({ text, className, color }: FlowingTextProps) => {
 
   useLayoutEffect(() => {
     const update = () => {
-      const contentWidth = contentRef.current?.getBoundingClientRect().width ?? 0;
+      const contentWidth = contentRef.current?.offsetWidth ?? 0;
       const viewportWidth = viewportRef.current?.clientWidth ?? 0;
       setShouldFlow(contentWidth > viewportWidth);
     };
@@ -434,7 +434,7 @@ const TrackTicker = ({ title, artist, titleClassName, artistClassName, mutedColo
 
   useEffect(() => {
     const update = () => {
-      const contentWidth = firstCopyRef.current?.getBoundingClientRect().width ?? 0;
+      const contentWidth = firstCopyRef.current?.offsetWidth ?? 0;
       const gap = compactTickerGap(viewportRef.current?.clientWidth ?? 0, contentWidth);
       setTicker({ distance: contentWidth + gap, gap });
     };
