@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ImageOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
-import { isRecentCardImageMissing } from '../api/check-recent-card-image.client';
+import { checkRecentCardImage } from '../api/check-recent-card-image.client';
 
 interface RecentCardsProps {
   cardIds: string[];
@@ -26,11 +26,50 @@ export const RecentCards = ({
   const t = useTranslations('RecentCards');
   const [failedCardIds, setFailedCardIds] = useState<Set<string>>(() => new Set());
   const [loadedCardIds, setLoadedCardIds] = useState<Set<string>>(() => new Set());
+  const [recoveredImageUrls, setRecoveredImageUrls] = useState<Record<string, string>>({});
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const checkingCardIds = useRef(new Set<string>());
+  const imageUrls = useRef(new Set<string>());
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    const urls = imageUrls.current;
+    return () => {
+      isMounted.current = false;
+      for (const url of urls) URL.revokeObjectURL(url);
+    };
+  }, []);
 
   const handleImageError = async (cardId: string) => {
+    if (recoveredImageUrls[cardId]) {
+      setFailedCardIds((current) => new Set(current).add(cardId));
+      return;
+    }
+    if (checkingCardIds.current.has(cardId)) return;
+
+    checkingCardIds.current.add(cardId);
+    const result = await checkRecentCardImage(cardId);
+    checkingCardIds.current.delete(cardId);
+    if (!isMounted.current) return;
+
+    if (result.status === 'missing') {
+      onMissingCard(cardId);
+      return;
+    }
+    if (result.status === 'recovered') {
+      const url = URL.createObjectURL(result.image);
+      imageUrls.current.add(url);
+      setRecoveredImageUrls((current) => ({ ...current, [cardId]: url }));
+      setFailedCardIds((current) => {
+        const next = new Set(current);
+        next.delete(cardId);
+        return next;
+      });
+      return;
+    }
+
     setFailedCardIds((current) => new Set(current).add(cardId));
-    if (await isRecentCardImageMissing(cardId)) onMissingCard(cardId);
   };
 
   if (!isLoaded || cardIds.length === 0) return null;
@@ -79,7 +118,7 @@ export const RecentCards = ({
                   {/* SVG uses the saved card ID and keeps its original aspect ratio inside the fixed preview slot. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`/card/${encodeURIComponent(cardId)}.svg`}
+                    src={recoveredImageUrls[cardId] ?? `/card/${encodeURIComponent(cardId)}.svg`}
                     alt={t('imageAlt')}
                     className={cn(
                       'relative max-h-full max-w-full object-contain transition-opacity duration-200',
@@ -99,7 +138,7 @@ export const RecentCards = ({
           {/* The SVG keeps its original dimensions unless it would exceed the viewport. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`/card/${encodeURIComponent(hoveredCardId)}.svg`}
+            src={recoveredImageUrls[hoveredCardId] ?? `/card/${encodeURIComponent(hoveredCardId)}.svg`}
             alt=""
             className="max-h-[calc(100dvh-2.5rem)] max-w-[calc(100vw-2.5rem)] drop-shadow-[0_20px_40px_rgba(0,0,0,0.28)]"
           />
