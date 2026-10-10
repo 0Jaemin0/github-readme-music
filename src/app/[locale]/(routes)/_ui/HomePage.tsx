@@ -10,13 +10,13 @@ import { CardGeneratorWorkspace, useCardGeneratorContext } from '@/widgets/card-
 
 export const HomePage = () => {
   const t = useTranslations('Home');
-  const { isLanding, isBusy, resetEditor } = useCardGeneratorContext();
+  const { isBusy, resetEditor } = useCardGeneratorContext();
   const [isLanguageChanging, setIsLanguageChanging] = useState(false);
 
   return (
-    <div className={isLanding ? 'flex h-dvh flex-col overflow-hidden' : 'flex min-h-dvh flex-col'}>
+    <div className="flex min-h-dvh flex-col">
       <header className="shrink-0">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6 sm:px-5">
           <button
             type="button"
             className="flex cursor-pointer items-center gap-2"
@@ -26,17 +26,17 @@ export const HomePage = () => {
             <Image src={brandMark} alt="" priority className="size-7" />
             <span className="font-mono text-[13px] font-semibold tracking-[-0.02em]">github-readme-music</span>
           </button>
-          <nav className="flex items-center" aria-label={t('navigationLabel')}>
+          <nav className="flex items-center gap-1 sm:gap-0" aria-label={t('navigationLabel')}>
             <LocaleSwitcher disabled={isBusy} onPendingChange={setIsLanguageChanging} />
-            <span aria-hidden="true" className="mx-3 h-4 w-px bg-border" />
+            <span aria-hidden="true" className="mx-3 hidden h-4 w-px bg-border sm:block" />
             <ThemeToggle />
           </nav>
         </div>
       </header>
 
       <main className="flex min-h-0 flex-1 flex-col">
-        <section className="mx-auto w-full max-w-3xl shrink-0 px-5 pb-4 pt-16 text-center sm:pt-24">
-          <h1 className="text-balance text-[2rem] font-semibold leading-[1.16] tracking-[-0.04em] sm:text-[3.25rem]">
+        <section className="mx-auto w-full max-w-3xl shrink-0 px-5 pb-4 pt-16 text-center sm:pt-18">
+          <h1 className="text-balance text-[clamp(1.75rem,8.8vw,2rem)] font-semibold leading-[1.16] tracking-[-0.04em] sm:text-[3.25rem]">
             {t('heading')}
             <br />
             <span className="text-primary">{t('headingAccent')}</span>

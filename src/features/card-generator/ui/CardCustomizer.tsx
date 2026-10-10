@@ -48,9 +48,9 @@ export const CardCustomizer = ({ theme, onChange }: CardCustomizerProps) => {
           <ColorField label={t('artist')} value={theme.muted} onChange={(v) => set('muted', v)} />
           <ColorField label={t('accent')} value={theme.accent} onChange={(v) => set('accent', v)} />
         </div>
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
           <span className="text-[13px] text-muted-foreground">{t('gradient.label')}</span>
-          <div role="radiogroup" aria-label={t('gradient.direction')} className="flex items-center gap-1.5">
+          <div role="radiogroup" aria-label={t('gradient.direction')} className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
               role="radio"
@@ -141,8 +141,11 @@ interface RangeRowProps {
 
 const RangeRow = ({ id, label, value, min, max, suffix, onChange }: RangeRowProps) => {
   return (
-    <div className="flex items-center gap-3">
-      <label htmlFor={id} className="w-28 shrink-0 text-[13px] text-muted-foreground">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 sm:flex sm:gap-3">
+      <label
+        htmlFor={id}
+        className="col-start-1 row-start-1 min-w-0 text-[13px] text-muted-foreground sm:w-28 sm:shrink-0"
+      >
         {label}
       </label>
       <input
@@ -152,9 +155,9 @@ const RangeRow = ({ id, label, value, min, max, suffix, onChange }: RangeRowProp
         max={max}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-muted accent-primary [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+        className="col-span-2 row-start-2 h-1.5 w-full min-w-0 cursor-pointer appearance-none rounded-full bg-muted accent-primary sm:w-auto sm:flex-1 [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
       />
-      <span className="w-12 shrink-0 text-right font-mono text-[12px] text-muted-foreground">
+      <span className="col-start-2 row-start-1 shrink-0 text-right font-mono text-[12px] text-muted-foreground sm:w-12">
         {value}
         {suffix}
       </span>

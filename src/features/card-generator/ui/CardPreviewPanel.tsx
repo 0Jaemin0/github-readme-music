@@ -1,5 +1,6 @@
 'use client';
 
+import { useLayoutEffect, useRef, useState } from 'react';
 import {
   CARD_OUTPUT_WIDTHS,
   CARD_STYLES,
@@ -38,6 +39,32 @@ export const CardPreviewPanel = ({
 }: CardPreviewPanelProps) => {
   const t = useTranslations('CardEditor.preview');
   const styleLabels = { player: t('styles.player'), compact: t('styles.compact'), vertical: t('styles.vertical') };
+  const previewViewportRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [previewSize, setPreviewSize] = useState<{ width: number; height: number } | null>(null);
+  const cardWidth = CARD_OUTPUT_WIDTHS[style];
+  const scale = previewSize ? Math.min(1, previewSize.width / cardWidth) : 1;
+
+  useLayoutEffect(() => {
+    const viewport = previewViewportRef.current;
+    const card = cardRef.current;
+    if (!viewport || !card) return;
+
+    const updatePreviewSize = () => {
+      const width = viewport.clientWidth;
+      const height = card.offsetHeight;
+      setPreviewSize((current) =>
+        current?.width === width && current.height === height ? current : { width, height },
+      );
+    };
+
+    updatePreviewSize();
+    const observer = new ResizeObserver(updatePreviewSize);
+    observer.observe(viewport);
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, [style]);
+
   return (
     <section className="rounded-xl border border-border bg-background p-4 sm:p-5">
       <div className="mb-3">
@@ -55,8 +82,20 @@ export const CardPreviewPanel = ({
           ))}
         </TabsList>
         <div className="py-2 sm:px-6 sm:py-4">
-          <div className="mx-auto max-w-full" style={{ width: CARD_OUTPUT_WIDTHS[style] }}>
-            <MusicCard track={track} meta={meta} style={style} theme={theme} progressSeconds={progressSeconds} />
+          <div ref={previewViewportRef} className="w-full min-w-0 overflow-hidden">
+            <div className="mx-auto" style={{ width: cardWidth * scale, height: (previewSize?.height ?? 0) * scale }}>
+              <div
+                ref={cardRef}
+                style={{
+                  width: cardWidth,
+                  transform: scale < 1 ? `scale(${scale})` : undefined,
+                  transformOrigin: 'top left',
+                  visibility: previewSize ? 'visible' : 'hidden',
+                }}
+              >
+                <MusicCard track={track} meta={meta} style={style} theme={theme} progressSeconds={progressSeconds} />
+              </div>
+            </div>
           </div>
           {style !== 'compact' ? (
             <PlaybackPosition value={progressSeconds} duration={track.duration} onChange={onProgressChange} />

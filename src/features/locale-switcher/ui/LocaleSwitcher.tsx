@@ -36,7 +36,7 @@ export const LocaleSwitcher = ({ disabled = false, onPendingChange }: LocaleSwit
         onFocus={prefetchOtherLocale}
         aria-label={t('label')}
         title={isDisabled ? t('busy') : t('label')}
-        className="inline-flex h-8 cursor-pointer items-center justify-center gap-1 rounded-md px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait disabled:opacity-50 data-popup-open:bg-accent data-popup-open:text-foreground"
+        className="inline-flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait disabled:opacity-50 data-popup-open:bg-accent data-popup-open:text-foreground sm:h-8"
       >
         <Languages className="size-4" aria-hidden="true" />
         <ChevronDown className="size-3" aria-hidden="true" />
